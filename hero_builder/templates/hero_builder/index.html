@@ -1,0 +1,31 @@
+{% extends "hero_builder/base.html" %}
+
+{% block title %}Hero Builder - Olden Era Calculator{% endblock %}
+
+{% block content %}
+<h1 style="color: #d4af37; margin-bottom: 20px;">Select a Hero to Build</h1>
+
+<div class="faction-grid">
+    {% for faction in factions %}
+    <div class="faction-card">
+        <h2>{{ faction.name }}</h2>
+        <ul class="hero-list">
+            {% for hero in faction.heroes.all %}
+            <li>
+                <a href="{% url 'hero_builder:builder' hero.slug %}">
+                    <span>{{ hero.display_name }}</span>
+                    <span class="hero-class">{{ hero.class_type|title }}</span>
+                </a>
+            </li>
+            {% empty %}
+            <li style="color: #666;">No heroes available</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% empty %}
+    <div class="faction-card">
+        <p style="color: #666;">No factions available. Please import game data.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

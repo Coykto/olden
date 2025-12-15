@@ -1,0 +1,27 @@
+{% extends "hero_builder/base.html" %}
+
+{% block title %}No Data - Olden Era Calculator{% endblock %}
+
+{% block content %}
+<div class="section" style="text-align: center; padding: 60px 20px;">
+    <h1 style="color: #d4af37; font-size: 2.5rem; margin-bottom: 20px;">⚠️ No Game Data Found</h1>
+    <p style="font-size: 1.2rem; color: #aaa; margin-bottom: 30px;">
+        The database is empty. Please import game data first.
+    </p>
+
+    <div style="background: #2a2a2a; border: 1px solid #444; border-radius: 8px; padding: 30px; max-width: 600px; margin: 0 auto; text-align: left;">
+        <h2 style="color: #d4af37; margin-bottom: 15px;">To import game data:</h2>
+        <ol style="color: #ccc; line-height: 2; padding-left: 20px;">
+            <li>Make sure Heroes of Might & Magic: Olden Era is installed</li>
+            <li>Verify the game path in <code style="background: #1a1a1a; padding: 2px 6px; border-radius: 3px;">config/settings.py</code></li>
+            <li>Run the import command:</li>
+        </ol>
+
+        <pre style="background: #1a1a1a; color: #0f0; padding: 15px; border-radius: 4px; margin-top: 15px; overflow-x: auto;">python manage.py import_gamedata</pre>
+
+        <p style="color: #888; margin-top: 20px; font-size: 0.9rem;">
+            This will extract and parse all game data from your installation directory.
+        </p>
+    </div>
+</div>
+{% endblock %}

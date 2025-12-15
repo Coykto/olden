@@ -1,0 +1,10 @@
+[project]
+name = "olden-calc"
+version = "0.1.0"
+description = "Heroes of Might and Magic: Olden Era calculators and hero builder"
+requires-python = ">=3.10"
+dependencies = [
+    "django>=5.0",
+    "fastapi>=0.124.4",
+    "uvicorn>=0.38.0",
+]
