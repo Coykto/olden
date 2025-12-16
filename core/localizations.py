@@ -160,6 +160,53 @@ def get_skill_param_mappings() -> dict:
 
 
 @lru_cache(maxsize=1)
+def get_subskill_configs() -> dict:
+    """
+    Load subskill configurations from game files.
+    Returns a dict mapping subskill_id -> subskill config data.
+    """
+    # Try multiple possible locations for subskill data
+    possible_paths = [
+        Path("/tmp/DB/heroes_skills/sub_skills/sub_skills.json"),
+        Path(settings.GAME_DATA_PATH) / "DB" / "heroes_skills" / "sub_skills" / "sub_skills.json",
+    ]
+
+    for path in possible_paths:
+        if path.exists():
+            try:
+                with open(path, 'r', encoding='utf-8-sig') as f:
+                    data = json.load(f)
+                    # Convert array to dict keyed by id
+                    return {item['id']: item for item in data.get('array', [])}
+            except Exception:
+                continue
+
+    return {}
+
+
+def _extract_subskill_values(subskill_config: dict) -> list:
+    """Extract numeric values from subskill bonuses."""
+    values = []
+
+    for bonus in subskill_config.get('bonuses', []):
+        params = bonus.get('parameters', [])
+        # Look for numeric values in parameters
+        for param in params:
+            if isinstance(param, str):
+                try:
+                    num = float(param)
+                    # Convert percentages (values < 1) to whole numbers
+                    if 0 < abs(num) < 1:
+                        values.append(int(abs(num) * 100))
+                    elif num != 0:
+                        values.append(int(abs(num)))
+                except ValueError:
+                    pass
+
+    return values if values else [10]  # Fallback default
+
+
+@lru_cache(maxsize=1)
 def get_localizations(lang: str = "english") -> dict:
     """
     Load localization strings from game files.
@@ -270,16 +317,47 @@ def _extract_skill_values(skill_data: dict, skill_id: str, level: int = 1) -> li
 
 def get_skill_info(skill_id: str, level: int = 1) -> dict:
     """
-    Get display info for a skill.
+    Get display info for a skill or subskill.
 
-    Uses pre-extracted values from the database (populated at import time).
-    Falls back to runtime extraction only if database values are not available.
+    For regular skills: Uses pre-extracted values from the database.
+    For subskills: Loads data from subskill config files.
     """
     from gamedata.models import Skill
 
     localizations = get_localizations()
 
-    # Get skill from database
+    # Handle subskills specially - they're stored in a separate config file
+    if skill_id.startswith('sub_skill_'):
+        subskill_configs = get_subskill_configs()
+        subskill_config = subskill_configs.get(skill_id, {})
+
+        # Extract values from subskill bonuses
+        skill_values = _extract_subskill_values(subskill_config) if subskill_config else [10]
+
+        # Get localized name and description
+        name = (
+            localizations.get(f"{skill_id}_name") or
+            localizations.get(skill_id) or
+            subskill_config.get('name', skill_id.replace("sub_skill_", "").replace("_", " ").title())
+        )
+
+        desc_key = subskill_config.get('desc', f"{skill_id}_desc")
+        description = localizations.get(desc_key) or localizations.get(f"{skill_id}_desc") or ""
+
+        # Replace placeholders with values
+        def replace_placeholder(match):
+            index = int(match.group(1))
+            return str(skill_values[index] if index < len(skill_values) else "?")
+
+        description = re.sub(r'\{(\d+)\}', replace_placeholder, description)
+
+        return {
+            "id": skill_id,
+            "name": name,
+            "description": description,
+        }
+
+    # Regular skill handling
     skill = None
     skill_data = None
     skill_values = []

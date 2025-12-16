@@ -23,6 +23,8 @@ urlpatterns = [
 
     # API endpoints - Skills
     path('api/skills/', views.api_skills_combat, name='api_skills'),
+    path('api/skills/available/', views.api_available_skills, name='api_available_skills'),
+    path('api/skills/<str:skill_id>/level/<int:level>/subskills/', views.api_skill_subskills, name='api_skill_subskills'),
 
     # API endpoints - Calculator
     path('api/calculate-damage/', views.api_calculate_damage, name='api_calculate_damage'),

@@ -399,6 +399,75 @@ def api_calculate_damage(request):
     return JsonResponse(response)
 
 
+def api_available_skills(request):
+    """
+    API endpoint to get skills available for selection.
+    Filters by faction to exclude other factions' skills.
+    """
+    version = GameVersion.objects.filter(is_active=True).first()
+    if not version:
+        return JsonResponse({'error': 'No active game version'}, status=404)
+
+    faction_id = request.GET.get('faction', '')
+    exclude_ids = request.GET.get('exclude', '').split(',') if request.GET.get('exclude') else []
+
+    # Get the faction's own faction skill
+    faction = Faction.objects.filter(version=version, id_key=faction_id).first()
+    allowed_faction_skill = faction.faction_skill if faction else None
+
+    # Get all other factions' skills to exclude
+    other_faction_skills = set(
+        Faction.objects.filter(version=version)
+        .exclude(id_key=faction_id)
+        .exclude(faction_skill='')
+        .values_list('faction_skill', flat=True)
+    )
+
+    skills_data = []
+    for skill in Skill.objects.filter(version=version).order_by('skill_type', 'id_key'):
+        # Skip if already selected
+        if skill.id_key in exclude_ids:
+            continue
+        # For Faction-type skills, only allow the hero's own faction skill
+        if skill.skill_type == 'Faction':
+            if skill.id_key != allowed_faction_skill:
+                continue
+
+        info = get_skill_info(skill.id_key, level=1)
+
+        # Get ALL subskills from level 2 and level 3 data
+        subskill_preview = []
+        params = skill.raw_data.get('parametersPerLevel', [])
+
+        # Collect subskill IDs from both levels
+        all_subskill_ids = []
+        if len(params) >= 2:
+            all_subskill_ids.extend(params[1].get('subSkills', []))
+        if len(params) >= 3:
+            all_subskill_ids.extend(params[2].get('subSkills', []))
+
+        # Get full info for each subskill
+        for sub_id in all_subskill_ids:
+            sub_info = get_skill_info(sub_id, level=1)
+            subskill_preview.append({
+                'id': sub_id,
+                'name': sub_info['name'],
+                'description': sub_info['description'],
+                'icon': f'{sub_id}_icon',  # Subskill icons have _icon suffix
+            })
+
+        skills_data.append({
+            'id': skill.id_key,
+            'type': skill.skill_type,
+            'name': info['name'],
+            'description': info['description'],
+            'icon': skill.id_key,
+            'subskill_preview': subskill_preview,
+        })
+
+    return JsonResponse({'skills': skills_data})
+
+
 def api_skills_combat(request):
     """API endpoint to get skills with combat effects."""
     version = GameVersion.objects.filter(is_active=True).first()
@@ -420,3 +489,51 @@ def api_skills_combat(request):
         })
 
     return JsonResponse({'skills': skills_data})
+
+
+def api_skill_subskills(request, skill_id, level):
+    """
+    API endpoint to get subskills when leveling up a skill.
+    """
+    version = GameVersion.objects.filter(is_active=True).first()
+    if not version:
+        return JsonResponse({'error': 'No active game version'}, status=404)
+
+    if level not in [2, 3]:
+        return JsonResponse({'error': 'Level must be 2 or 3'}, status=400)
+
+    skill = Skill.objects.filter(version=version, id_key=skill_id).first()
+    if not skill:
+        return JsonResponse({'error': 'Skill not found'}, status=404)
+
+    # Get upgraded skill info
+    skill_info = get_skill_info(skill_id, level=level)
+    icon_suffix = f'_{level}' if level > 1 else ''
+
+    # Get subskills from raw_data
+    params = skill.raw_data.get('parametersPerLevel', [])
+    if len(params) < level:
+        return JsonResponse({'error': 'Invalid skill level data'}, status=500)
+
+    subskill_ids = params[level - 1].get('subSkills', [])
+
+    subskills_data = []
+    for sub_id in subskill_ids:
+        sub_info = get_skill_info(sub_id, level=1)
+        subskills_data.append({
+            'id': sub_id,
+            'name': sub_info['name'],
+            'description': sub_info['description'],
+            'icon': f'{sub_id}_icon',  # Subskill icons have _icon suffix
+        })
+
+    return JsonResponse({
+        'skill': {
+            'id': skill_id,
+            'level': level,
+            'name': skill_info['name'],
+            'description': skill_info['description'],
+            'icon': f'{skill_id}{icon_suffix}',
+        },
+        'subskills': subskills_data,
+    })

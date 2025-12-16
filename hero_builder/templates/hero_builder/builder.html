@@ -245,7 +245,21 @@
 
     .subskill-btn.disabled {
         opacity: 0.4;
-        cursor: default;
+        cursor: not-allowed;
+    }
+
+    .subskill-btn.filled {
+        cursor: pointer;
+    }
+
+    .subskill-btn.filled .tooltip-content {
+        left: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        margin-left: 10px;
+        min-width: 200px;
+        max-width: 280px;
+        white-space: normal;
     }
 
     .subskill-btn .add-text {
@@ -492,6 +506,215 @@
             justify-content: center;
         }
     }
+
+    /* Modal Overlay */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.85);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    /* Skill Selection Modal */
+    .skill-modal {
+        background: linear-gradient(180deg, #1a2030 0%, #141820 100%);
+        border: 2px solid #3a4555;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 700px;
+        max-height: 80vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .modal-header {
+        padding: 20px;
+        border-bottom: 1px solid #2a3545;
+    }
+
+    .modal-header h2 {
+        color: #c9a227;
+        font-size: 1.3rem;
+        margin: 0 0 15px 0;
+        text-transform: uppercase;
+    }
+
+    .skill-search {
+        width: 100%;
+        padding: 12px 15px;
+        background: #252d38;
+        border: 1px solid #3a4555;
+        border-radius: 8px;
+        color: #fff;
+        font-size: 1rem;
+    }
+
+    .skill-search::placeholder {
+        color: #5a6575;
+    }
+
+    .skill-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 10px;
+    }
+
+    /* Skill Option */
+    .skill-option {
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+        padding: 15px;
+        margin: 8px 0;
+        background: #1e2530;
+        border: 2px solid #2a3545;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .skill-option:hover {
+        border-color: #5a7090;
+        background: #252d38;
+    }
+
+    .skill-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 8px;
+        border: 1px solid #3a4555;
+    }
+
+    .skill-info {
+        flex: 1;
+    }
+
+    .skill-name {
+        color: #c9a227;
+        font-size: 1.1rem;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .skill-desc {
+        color: #8899aa;
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+
+    .subskill-previews {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 4px;
+        max-width: 140px;
+        justify-content: flex-end;
+        align-content: flex-start;
+        align-self: flex-start;
+    }
+
+    .subskill-preview-wrapper {
+        position: relative;
+    }
+
+    .subskill-preview-wrapper .tooltip-content {
+        left: auto;
+        right: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        margin-right: 10px;
+        min-width: 200px;
+        max-width: 280px;
+        white-space: normal;
+        z-index: 1001;
+    }
+
+    .subskill-preview-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 4px;
+        opacity: 0.7;
+        transition: opacity 0.2s;
+    }
+
+    .subskill-preview-wrapper:hover .subskill-preview-icon {
+        opacity: 1;
+    }
+
+    /* Subskill Selection Modal */
+    .subskill-modal {
+        background: linear-gradient(180deg, #1a2030 0%, #141820 100%);
+        border: 2px solid #3a4555;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 600px;
+        padding: 20px;
+    }
+
+    .upgraded-skill {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        background: #1e2530;
+        border: 2px solid #c9a227;
+        border-radius: 10px;
+    }
+
+    .skill-icon-large {
+        width: 70px;
+        height: 70px;
+        border-radius: 8px;
+    }
+
+    .subskill-options {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .subskill-option {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px;
+        background: #1e2530;
+        border: 2px solid #2a3545;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .subskill-option:hover {
+        border-color: #5a9090;
+        background: #252d38;
+    }
+
+    .subskill-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 8px;
+    }
+
+    .subskill-name {
+        color: #7ec8e3;
+        font-size: 1rem;
+        font-weight: bold;
+        margin-bottom: 4px;
+    }
+
+    .subskill-desc {
+        color: #8899aa;
+        font-size: 0.85rem;
+        line-height: 1.3;
+    }
 </style>
 {% endblock %}
 
@@ -505,7 +728,7 @@
     <div class="main-with-sidebar">
         <div class="main-column">
             <!-- Hero Card -->
-            <div class="hero-card">
+            <div class="hero-card" data-hero-faction="{{ hero.faction.slug }}" data-hero-id="{{ hero.game_id }}">
                 <div class="hero-header">
                     <!-- Portrait Column -->
                     <div class="portrait-column">
@@ -754,4 +977,468 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<div id="skill-modal-container"></div>
+
+<script>
+// Client-side state for hero build
+const heroBuild = {
+    heroId: '',
+    heroFaction: '',
+    skills: [],  // Array of 8 slots: {skillId, level, subskills} or null
+    startingSkillIds: []
+};
+
+const SkillManager = {
+    init() {
+        // Get hero info from DOM
+        const heroCard = document.querySelector('[data-hero-faction]');
+        heroBuild.heroFaction = heroCard?.dataset.heroFaction || '';
+        heroBuild.heroId = heroCard?.dataset.heroId || '';
+
+        // Initialize skills array with 8 slots
+        heroBuild.skills = new Array(8).fill(null);
+
+        // Get starting skills from DOM
+        const skillSlots = document.querySelectorAll('.skill-with-subs');
+        skillSlots.forEach((slot, index) => {
+            const skillMain = slot.querySelector('.skill-main');
+            const skillId = skillMain?.dataset.skillId;
+            const skillLevel = parseInt(skillMain?.dataset.skillLevel) || 1;
+
+            if (skillId) {
+                // Extract name and description from tooltip if present
+                const tooltipName = skillMain.querySelector('.tooltip-name')?.textContent || skillId;
+                const tooltipDesc = skillMain.querySelector('.tooltip-desc')?.textContent || '';
+
+                // Remove level prefix from name if it exists
+                const name = tooltipName.replace(/^(Basic|Advanced|Expert)\s+/, '');
+
+                heroBuild.skills[index] = {
+                    skillId: skillId,
+                    level: skillLevel,
+                    subskills: [null, null],
+                    subskillNames: [null, null],
+                    subskillDescs: [null, null],
+                    name: name,
+                    description: tooltipDesc
+                };
+                heroBuild.startingSkillIds.push(skillId);
+            }
+        });
+
+        // Set up all click handlers (including subskill buttons for starting skills)
+        this.updateUI();
+    },
+
+    setupClickHandlers() {
+        const skillSlots = document.querySelectorAll('.skill-with-subs');
+        skillSlots.forEach((slot, index) => {
+            const skillMain = slot.querySelector('.skill-main');
+
+            // Check if it's an empty slot
+            if (heroBuild.skills[index] === null) {
+                skillMain.style.cursor = 'pointer';
+                skillMain.onclick = () => SkillSelectionModal.open(index);
+            }
+        });
+    },
+
+    addSkill(slotIndex, skillId, skillName, skillIcon, skillDescription) {
+        heroBuild.skills[slotIndex] = {
+            skillId: skillId,
+            level: 1,
+            subskills: [null, null],
+            subskillNames: [null, null],
+            subskillDescs: [null, null],
+            name: skillName,
+            icon: skillIcon,
+            description: skillDescription || ''
+        };
+        this.updateUI();
+    },
+
+    getSelectedSkillIds() {
+        return heroBuild.skills
+            .filter(s => s !== null)
+            .map(s => s.skillId);
+    },
+
+    levelUpSkill(slotIndex, subskillId, subskillName, subskillDesc) {
+        const skill = heroBuild.skills[slotIndex];
+        if (!skill || skill.level >= 3) return;
+
+        // Store subskill at the appropriate index (0 for Basic→Advanced, 1 for Advanced→Expert)
+        const subskillIndex = skill.level - 1;
+        skill.subskills[subskillIndex] = subskillId;
+        skill.subskillNames[subskillIndex] = subskillName;
+        skill.subskillDescs[subskillIndex] = subskillDesc || '';
+
+        // Increase level
+        skill.level++;
+
+        // Update UI
+        this.updateUI();
+    },
+
+    repickSubskill(slotIndex, subskillSlot, subskillId, subskillName, subskillDesc) {
+        const skill = heroBuild.skills[slotIndex];
+        if (!skill) return;
+
+        // Replace the subskill at the specified slot (no level change)
+        skill.subskills[subskillSlot] = subskillId;
+        skill.subskillNames[subskillSlot] = subskillName;
+        skill.subskillDescs[subskillSlot] = subskillDesc || '';
+
+        // Update UI
+        this.updateUI();
+    },
+
+    removeSkill(slotIndex) {
+        const skill = heroBuild.skills[slotIndex];
+        if (!skill) return;
+
+        // Can't remove starting skills
+        if (heroBuild.startingSkillIds.includes(skill.skillId)) {
+            alert('Cannot remove starting skills');
+            return;
+        }
+
+        // Reset slot
+        heroBuild.skills[slotIndex] = null;
+        this.updateUI();
+    },
+
+    updateUI() {
+        const skillSlots = document.querySelectorAll('.skill-with-subs');
+
+        heroBuild.skills.forEach((skill, index) => {
+            if (index >= skillSlots.length) return;
+
+            const slot = skillSlots[index];
+            const skillMain = slot.querySelector('.skill-main');
+            const subskillBtns = slot.querySelectorAll('.subskill-btn');
+
+            if (skill === null) {
+                // Empty slot - show plus sign
+                skillMain.innerHTML = '<span class="skill-add-text">+</span>';
+                skillMain.style.cursor = 'pointer';
+                skillMain.onclick = () => SkillSelectionModal.open(index);
+                skillMain.oncontextmenu = null;
+                skillMain.removeAttribute('data-skill-id');
+
+                // Disable both subskill buttons
+                subskillBtns.forEach(btn => {
+                    btn.className = 'subskill-btn disabled';
+                    btn.innerHTML = '';
+                    btn.onclick = null;
+                });
+            } else {
+                // Filled slot - show skill icon with tooltip
+                const iconSuffix = skill.level > 1 ? `_${skill.level}` : '';
+                const levelPrefix = skill.level === 1 ? 'Basic ' : skill.level === 2 ? 'Advanced ' : 'Expert ';
+
+                skillMain.className = 'skill-main tooltip-wrapper';
+                skillMain.innerHTML = `
+                    <img src="/media/gamedata/skills/${skill.skillId}${iconSuffix}.png" alt="${skill.name || skill.skillId}">
+                    <div class="tooltip-content">
+                        <div class="tooltip-name">${levelPrefix}${skill.name || skill.skillId}</div>
+                        ${skill.description ? `<div class="tooltip-desc">${skill.description}</div>` : ''}
+                    </div>
+                `;
+                skillMain.dataset.skillId = skill.skillId;
+                skillMain.dataset.skillLevel = skill.level;
+
+                // Add right-click to remove (only for non-starting skills)
+                if (!heroBuild.startingSkillIds.includes(skill.skillId)) {
+                    skillMain.oncontextmenu = (e) => {
+                        e.preventDefault();
+                        if (confirm(`Remove ${skill.name || skill.skillId}?`)) {
+                            SkillManager.removeSkill(index);
+                        }
+                    };
+                } else {
+                    skillMain.oncontextmenu = null;
+                }
+
+                // First subskill button
+                if (skill.level === 1) {
+                    // Can level up to Advanced
+                    subskillBtns[0].className = 'subskill-btn';
+                    subskillBtns[0].innerHTML = '<span class="add-text">+</span>';
+                    subskillBtns[0].onclick = () => SubskillSelectionModal.open(index);
+                } else if (!skill.subskills[0]) {
+                    // Level 2+ but no first subskill yet (e.g., Lord Edgar starts at Advanced)
+                    // Allow selecting first subskill without leveling up
+                    subskillBtns[0].className = 'subskill-btn';
+                    subskillBtns[0].innerHTML = '<span class="add-text">+</span>';
+                    subskillBtns[0].onclick = () => SubskillSelectionModal.openForRepick(index, 0);
+                } else {
+                    // Show selected subskill with tooltip - clickable to repick
+                    subskillBtns[0].className = 'subskill-btn filled tooltip-wrapper';
+                    subskillBtns[0].innerHTML = `
+                        <img src="/media/gamedata/skills/${skill.subskills[0]}_icon.png">
+                        <div class="tooltip-content">
+                            <div class="tooltip-name">${skill.subskillNames[0] || skill.subskills[0]}</div>
+                            ${skill.subskillDescs[0] ? `<div class="tooltip-desc">${skill.subskillDescs[0]}</div>` : ''}
+                        </div>
+                    `;
+                    subskillBtns[0].style.cursor = 'pointer';
+                    subskillBtns[0].onclick = () => SubskillSelectionModal.openForRepick(index, 0);
+                }
+
+                // Second subskill button
+                if (skill.level < 2) {
+                    // Skill is Basic - second subskill not available
+                    subskillBtns[1].className = 'subskill-btn disabled';
+                    subskillBtns[1].innerHTML = '';
+                    subskillBtns[1].onclick = null;
+                } else if (skill.level === 2 && skill.subskills[0]) {
+                    // Advanced with first subskill - can level up to Expert
+                    subskillBtns[1].className = 'subskill-btn';
+                    subskillBtns[1].innerHTML = '<span class="add-text">+</span>';
+                    subskillBtns[1].onclick = () => SubskillSelectionModal.open(index);
+                } else if (skill.level === 2 && !skill.subskills[0]) {
+                    // Advanced but no first subskill - must pick first subskill first
+                    subskillBtns[1].className = 'subskill-btn disabled';
+                    subskillBtns[1].innerHTML = '';
+                    subskillBtns[1].onclick = null;
+                } else if (skill.level === 3 && !skill.subskills[1]) {
+                    // Expert but no second subskill yet - allow selecting without level change
+                    subskillBtns[1].className = 'subskill-btn';
+                    subskillBtns[1].innerHTML = '<span class="add-text">+</span>';
+                    subskillBtns[1].onclick = () => SubskillSelectionModal.openForRepick(index, 1);
+                } else if (skill.subskills[1]) {
+                    // Show selected subskill with tooltip - clickable to repick
+                    subskillBtns[1].className = 'subskill-btn filled tooltip-wrapper';
+                    subskillBtns[1].innerHTML = `
+                        <img src="/media/gamedata/skills/${skill.subskills[1]}_icon.png">
+                        <div class="tooltip-content">
+                            <div class="tooltip-name">${skill.subskillNames[1] || skill.subskills[1]}</div>
+                            ${skill.subskillDescs[1] ? `<div class="tooltip-desc">${skill.subskillDescs[1]}</div>` : ''}
+                        </div>
+                    `;
+                    subskillBtns[1].style.cursor = 'pointer';
+                    subskillBtns[1].onclick = () => SubskillSelectionModal.openForRepick(index, 1);
+                }
+            }
+        });
+    }
+};
+
+// Skill Selection Modal with API integration
+const SkillSelectionModal = {
+    allSkills: [],
+    slotIndex: null,
+
+    async open(slotIndex) {
+        this.slotIndex = slotIndex;
+
+        // Get faction from hero card data attribute
+        const heroFaction = document.querySelector('[data-hero-faction]')?.dataset.heroFaction || '';
+        const excludeIds = SkillManager.getSelectedSkillIds().join(',');
+
+        // Fetch skills from API
+        try {
+            const response = await fetch(`/api/skills/available/?faction=${heroFaction}&exclude=${excludeIds}`);
+            const data = await response.json();
+            this.allSkills = data.skills || [];
+            this.render(this.allSkills);
+        } catch (error) {
+            console.error('Error fetching skills:', error);
+            // Show error state
+            const container = document.getElementById('skill-modal-container');
+            container.innerHTML = `
+                <div class="modal-overlay" onclick="SkillSelectionModal.close()">
+                    <div class="skill-modal" onclick="event.stopPropagation()">
+                        <div class="modal-header">
+                            <h2>Select Skill</h2>
+                            <p style="color: #ff6666;">Error loading skills. Please try again.</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    },
+
+    render(skills) {
+        const container = document.getElementById('skill-modal-container');
+        container.innerHTML = `
+            <div class="modal-overlay" onclick="SkillSelectionModal.close()">
+                <div class="skill-modal" onclick="event.stopPropagation()">
+                    <div class="modal-header">
+                        <h2>Select Skill</h2>
+                        <input type="text"
+                               class="skill-search"
+                               placeholder="Search skills..."
+                               oninput="SkillSelectionModal.filter(this.value)">
+                    </div>
+                    <div class="skill-list" id="skill-list">
+                        ${skills.map(s => this.renderSkillOption(s)).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    renderSkillOption(skill) {
+        return `
+            <div class="skill-option" data-skill-id="${skill.id}"
+                 onclick="SkillSelectionModal.select('${skill.id}')">
+                <img src="/media/gamedata/skills/${skill.icon}.png" class="skill-icon" alt="${skill.name}">
+                <div class="skill-info">
+                    <div class="skill-name">BASIC ${skill.name.toUpperCase()}</div>
+                    <div class="skill-desc">${skill.description}</div>
+                </div>
+                <div class="subskill-previews">
+                    ${(skill.subskill_preview || []).map(sub =>
+                        `<div class="subskill-preview-wrapper tooltip-wrapper">
+                            <img src="/media/gamedata/skills/${sub.icon}.png" class="subskill-preview-icon" alt="${sub.name}">
+                            <div class="tooltip-content">
+                                <div class="tooltip-name">${sub.name}</div>
+                                <div class="tooltip-desc">${sub.description}</div>
+                            </div>
+                        </div>`
+                    ).join('')}
+                </div>
+            </div>
+        `;
+    },
+
+    filter(searchText) {
+        const filtered = this.allSkills.filter(s =>
+            s.name.toLowerCase().includes(searchText.toLowerCase())
+        );
+        document.getElementById('skill-list').innerHTML =
+            filtered.map(s => this.renderSkillOption(s)).join('');
+    },
+
+    select(skillId) {
+        const skill = this.allSkills.find(s => s.id === skillId);
+        if (skill) {
+            SkillManager.addSkill(this.slotIndex, skill.id, skill.name, skill.icon, skill.description);
+        }
+        this.close();
+    },
+
+    close() {
+        document.getElementById('skill-modal-container').innerHTML = '';
+    }
+};
+
+const SubskillSelectionModal = {
+    slotIndex: null,
+    subskillSlot: null,  // 0 or 1, for repicking
+    isRepick: false,
+
+    async open(slotIndex) {
+        this.slotIndex = slotIndex;
+        this.subskillSlot = null;
+        this.isRepick = false;
+        const skill = heroBuild.skills[slotIndex];
+        if (!skill) return;
+
+        const nextLevel = skill.level + 1;
+        if (nextLevel > 3) return;  // Already at max level
+
+        try {
+            const response = await fetch(`/api/skills/${skill.skillId}/level/${nextLevel}/subskills/`);
+            if (!response.ok) throw new Error('Failed to fetch subskills');
+            const data = await response.json();
+            this.render(data);
+        } catch (error) {
+            console.error('Error loading subskills:', error);
+        }
+    },
+
+    async openForRepick(slotIndex, subskillSlot) {
+        this.slotIndex = slotIndex;
+        this.subskillSlot = subskillSlot;
+        this.isRepick = true;
+        const skill = heroBuild.skills[slotIndex];
+        if (!skill) return;
+
+        // subskillSlot 0 = level 2 subskills, subskillSlot 1 = level 3 subskills
+        const level = subskillSlot + 2;
+
+        try {
+            const response = await fetch(`/api/skills/${skill.skillId}/level/${level}/subskills/`);
+            if (!response.ok) throw new Error('Failed to fetch subskills');
+            const data = await response.json();
+            this.render(data);
+        } catch (error) {
+            console.error('Error loading subskills:', error);
+        }
+    },
+
+    render(data) {
+        const container = document.getElementById('skill-modal-container');
+        container.innerHTML = `
+            <div class="modal-overlay" onclick="SubskillSelectionModal.close()">
+                <div class="subskill-modal" onclick="event.stopPropagation()">
+                    <div class="upgraded-skill">
+                        <img src="/media/gamedata/skills/${data.skill.icon}.png" class="skill-icon-large">
+                        <div class="skill-info">
+                            <div class="skill-name">${data.skill.name.toUpperCase()}</div>
+                            <div class="skill-desc">${data.skill.description}</div>
+                        </div>
+                    </div>
+                    <div class="subskill-options">
+                        ${data.subskills.map(sub => this.renderSubskillOption(sub)).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    renderSubskillOption(subskill) {
+        return `
+            <div class="subskill-option" onclick="SubskillSelectionModal.select('${subskill.id}')">
+                <img src="/media/gamedata/skills/${subskill.icon}.png" class="subskill-icon">
+                <div class="subskill-info">
+                    <div class="subskill-name">${subskill.name}</div>
+                    <div class="subskill-desc">${subskill.description}</div>
+                </div>
+            </div>
+        `;
+    },
+
+    select(subskillId) {
+        // Find the subskill name and description from the rendered data
+        const subskillElement = document.querySelector(`.subskill-option[onclick*="${subskillId}"]`);
+        const subskillName = subskillElement ?
+            subskillElement.querySelector('.subskill-name')?.textContent :
+            subskillId;
+        const subskillDesc = subskillElement ?
+            subskillElement.querySelector('.subskill-desc')?.textContent :
+            '';
+
+        if (this.isRepick) {
+            SkillManager.repickSubskill(this.slotIndex, this.subskillSlot, subskillId, subskillName, subskillDesc);
+        } else {
+            SkillManager.levelUpSkill(this.slotIndex, subskillId, subskillName, subskillDesc);
+        }
+        this.close();
+    },
+
+    close() {
+        document.getElementById('skill-modal-container').innerHTML = '';
+    }
+};
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    SkillManager.init();
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            SkillSelectionModal.close();
+            SubskillSelectionModal.close();
+        }
+    });
+});
+</script>
 {% endblock %}
