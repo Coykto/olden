@@ -17,7 +17,8 @@ class AssetExtractor:
         'hero_portraits': re.compile(r'^hero_(human|necromancer|dungeon|unfrozen)_\d+_\w+$'),
         'hero_portraits_large': re.compile(r'^hero_(human|necromancer|dungeon|unfrozen)_\d+_\w+_large$'),
         'unit_icons': re.compile(r'^[a-z_]+_(icon|diffuse)$'),
-        'skill_icons': re.compile(r'^(skill_|sub_skill_|sub_class_)'),
+        'skill_icons': re.compile(r'^(skill_|sub_skill_)'),
+        'advanced_class_icons': re.compile(r'^sub_class_'),
         'item_icons': re.compile(r'_artifact$'),
         'faction_icons': re.compile(r'^fraction_(human|undead|dungeon|unfrozen|demon|nature)'),
     }
@@ -40,6 +41,11 @@ class AssetExtractor:
         'might_dungeon_icon', 'magic_dungeon_icon',
         'might_unfrozen_icon', 'magic_unfrozen_icon',
     ]
+    # Generic class type icons (source name -> destination name)
+    GENERIC_CLASS_ICONS = {
+        'wip_might_specialization_icon': 'might_icon',
+        'wip_mage_specialization_icon': 'magic_icon',
+    }
 
     def extract_all(self, force: bool = False) -> Dict[str, int]:
         """
@@ -61,6 +67,9 @@ class AssetExtractor:
 
         # Extract skill icons
         results['skills'] = self._extract_skill_icons(force)
+
+        # Extract advanced class icons
+        results['advanced_classes'] = self._extract_advanced_class_icons(force)
 
         # Extract item icons
         results['items'] = self._extract_by_pattern('items', self.PATTERNS['item_icons'], force)
@@ -235,9 +244,9 @@ class AssetExtractor:
                 data = obj.read()
                 name = data.m_Name
 
-                # Match skill icons (skill_* but not effects/abilities)
+                # Match skill icons (skill_* but not effects/abilities, and not sub_class_)
                 if name.startswith('skill_') and data.m_Width == 256:
-                    if 'effect' not in name.lower() and 'ability' not in name.lower():
+                    if 'effect' not in name.lower() and 'ability' not in name.lower() and not name.startswith('sub_class_'):
                         out_file = output_path / f"{name}.png"
 
                         if not force and out_file.exists():
@@ -252,12 +261,51 @@ class AssetExtractor:
 
         return count
 
+    def _extract_advanced_class_icons(self, force: bool = False) -> int:
+        """Extract advanced class icons (sub_class_* textures)."""
+        output_path = self.output_dir / "advanced_classes"
+        output_path.mkdir(parents=True, exist_ok=True)
+
+        count = 0
+        # Advanced class icons are in resources.assets
+        resources_path = self.game_data_path / "resources.assets"
+
+        if not resources_path.exists():
+            return 0
+
+        env = UnityPy.load(str(resources_path))
+
+        for obj in env.objects:
+            if obj.type.name != 'Texture2D':
+                continue
+
+            try:
+                data = obj.read()
+                name = data.m_Name
+
+                # Match advanced class icons (sub_class_* icons)
+                if name.startswith('sub_class_') and '_icon' in name:
+                    out_file = output_path / f"{name}.png"
+
+                    if not force and out_file.exists():
+                        continue
+
+                    image = data.image
+                    image.save(str(out_file))
+                    count += 1
+
+            except Exception:
+                pass
+
+        return count
+
     def _extract_ui_icons(self, force: bool = False) -> int:
-        """Extract UI icons (faction icons, class icons)."""
+        """Extract UI icons (faction icons, class icons, generic class type icons)."""
         output_path = self.output_dir / "ui"
         output_path.mkdir(parents=True, exist_ok=True)
 
         icons_to_find = set(self.FACTION_ICONS + self.CLASS_ICONS)
+        generic_icons = self.GENERIC_CLASS_ICONS  # source_name -> dest_name mapping
         count = 0
 
         for asset_file in self.game_data_path.glob("*.assets"):
@@ -272,8 +320,21 @@ class AssetExtractor:
                         data = obj.read()
                         name = data.m_Name
 
+                        # Check for exact match icons
                         if name in icons_to_find:
                             out_file = output_path / f"{name}.png"
+
+                            if not force and out_file.exists():
+                                continue
+
+                            image = data.image
+                            image.save(str(out_file))
+                            count += 1
+
+                        # Check for generic class icons (with name mapping)
+                        elif name in generic_icons:
+                            dest_name = generic_icons[name]
+                            out_file = output_path / f"{dest_name}.png"
 
                             if not force and out_file.exists():
                                 continue

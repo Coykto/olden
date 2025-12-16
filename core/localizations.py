@@ -419,3 +419,11 @@ def get_skill_info(skill_id: str, level: int = 1) -> dict:
         "name": name,
         "description": description,
     }
+
+
+def get_advanced_class_info(class_id: str) -> dict:
+    """Get display info for an advanced class."""
+    localizations = get_localizations()
+    name = localizations.get(f"{class_id}_name", class_id.replace("_", " ").title())
+    description = localizations.get(f"{class_id}_desc", "")
+    return {"id": class_id, "name": name, "description": description}

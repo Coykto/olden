@@ -9,7 +9,7 @@ import re
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils.text import slugify
-from gamedata.models import GameVersion, Faction, Unit, Hero, Skill, Item, Spell, UnitAbility, CombatModifier
+from gamedata.models import GameVersion, Faction, Unit, Hero, Skill, Item, Spell, UnitAbility, CombatModifier, AdvancedClass
 from core.data_reader import GameDataReader
 from core.asset_extractor import AssetExtractor
 from core.skill_value_extractor import SkillValueExtractor
@@ -82,6 +82,7 @@ class Command(BaseCommand):
                 self._import_units(reader, version, localizations)
                 self._import_heroes(reader, version, localizations)
                 self._import_skills(reader, version)
+                self._import_advanced_classes(reader, version)
                 self._import_items(reader, version)
                 self._import_spells(reader, version)
 
@@ -339,6 +340,41 @@ class Command(BaseCommand):
 
         Item.objects.bulk_create(item_objects)
         self.stdout.write(f"  Created {len(item_objects)} items")
+
+    def _import_advanced_classes(self, reader: GameDataReader, version: GameVersion):
+        """Import advanced class data."""
+        self.stdout.write("Importing advanced classes...")
+
+        advanced_classes_data = reader.get_all_advanced_classes()
+        faction_map = {f.id_key: f for f in version.factions.all()}
+
+        advanced_class_objects = []
+        for ac_data in advanced_classes_data:
+            faction_id = ac_data.get("faction")
+            if faction_id not in faction_map:
+                continue
+
+            # Extract required skill IDs from activation conditions
+            required_skill_ids = [
+                condition.get("skillSid")
+                for condition in ac_data.get("activationConditions", [])
+                if condition.get("skillSid")
+            ]
+
+            advanced_class_objects.append(AdvancedClass(
+                version=version,
+                id_key=ac_data["id"],
+                faction=faction_map[faction_id],
+                class_type=ac_data.get("classType", "might"),
+                icon=ac_data.get("icon", ""),
+                activation_conditions=ac_data.get("activationConditions", []),
+                required_skill_ids=required_skill_ids,
+                bonuses=ac_data.get("bonuses", []),
+                raw_data=ac_data
+            ))
+
+        AdvancedClass.objects.bulk_create(advanced_class_objects)
+        self.stdout.write(f"  Created {len(advanced_class_objects)} advanced classes")
 
     def _import_spells(self, reader: GameDataReader, version: GameVersion):
         """Import spell data."""

@@ -151,8 +151,8 @@ class Hero(models.Model):
 
     @property
     def class_icon_url(self):
-        """Get the URL to this hero's class icon (might/magic per faction)."""
-        return f"/media/gamedata/ui/{self.class_type}_{self.faction.id_key}_icon.png"
+        """Get the URL to this hero's generic class icon (might/magic)."""
+        return f"/media/gamedata/ui/{self.class_type}_icon.png"
 
     # Specialization
     specialization_name = models.CharField(max_length=200, default="", blank=True)
@@ -456,3 +456,40 @@ class CombatModifier(models.Model):
 
     def __str__(self):
         return f"{self.source_id} L{self.level}: {self.modifier_type} = {self.value}"
+
+
+class AdvancedClass(models.Model):
+    """Represents an advanced class (subclass) for heroes."""
+
+    version = models.ForeignKey(GameVersion, on_delete=models.CASCADE, related_name='advanced_classes')
+    id_key = models.CharField(max_length=100, help_text="Advanced class identifier")
+
+    faction = models.ForeignKey(Faction, on_delete=models.CASCADE, related_name='advanced_classes')
+    class_type = models.CharField(max_length=20, choices=Hero.CLASS_TYPE_CHOICES)
+
+    icon = models.CharField(max_length=100, blank=True)
+
+    activation_conditions = models.JSONField(default=list, help_text="Requirements to unlock")
+    required_skill_ids = models.JSONField(default=list, help_text="Pre-extracted skill IDs for quick lookups")
+    bonuses = models.JSONField(default=list, help_text="Bonus effects")
+    raw_data = models.JSONField(help_text="Complete raw data from game files")
+
+    class Meta:
+        ordering = ['version', 'faction', 'class_type', 'id_key']
+        unique_together = [['version', 'id_key']]
+        verbose_name_plural = 'Advanced Classes'
+        indexes = [models.Index(fields=['version', 'faction', 'class_type'])]
+
+    def __str__(self):
+        return f"{self.id_key} (v{self.version.build_id})"
+
+    @property
+    def icon_url(self):
+        if self.icon:
+            return f"/media/gamedata/advanced_classes/{self.icon}.png"
+        return ""
+
+    @property
+    def display_info(self):
+        from core.localizations import get_advanced_class_info
+        return get_advanced_class_info(self.id_key)

@@ -10,7 +10,7 @@ from gamedata.models import GameVersion, Hero, Faction, Item, Skill, Unit
 from core.damage_calculator import (
     DamageCalculator, create_unit_stack_from_db, create_hero_build_from_db
 )
-from core.localizations import get_skill_info
+from core.localizations import get_skill_info, get_localizations
 
 
 def index(request):
@@ -537,3 +537,99 @@ def api_skill_subskills(request, skill_id, level):
         },
         'subskills': subskills_data,
     })
+
+
+def api_advanced_classes(request):
+    """
+    API endpoint to get available advanced classes.
+    Query params: faction (required), class_type (required)
+    """
+    version = GameVersion.objects.filter(is_active=True).first()
+    if not version:
+        return JsonResponse({'error': 'No active game version'}, status=404)
+
+    faction_slug = request.GET.get('faction')
+    class_type = request.GET.get('class_type')
+
+    if not faction_slug or not class_type:
+        return JsonResponse({'error': 'faction and class_type required'}, status=400)
+
+    # Import AdvancedClass from gamedata.models
+    from gamedata.models import AdvancedClass
+
+    # Get faction to look up base class name
+    faction = Faction.objects.filter(version=version, slug=faction_slug).first()
+    if not faction:
+        return JsonResponse({'error': 'Faction not found'}, status=404)
+
+    # Get base class name, description, and icon from localizations
+    localizations = get_localizations()
+    base_class_name_key = f"{class_type}_{faction.id_key}_name"
+    base_class_desc_key = f"{class_type}_desc"  # Generic description for might/magic
+    base_class_name = localizations.get(base_class_name_key, class_type.title())
+    base_class_desc = localizations.get(base_class_desc_key, '')
+    # Use generic might/magic icon (not faction-specific)
+    base_class_icon_url = f"/media/gamedata/ui/{class_type}_icon.png"
+
+    classes_qs = AdvancedClass.objects.filter(
+        version=version,
+        faction__slug=faction_slug,
+        class_type=class_type
+    ).select_related('faction')
+
+    classes_data = []
+    for adv_class in classes_qs:
+        info = adv_class.display_info
+        classes_data.append({
+            'id': adv_class.id_key,
+            'name': info['name'],
+            'description': info['description'],
+            'icon_url': adv_class.icon_url,
+            'required_skills': adv_class.required_skill_ids,
+            'activation_conditions': adv_class.activation_conditions,
+        })
+
+    return JsonResponse({
+        'base_class_name': base_class_name,
+        'base_class_description': base_class_desc,
+        'base_class_icon_url': base_class_icon_url,
+        'advanced_classes': classes_data
+    })
+
+
+def api_advanced_class_skill_indicators(request):
+    """
+    API endpoint to get skill-to-advanced-class mapping.
+    Query params: faction (required), class_type (required)
+    Returns: {skill_indicators: {skill_id: [{class_id, icon_url}, ...]}}
+    """
+    version = GameVersion.objects.filter(is_active=True).first()
+    if not version:
+        return JsonResponse({'error': 'No active game version'}, status=404)
+
+    faction_slug = request.GET.get('faction')
+    class_type = request.GET.get('class_type')
+
+    if not faction_slug or not class_type:
+        return JsonResponse({'error': 'faction and class_type required'}, status=400)
+
+    from gamedata.models import AdvancedClass
+
+    classes_qs = AdvancedClass.objects.filter(
+        version=version,
+        faction__slug=faction_slug,
+        class_type=class_type
+    )
+
+    # Build skill -> [advanced classes] mapping
+    skill_indicators = {}
+    for adv_class in classes_qs:
+        for skill_id in adv_class.required_skill_ids:
+            if skill_id not in skill_indicators:
+                skill_indicators[skill_id] = []
+            skill_indicators[skill_id].append({
+                'class_id': adv_class.id_key,
+                'icon_url': adv_class.icon_url,
+            })
+
+    return JsonResponse({'skill_indicators': skill_indicators})
