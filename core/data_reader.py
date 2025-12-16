@@ -130,6 +130,18 @@ class GameDataReader:
         data = self.read_json("heroes_skills/skills/skills.json")
         return data.get("array", [])
 
+    def get_all_advanced_classes(self) -> List[Dict[str, Any]]:
+        """Get all advanced class data from heroes_sub_classes directory."""
+        advanced_classes = []
+        sub_classes_dir = self.extract_to / "heroes_sub_classes"
+
+        for json_file in sub_classes_dir.rglob("sub_classes_*.json"):
+            data = self.read_json(json_file.relative_to(self.extract_to))
+            if "array" in data:
+                advanced_classes.extend(data["array"])
+
+        return advanced_classes
+
     def get_all_spells(self) -> List[Dict[str, Any]]:
         """Get all magic/spell data from magics directory."""
         spells = []
