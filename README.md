@@ -1,4 +1,4 @@
-# Olden Calc
+# Olden Forge
 
 Hero builder and calculators for Heroes of Might and Magic: Olden Era.
 
