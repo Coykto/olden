@@ -100,7 +100,7 @@
     /* Class Badge Tooltip */
     .class-tooltip {
         position: absolute;
-        left: 100%;
+        left: 80%;
         top: 50%;
         transform: translateY(-50%);
         margin-left: 15px;
@@ -283,6 +283,7 @@
     }
 
     .skill-main {
+        position: relative;
         width: 60px;
         height: 60px;
         background: #252d38;
@@ -291,7 +292,6 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        position: relative;
         cursor: pointer;
         transition: all 0.15s;
     }
@@ -825,25 +825,23 @@
     /* Skill Indicator Icons */
     .skill-indicators {
         position: absolute;
-        bottom: 2px;
-        right: 2px;
+        top: -18px;
+        left: 0px;
+        transform: translateX(-50%);
         display: flex;
-        gap: 2px;
     }
 
     .skill-indicator-icon {
-        width: 16px;
-        height: 16px;
-        border-radius: 3px;
-        border: 1px solid #3a4555;
-        background: rgba(0, 0, 0, 0.5);
+        width: 36px !important;
+        height: 36px !important;
+        border-radius: 50% !important;
+        background: rgb(38 45 56);
     }
 
     /* Indicators in modal skill options */
     .skill-option .skill-indicators {
         position: absolute;
-        bottom: 4px;
-        right: 4px;
+        top: -18px;
     }
 
     .skill-option .skill-icon-wrapper {
