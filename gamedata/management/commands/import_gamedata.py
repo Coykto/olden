@@ -5,11 +5,15 @@ Usage:
     python manage.py import_gamedata
     python manage.py import_gamedata --force  # Force re-import even if version exists
 """
+import re
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils.text import slugify
-from gamedata.models import GameVersion, Faction, Unit, Hero, Skill, Item, Spell
+from gamedata.models import GameVersion, Faction, Unit, Hero, Skill, Item, Spell, UnitAbility, CombatModifier
 from core.data_reader import GameDataReader
+from core.asset_extractor import AssetExtractor
+from core.skill_value_extractor import SkillValueExtractor
+from core.combat_value_extractor import CombatValueExtractor
 
 
 class Command(BaseCommand):
@@ -85,6 +89,13 @@ class Command(BaseCommand):
                 f"Successfully imported game data for version {build_id}"
             ))
 
+            # Extract game assets (images)
+            self.stdout.write("Extracting game assets...")
+            extractor = AssetExtractor()
+            results = extractor.extract_all(force=force)
+            for category, count in results.items():
+                self.stdout.write(f"  Extracted {count} {category}")
+
         except Exception as e:
             self.stdout.write(self.style.ERROR(f"Import failed: {e}"))
             raise
@@ -96,29 +107,50 @@ class Command(BaseCommand):
         data = reader.read_json("data.json")
         factions_data = data.get("availableFractions", [])
 
+        # Map internal faction IDs to skill IDs
+        faction_skill_map = {
+            'human': 'skill_faction_humans',
+            'undead': 'skill_faction_undead',
+            'dungeon': 'skill_faction_dungeon',
+            'unfrozen': 'skill_faction_unfrozen',
+        }
+
         faction_objects = []
         for faction_id in factions_data:
             # Get localized faction name (e.g., "human_name" -> "Temple")
             name_key = f"{faction_id}_name"
             faction_name = localizations.get(name_key, faction_id.capitalize())
 
+            # Get faction description
+            desc_key = f"{faction_id}_desc"
+            faction_desc = localizations.get(desc_key, "")
+
             faction_objects.append(Faction(
                 version=version,
                 id_key=faction_id,
-                name=faction_name
+                slug=slugify(faction_name),
+                name=faction_name,
+                description=faction_desc,
+                faction_skill=faction_skill_map.get(faction_id, "")
             ))
 
         Faction.objects.bulk_create(faction_objects)
         self.stdout.write(f"  Created {len(faction_objects)} factions")
 
     def _import_units(self, reader: GameDataReader, version: GameVersion, localizations: dict):
-        """Import unit data."""
+        """Import unit data with combat extraction."""
         self.stdout.write("Importing units...")
 
         units_data = reader.get_all_units()
         faction_map = {f.id_key: f for f in version.factions.all()}
 
+        # Initialize combat extractor
+        combat_extractor = CombatValueExtractor(reader.extract_to)
+        combat_extractor.load()
+
         unit_objects = []
+        combat_extracted = 0
+
         for unit_data in units_data:
             faction_id = unit_data.get("fraction")
             if faction_id not in faction_map:
@@ -134,6 +166,11 @@ class Command(BaseCommand):
 
             # Get display name from localizations
             display_name = localizations.get(unit_id, unit_id.replace("_", " ").title())
+
+            # Extract combat data
+            combat_data = combat_extractor.extract_unit_combat_data(unit_data)
+            if combat_data['damage_modifiers']['outDmgMods'] or combat_data['damage_modifiers']['inDmgMods']:
+                combat_extracted += 1
 
             unit_objects.append(Unit(
                 version=version,
@@ -159,11 +196,14 @@ class Command(BaseCommand):
                 luck=stats.get("luck", 0),
                 moral=stats.get("moral", 0),
                 move_type=stats.get("moveType", "ground"),
+                attack_type=combat_data['attack_type'],
+                abilities=[a['id'] for a in combat_data['abilities']],
+                damage_modifiers=combat_data['damage_modifiers'],
                 raw_data=unit_data
             ))
 
         Unit.objects.bulk_create(unit_objects)
-        self.stdout.write(f"  Created {len(unit_objects)} units")
+        self.stdout.write(f"  Created {len(unit_objects)} units ({combat_extracted} with damage modifiers)")
 
     def _import_heroes(self, reader: GameDataReader, version: GameVersion, localizations: dict):
         """Import hero data."""
@@ -200,6 +240,17 @@ class Command(BaseCommand):
             # Generate URL-friendly slug from display name
             hero_slug = slugify(display_name)
 
+            # Get specialization name and description
+            spec_name = localizations.get(f"{hero_id}_spec_name", "")
+            spec_desc = localizations.get(f"{hero_id}_spec_description", "")
+
+            # Extract sort order from id_key (e.g., "human_hero_1" -> 1)
+            sort_match = re.search(r'_(\d+)$', hero_id)
+            sort_order = int(sort_match.group(1)) if sort_match else 0
+
+            # Get starting skills
+            starting_skills = [s['sid'] for s in hero_data.get('startSkills', [])]
+
             hero_objects.append(Hero(
                 version=version,
                 id_key=hero_id,
@@ -209,6 +260,10 @@ class Command(BaseCommand):
                 icon=hero_data.get("icon", ""),
                 mesh=hero_data.get("mesh", ""),
                 class_type=hero_data.get("classType", "might"),
+                specialization_name=spec_name,
+                specialization_desc=spec_desc,
+                sort_order=sort_order,
+                starting_skills=starting_skills,
                 cost_gold=hero_data.get("costGold", 0),
                 start_level=hero_data.get("startLevel", 1),
                 start_offence=stats.get("offence", 0),
@@ -224,22 +279,41 @@ class Command(BaseCommand):
         self.stdout.write(f"  Created {len(hero_objects)} heroes (skipped {skipped_count} campaign/tutorial heroes)")
 
     def _import_skills(self, reader: GameDataReader, version: GameVersion):
-        """Import skill data."""
+        """Import skill data with pre-extracted parameter values."""
         self.stdout.write("Importing skills...")
 
         skills_data = reader.get_all_skills()
 
+        # Initialize the skill value extractor
+        extractor = SkillValueExtractor(reader.extract_to)
+        extractor.load()
+        self.stdout.write(f"  Loaded {len(extractor.get_extraction_rules())} skill extraction rules")
+
         skill_objects = []
+        extracted_count = 0
+
         for skill_data in skills_data:
+            skill_id = skill_data["id"]
+
+            # Extract parameter values for all levels
+            extracted_values = extractor.extract_skill_values(skill_id, skill_data)
+
+            # Convert keys to strings for JSON storage
+            extracted_values_str = {str(k): v for k, v in extracted_values.items()}
+
+            if extracted_values_str:
+                extracted_count += 1
+
             skill_objects.append(Skill(
                 version=version,
-                id_key=skill_data["id"],
+                id_key=skill_id,
                 skill_type=skill_data.get("skillType", "Common"),
-                raw_data=skill_data
+                raw_data=skill_data,
+                extracted_values=extracted_values_str
             ))
 
         Skill.objects.bulk_create(skill_objects)
-        self.stdout.write(f"  Created {len(skill_objects)} skills")
+        self.stdout.write(f"  Created {len(skill_objects)} skills ({extracted_count} with extracted values)")
 
     def _import_items(self, reader: GameDataReader, version: GameVersion):
         """Import item data."""

@@ -1,31 +1,177 @@
 {% extends "hero_builder/base.html" %}
 
-{% block title %}Hero Builder - Olden Era Calculator{% endblock %}
+{% block title %}Pick Faction - Olden Era Calculator{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .page-title {
+        color: #d4af37;
+        text-align: center;
+        font-size: 1.8rem;
+        margin-bottom: 40px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    .faction-grid {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        flex-wrap: wrap;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .faction-card {
+        background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%);
+        border: 2px solid #444;
+        border-radius: 12px;
+        padding: 30px 25px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 200px;
+        text-decoration: none;
+        display: block;
+    }
+
+    .faction-card:hover {
+        border-color: #d4af37;
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2);
+    }
+
+    .faction-icon {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 20px;
+    }
+
+    .faction-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .faction-name {
+        color: #fff;
+        font-size: 1.3rem;
+        font-weight: bold;
+        margin-bottom: 8px;
+    }
+
+    .faction-skill {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        padding-top: 15px;
+        border-top: 1px solid #333;
+    }
+
+    .faction-skill-label {
+        color: #d4af37;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .faction-skill-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        border: 2px solid #444;
+    }
+
+    .faction-card:hover .faction-skill-icon {
+        border-color: #d4af37;
+    }
+
+    /* Skill tooltip */
+    .skill-wrapper {
+        position: relative;
+        display: inline-block;
+    }
+
+    .skill-tooltip {
+        display: none;
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        margin-bottom: 10px;
+        background: linear-gradient(180deg, #3a3a3a 0%, #2a2a2a 100%);
+        border: 1px solid #555;
+        border-radius: 8px;
+        padding: 12px 16px;
+        min-width: 220px;
+        max-width: 300px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        z-index: 100;
+        text-align: left;
+    }
+
+    .skill-wrapper:hover .skill-tooltip {
+        display: block;
+    }
+
+    .skill-tooltip-name {
+        color: #fff;
+        font-size: 1rem;
+        font-weight: bold;
+        margin-bottom: 8px;
+    }
+
+    .skill-tooltip-desc {
+        color: #aaa;
+        font-size: 0.85rem;
+        line-height: 1.4;
+    }
+
+    .click-hint {
+        text-align: center;
+        color: #666;
+        margin-top: 50px;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<h1 style="color: #d4af37; margin-bottom: 20px;">Select a Hero to Build</h1>
+<h1 class="page-title">Pick Faction</h1>
 
 <div class="faction-grid">
     {% for faction in factions %}
-    <div class="faction-card">
-        <h2>{{ faction.name }}</h2>
-        <ul class="hero-list">
-            {% for hero in faction.heroes.all %}
-            <li>
-                <a href="{% url 'hero_builder:builder' hero.slug %}">
-                    <span>{{ hero.display_name }}</span>
-                    <span class="hero-class">{{ hero.class_type|title }}</span>
-                </a>
-            </li>
-            {% empty %}
-            <li style="color: #666;">No heroes available</li>
-            {% endfor %}
-        </ul>
-    </div>
+    <a href="{% url 'hero_builder:faction_heroes' faction.slug %}" class="faction-card">
+        <div class="faction-icon">
+            <img src="{{ faction.icon_url }}" alt="{{ faction.name }}">
+        </div>
+        <div class="faction-name">{{ faction.name }}</div>
+        {% if faction.skill_icon_url %}
+        <div class="faction-skill">
+            <span class="faction-skill-label">Faction Skill</span>
+            <div class="skill-wrapper">
+                <img src="{{ faction.skill_icon_url }}" alt="Faction Skill" class="faction-skill-icon">
+                {% with faction.skill_info as skill %}
+                {% if skill %}
+                <div class="skill-tooltip">
+                    <div class="skill-tooltip-name">{{ skill.name }}</div>
+                    {% if skill.description %}
+                    <div class="skill-tooltip-desc">{{ skill.description }}</div>
+                    {% endif %}
+                </div>
+                {% endif %}
+                {% endwith %}
+            </div>
+        </div>
+        {% endif %}
+    </a>
     {% empty %}
-    <div class="faction-card">
-        <p style="color: #666;">No factions available. Please import game data.</p>
-    </div>
+    <p style="color: #666;">No factions available. Please import game data.</p>
     {% endfor %}
 </div>
+
+<div class="click-hint">Click to select</div>
 {% endblock %}
