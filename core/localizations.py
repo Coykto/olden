@@ -427,3 +427,64 @@ def get_advanced_class_info(class_id: str) -> dict:
     name = localizations.get(f"{class_id}_name", class_id.replace("_", " ").title())
     description = localizations.get(f"{class_id}_desc", "")
     return {"id": class_id, "name": name, "description": description}
+
+
+@lru_cache(maxsize=1)
+def get_item_args(lang: str = "english") -> dict:
+    """
+    Load item description args from game files.
+    Returns a dict mapping sid -> list of function names.
+    """
+    args_file = settings.GAME_DATA_PATH / "StreamingAssets" / "Lang" / "args" / "artifacts.json"
+
+    if not args_file.exists():
+        return {}
+
+    try:
+        with open(args_file, 'r', encoding='utf-8-sig') as f:
+            data = json.load(f)
+            tokens_args = data.get("tokensArgs", [])
+            return {item["sid"]: item.get("args", []) for item in tokens_args}
+    except Exception:
+        return {}
+
+
+def get_item_info(item_id: str) -> dict:
+    """
+    Get display info for an item including name, descriptions, and narrative.
+
+    Args:
+        item_id: The item's id_key (e.g., 'shamaniac_soul_gemwood_mask_artifact')
+                 Note: id_key already contains '_artifact' suffix
+
+    Returns:
+        dict with name, description_template, description_args,
+        upgrade_description_template, upgrade_description_args, narrative_description
+    """
+    localizations = get_localizations()
+    args_data = get_item_args()
+
+    # Item localization keys follow pattern: {item_id}_{field}
+    # Note: item_id already contains '_artifact' suffix
+    name_key = f"{item_id}_name"
+    desc_key = f"{item_id}_description"
+    upgrade_desc_key = f"{item_id}_upgradeDescription"
+    narrative_key = f"{item_id}_narrativeDescription"
+
+    name = localizations.get(name_key, item_id.replace("_", " ").title())
+    description_template = localizations.get(desc_key, "")
+    upgrade_description_template = localizations.get(upgrade_desc_key, "")
+    narrative_description = localizations.get(narrative_key, "")
+
+    # Get args for description and upgrade description
+    description_args = args_data.get(desc_key, [])
+    upgrade_description_args = args_data.get(upgrade_desc_key, [])
+
+    return {
+        "name": name,
+        "description_template": description_template,
+        "description_args": description_args,
+        "upgrade_description_template": upgrade_description_template,
+        "upgrade_description_args": upgrade_description_args,
+        "narrative_description": narrative_description,
+    }

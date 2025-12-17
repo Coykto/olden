@@ -10,7 +10,7 @@ from gamedata.models import GameVersion, Hero, Faction, Item, Skill, Unit
 from core.damage_calculator import (
     DamageCalculator, create_unit_stack_from_db, create_hero_build_from_db
 )
-from core.localizations import get_skill_info, get_localizations
+from core.localizations import get_skill_info, get_localizations, get_item_info
 
 
 def index(request):
@@ -633,3 +633,62 @@ def api_advanced_class_skill_indicators(request):
             })
 
     return JsonResponse({'skill_indicators': skill_indicators})
+
+
+def api_available_items(request):
+    """
+    API endpoint to get available items for equipment slots.
+    Query params:
+        slot (required): Equipment slot type (head, armor, weapon, etc.)
+    Returns: {items: [...]}
+    """
+    version = GameVersion.objects.filter(is_active=True).first()
+    if not version:
+        return JsonResponse({'error': 'No active game version'}, status=404)
+
+    slot_param = request.GET.get('slot', '')
+
+    # Map frontend slot names to database slot names
+    slot_mapping = {
+        'head': 'head',
+        'armor': 'armor',
+        'back': 'back',
+        'belt': 'belt',
+        'boots': 'boots',
+        'weapon': 'left_hand',
+        'shield': 'right_hand',
+        'ring': 'ring',
+        'accessory': 'item_slot',
+        'unique': 'unic_slot',
+    }
+
+    db_slot = slot_mapping.get(slot_param)
+    if not db_slot:
+        return JsonResponse({'error': f'Invalid slot type: {slot_param}'}, status=400)
+
+    items = Item.objects.filter(version=version, slot=db_slot)
+
+    items_data = []
+    for item in items:
+        # Get localized info including narrative description
+        item_info = get_item_info(item.id_key)
+
+        items_data.append({
+            'id': item.id_key,
+            'icon': item.icon,
+            'rarity': item.rarity,
+            'max_level': item.max_level,
+            'cost_base': item.cost_base,
+            'cost_per_level': item.cost_per_level,
+            'item_set': item.item_set,
+            'raw_data': item.raw_data,
+            # Localized fields
+            'name': item_info['name'],
+            'description_template': item_info['description_template'],
+            'description_args': item_info['description_args'],
+            'upgrade_description_template': item_info['upgrade_description_template'],
+            'upgrade_description_args': item_info['upgrade_description_args'],
+            'narrative_description': item_info['narrative_description'],
+        })
+
+    return JsonResponse({'items': items_data})

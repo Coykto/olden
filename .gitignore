@@ -222,3 +222,5 @@ media/
 *.db
 
 decompiled/
+.playwright-mcp/
+**/node_modules/

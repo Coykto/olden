@@ -32,4 +32,7 @@ urlpatterns = [
 
     # API endpoints - Calculator
     path('api/calculate-damage/', views.api_calculate_damage, name='api_calculate_damage'),
+
+    # API endpoints - Items
+    path('api/items/available/', views.api_available_items, name='api_available_items'),
 ]

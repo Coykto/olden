@@ -9,13 +9,6 @@ The website runs on Django at `http://localhost:8000`
 uv run python manage.py runserver
 ```
 
-### Taking Screenshots for Testing
-Use Chrome headless to capture screenshots:
-```bash
-"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless --screenshot=/tmp/olden.png --window-size=1280,800 http://localhost:8000
-```
-
-Then read the screenshot with Claude's Read tool to view it.
 
 ### Key URLs
 - `/` - Home page (faction selection)

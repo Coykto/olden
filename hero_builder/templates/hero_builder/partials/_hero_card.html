@@ -1,0 +1,117 @@
+<!-- Hero Card -->
+<div class="hero-card" data-hero-faction="{{ hero.faction.slug }}" data-hero-class-type="{{ hero.class_type }}" data-hero-id="{{ hero.game_id }}" data-hero-view-radius="{{ hero.start_view_radius }}">
+    <div class="hero-header">
+        <!-- Portrait Column -->
+        <div class="portrait-column">
+            <div class="hero-portrait-wrapper">
+                {% if hero.portrait_url %}
+                <img src="{{ hero.portrait_url }}" alt="{{ hero.display_name }}" class="hero-portrait">
+                {% else %}
+                <div class="hero-portrait" style="background: linear-gradient(180deg, #333 0%, #222 100%);"></div>
+                {% endif %}
+            </div>
+            <div class="class-badge-wrapper">
+                <img src="{{ hero.class_icon_url }}" alt="{{ hero.class_type }}" class="class-badge">
+            </div>
+        </div>
+
+        <!-- Info Column -->
+        <div class="info-column">
+            <!-- Name Row -->
+            <div class="name-row">
+                <img src="{{ hero.faction.icon_url }}" alt="{{ hero.faction.name }}" class="faction-badge">
+                <div class="name-text">
+                    <span class="hero-name">{{ hero.display_name }}</span>
+                    <span class="hero-specialty">{{ hero.specialization_name|default:hero.class_type }}</span>
+                </div>
+            </div>
+
+            <!-- Stats + Skills Row -->
+            <div class="stats-skills-row">
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <img src="/media/gamedata/ui/stat_attack.png" alt="ATK" class="stat-icon">
+                        <span class="stat-value">{{ hero.start_offence }}</span>
+                    </div>
+                    <div class="stat-item">
+                        <img src="/media/gamedata/ui/stat_defence.png" alt="DEF" class="stat-icon">
+                        <span class="stat-value">{{ hero.start_defence }}</span>
+                    </div>
+                    <div class="stat-item">
+                        <img src="/media/gamedata/ui/stat_spellpower.png" alt="PWR" class="stat-icon">
+                        <span class="stat-value">{{ hero.start_spell_power }}</span>
+                    </div>
+                    <div class="stat-item">
+                        <img src="/media/gamedata/ui/stat_spellpower.png" alt="KNW" class="stat-icon" style="filter: hue-rotate(180deg);">
+                        <span class="stat-value">{{ hero.start_intelligence }}</span>
+                    </div>
+                    <div class="stat-item">
+                        <img src="/media/gamedata/ui/stat_luck.png" alt="LCK" class="stat-icon">
+                        <span class="stat-value">{{ hero.start_luck }}</span>
+                    </div>
+                    <div class="stat-item">
+                        <img src="/media/gamedata/ui/stat_morale.png" alt="MRL" class="stat-icon">
+                        <span class="stat-value">{{ hero.start_moral }}</span>
+                    </div>
+                </div>
+
+                <!-- Skills Grid (4 columns, 2 rows) -->
+                <div class="skills-grid">
+                    {% for skill in hero.starting_skills_with_levels %}
+                    <!-- Skill with 2 stacked subskill slots -->
+                    <div class="skill-with-subs">
+                        <div class="skill-main tooltip-wrapper" id="skill-{{ forloop.counter }}" data-skill-id="{{ skill.id }}" data-skill-level="{{ skill.level }}">
+                            <img src="/media/gamedata/skills/{{ skill.id }}{{ skill.icon_suffix }}.png" alt="{{ skill.level_prefix }}{{ skill.name }}">
+                            <div class="tooltip-content">
+                                <div class="tooltip-name">{{ skill.level_prefix }}{{ skill.name }}</div>
+                                {% if skill.description %}
+                                <div class="tooltip-desc">{{ skill.description }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="subskill-column">
+                            <div class="subskill-btn">
+                                <span class="add-text">+</span>
+                            </div>
+                            <div class="subskill-btn disabled"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <!-- Empty skill slots to fill first row (4 total) -->
+                    {% with hero.starting_skills_with_levels|length as skill_count %}
+                    {% if skill_count < 4 %}
+                    {% for i in "1234"|make_list %}
+                    {% if forloop.counter > skill_count %}
+                    <div class="skill-with-subs">
+                        <div class="skill-main">
+                            <span class="skill-add-text">+</span>
+                        </div>
+                        <div class="subskill-column">
+                            <div class="subskill-btn disabled"></div>
+                            <div class="subskill-btn disabled"></div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+
+                    <!-- Second row - 4 empty slots -->
+                    {% for i in "1234"|make_list %}
+                    <div class="skill-with-subs">
+                        <div class="skill-main">
+                            <span class="skill-add-text">+</span>
+                        </div>
+                        <div class="subskill-column">
+                            <div class="subskill-btn disabled"></div>
+                            <div class="subskill-btn disabled"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

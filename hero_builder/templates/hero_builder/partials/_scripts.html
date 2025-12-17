@@ -1,0 +1,1560 @@
+<div id="skill-modal-container"></div>
+
+<!-- Generated description functions from .script files -->
+{% load static %}
+<script src="{% static 'js/description-runtime.js' %}"></script>
+<script src="{% static 'js/generated/game_data.js' %}"></script>
+<script src="{% static 'js/generated/description_functions.js' %}"></script>
+<script src="{% static 'js/hero-state.js' %}"></script>
+
+<script>
+// Client-side state for hero build
+const heroBuild = {
+    heroId: '',
+    heroFaction: '',
+    heroViewRadius: 6,  // Hero's view radius for item description calculations
+    skills: [],  // Array of 8 slots: {skillId, level, subskills} or null
+    startingSkillIds: [],
+    // Equipment state
+    equipment: {
+        slots: {
+            'unique': null,      // { id, name, icon, level, maxLevel, ... }
+            'head': null,
+            'back': null,
+            'armor': null,
+            'weapon': null,      // left_hand
+            'shield': null,      // right_hand
+            'belt': null,
+            'boots': null,
+            'ring-1': null,
+            'ring-2': null,
+            'accessory-1': null, // item_slot
+            'accessory-2': null,
+            'accessory-3': null,
+            'accessory-4': null
+        },
+        backpack: new Array(24).fill(null)  // 4x6 grid
+    }
+};
+
+const SkillManager = {
+    init() {
+        // Get hero info from DOM
+        const heroCard = document.querySelector('[data-hero-faction]');
+        heroBuild.heroFaction = heroCard?.dataset.heroFaction || '';
+        heroBuild.heroId = heroCard?.dataset.heroId || '';
+        heroBuild.heroViewRadius = parseInt(heroCard?.dataset.heroViewRadius || '6', 10);
+
+        // Initialize skills array with 8 slots
+        heroBuild.skills = new Array(8).fill(null);
+
+        // Get starting skills from DOM
+        const skillSlots = document.querySelectorAll('.skill-with-subs');
+        skillSlots.forEach((slot, index) => {
+            const skillMain = slot.querySelector('.skill-main');
+            const skillId = skillMain?.dataset.skillId;
+            const skillLevel = parseInt(skillMain?.dataset.skillLevel) || 1;
+
+            if (skillId) {
+                // Extract name and description from tooltip if present
+                const tooltipName = skillMain.querySelector('.tooltip-name')?.textContent || skillId;
+                const tooltipDesc = skillMain.querySelector('.tooltip-desc')?.textContent || '';
+
+                // Remove level prefix from name if it exists
+                const name = tooltipName.replace(/^(Basic|Advanced|Expert)\s+/, '');
+
+                heroBuild.skills[index] = {
+                    skillId: skillId,
+                    level: skillLevel,
+                    subskills: [null, null],
+                    subskillNames: [null, null],
+                    subskillDescs: [null, null],
+                    name: name,
+                    description: tooltipDesc
+                };
+                heroBuild.startingSkillIds.push(skillId);
+            }
+        });
+
+        // Set up all click handlers (including subskill buttons for starting skills)
+        this.updateUI();
+    },
+
+    setupClickHandlers() {
+        const skillSlots = document.querySelectorAll('.skill-with-subs');
+        skillSlots.forEach((slot, index) => {
+            const skillMain = slot.querySelector('.skill-main');
+
+            // Check if it's an empty slot
+            if (heroBuild.skills[index] === null) {
+                skillMain.style.cursor = 'pointer';
+                skillMain.onclick = () => SkillSelectionModal.open(index);
+            }
+        });
+    },
+
+    addSkill(slotIndex, skillId, skillName, skillIcon, skillDescription) {
+        heroBuild.skills[slotIndex] = {
+            skillId: skillId,
+            level: 1,
+            subskills: [null, null],
+            subskillNames: [null, null],
+            subskillDescs: [null, null],
+            name: skillName,
+            icon: skillIcon,
+            description: skillDescription || ''
+        };
+        this.updateUI();
+    },
+
+    getSelectedSkillIds() {
+        return heroBuild.skills
+            .filter(s => s !== null)
+            .map(s => s.skillId);
+    },
+
+    levelUpSkill(slotIndex, subskillId, subskillName, subskillDesc) {
+        const skill = heroBuild.skills[slotIndex];
+        if (!skill || skill.level >= 3) return;
+
+        // Store subskill at the appropriate index (0 for Basic→Advanced, 1 for Advanced→Expert)
+        const subskillIndex = skill.level - 1;
+        skill.subskills[subskillIndex] = subskillId;
+        skill.subskillNames[subskillIndex] = subskillName;
+        skill.subskillDescs[subskillIndex] = subskillDesc || '';
+
+        // Increase level
+        skill.level++;
+
+        // Update UI
+        this.updateUI();
+    },
+
+    repickSubskill(slotIndex, subskillSlot, subskillId, subskillName, subskillDesc) {
+        const skill = heroBuild.skills[slotIndex];
+        if (!skill) return;
+
+        // Replace the subskill at the specified slot (no level change)
+        skill.subskills[subskillSlot] = subskillId;
+        skill.subskillNames[subskillSlot] = subskillName;
+        skill.subskillDescs[subskillSlot] = subskillDesc || '';
+
+        // Update UI
+        this.updateUI();
+    },
+
+    removeSkill(slotIndex) {
+        const skill = heroBuild.skills[slotIndex];
+        if (!skill) return;
+
+        // Can't remove starting skills
+        if (heroBuild.startingSkillIds.includes(skill.skillId)) {
+            alert('Cannot remove starting skills');
+            return;
+        }
+
+        // Reset slot
+        heroBuild.skills[slotIndex] = null;
+        this.updateUI();
+    },
+
+    updateUI() {
+        const skillSlots = document.querySelectorAll('.skill-with-subs');
+
+        heroBuild.skills.forEach((skill, index) => {
+            if (index >= skillSlots.length) return;
+
+            const slot = skillSlots[index];
+            const skillMain = slot.querySelector('.skill-main');
+            const subskillBtns = slot.querySelectorAll('.subskill-btn');
+
+            if (skill === null) {
+                // Empty slot - show plus sign
+                skillMain.innerHTML = '<span class="skill-add-text">+</span>';
+                skillMain.style.cursor = 'pointer';
+                skillMain.onclick = () => SkillSelectionModal.open(index);
+                skillMain.oncontextmenu = null;
+                skillMain.removeAttribute('data-skill-id');
+
+                // Disable both subskill buttons
+                subskillBtns.forEach(btn => {
+                    btn.className = 'subskill-btn disabled';
+                    btn.innerHTML = '';
+                    btn.onclick = null;
+                });
+            } else {
+                // Filled slot - show skill icon with tooltip
+                const iconSuffix = skill.level > 1 ? `_${skill.level}` : '';
+                const levelPrefix = skill.level === 1 ? 'Basic ' : skill.level === 2 ? 'Advanced ' : 'Expert ';
+
+                skillMain.className = 'skill-main tooltip-wrapper';
+                skillMain.innerHTML = `
+                    <img src="/media/gamedata/skills/${skill.skillId}${iconSuffix}.png" alt="${skill.name || skill.skillId}">
+                    ${typeof AdvancedClassManager !== 'undefined' ? AdvancedClassManager.renderSkillIndicators(skill.skillId) : ''}
+                    <div class="tooltip-content">
+                        <div class="tooltip-name">${levelPrefix}${skill.name || skill.skillId}</div>
+                        ${skill.description ? `<div class="tooltip-desc">${skill.description}</div>` : ''}
+                    </div>
+                `;
+                skillMain.dataset.skillId = skill.skillId;
+                skillMain.dataset.skillLevel = skill.level;
+
+                // Add right-click to remove (only for non-starting skills)
+                if (!heroBuild.startingSkillIds.includes(skill.skillId)) {
+                    skillMain.oncontextmenu = (e) => {
+                        e.preventDefault();
+                        if (confirm(`Remove ${skill.name || skill.skillId}?`)) {
+                            SkillManager.removeSkill(index);
+                        }
+                    };
+                } else {
+                    skillMain.oncontextmenu = null;
+                }
+
+                // First subskill button
+                if (skill.level === 1) {
+                    // Can level up to Advanced
+                    subskillBtns[0].className = 'subskill-btn';
+                    subskillBtns[0].innerHTML = '<span class="add-text">+</span>';
+                    subskillBtns[0].onclick = () => SubskillSelectionModal.open(index);
+                } else if (!skill.subskills[0]) {
+                    // Level 2+ but no first subskill yet (e.g., Lord Edgar starts at Advanced)
+                    // Allow selecting first subskill without leveling up
+                    subskillBtns[0].className = 'subskill-btn';
+                    subskillBtns[0].innerHTML = '<span class="add-text">+</span>';
+                    subskillBtns[0].onclick = () => SubskillSelectionModal.openForRepick(index, 0);
+                } else {
+                    // Show selected subskill with tooltip - clickable to repick
+                    subskillBtns[0].className = 'subskill-btn filled tooltip-wrapper';
+                    subskillBtns[0].innerHTML = `
+                        <img src="/media/gamedata/skills/${skill.subskills[0]}_icon.png">
+                        <div class="tooltip-content">
+                            <div class="tooltip-name">${skill.subskillNames[0] || skill.subskills[0]}</div>
+                            ${skill.subskillDescs[0] ? `<div class="tooltip-desc">${skill.subskillDescs[0]}</div>` : ''}
+                        </div>
+                    `;
+                    subskillBtns[0].style.cursor = 'pointer';
+                    subskillBtns[0].onclick = () => SubskillSelectionModal.openForRepick(index, 0);
+                }
+
+                // Second subskill button
+                if (skill.level < 2) {
+                    // Skill is Basic - second subskill not available
+                    subskillBtns[1].className = 'subskill-btn disabled';
+                    subskillBtns[1].innerHTML = '';
+                    subskillBtns[1].onclick = null;
+                } else if (skill.level === 2 && skill.subskills[0]) {
+                    // Advanced with first subskill - can level up to Expert
+                    subskillBtns[1].className = 'subskill-btn';
+                    subskillBtns[1].innerHTML = '<span class="add-text">+</span>';
+                    subskillBtns[1].onclick = () => SubskillSelectionModal.open(index);
+                } else if (skill.level === 2 && !skill.subskills[0]) {
+                    // Advanced but no first subskill - must pick first subskill first
+                    subskillBtns[1].className = 'subskill-btn disabled';
+                    subskillBtns[1].innerHTML = '';
+                    subskillBtns[1].onclick = null;
+                } else if (skill.level === 3 && !skill.subskills[1]) {
+                    // Expert but no second subskill yet - allow selecting without level change
+                    subskillBtns[1].className = 'subskill-btn';
+                    subskillBtns[1].innerHTML = '<span class="add-text">+</span>';
+                    subskillBtns[1].onclick = () => SubskillSelectionModal.openForRepick(index, 1);
+                } else if (skill.subskills[1]) {
+                    // Show selected subskill with tooltip - clickable to repick
+                    subskillBtns[1].className = 'subskill-btn filled tooltip-wrapper';
+                    subskillBtns[1].innerHTML = `
+                        <img src="/media/gamedata/skills/${skill.subskills[1]}_icon.png">
+                        <div class="tooltip-content">
+                            <div class="tooltip-name">${skill.subskillNames[1] || skill.subskills[1]}</div>
+                            ${skill.subskillDescs[1] ? `<div class="tooltip-desc">${skill.subskillDescs[1]}</div>` : ''}
+                        </div>
+                    `;
+                    subskillBtns[1].style.cursor = 'pointer';
+                    subskillBtns[1].onclick = () => SubskillSelectionModal.openForRepick(index, 1);
+                }
+            }
+        });
+
+        // Update advanced class progress tooltip
+        if (typeof AdvancedClassManager !== 'undefined') {
+            AdvancedClassManager.updateTooltip();
+        }
+    }
+};
+
+// Skill Selection Modal with API integration
+const SkillSelectionModal = {
+    allSkills: [],
+    slotIndex: null,
+
+    async open(slotIndex) {
+        this.slotIndex = slotIndex;
+
+        // Get faction from hero card data attribute
+        const heroFaction = document.querySelector('[data-hero-faction]')?.dataset.heroFaction || '';
+        const excludeIds = SkillManager.getSelectedSkillIds().join(',');
+
+        // Fetch skills from API
+        try {
+            const response = await fetch(`/api/skills/available/?faction=${heroFaction}&exclude=${excludeIds}`);
+            const data = await response.json();
+            // Cache descriptions for search (computed once for performance)
+            this.allSkills = (data.skills || []).map(skill => {
+                // Compute description using transpiled pipeline if available
+                const computedDesc = EquipmentManager.formatSkillDescription(skill, 1);
+                return {
+                    ...skill,
+                    _computedDescription: computedDesc,
+                    _cachedDescription: (computedDesc || skill.description || '').toLowerCase()
+                };
+            });
+            this.render(this.allSkills);
+        } catch (error) {
+            console.error('Error fetching skills:', error);
+            // Show error state
+            const container = document.getElementById('skill-modal-container');
+            container.innerHTML = `
+                <div class="modal-overlay" onclick="SkillSelectionModal.close()">
+                    <div class="skill-modal" onclick="event.stopPropagation()">
+                        <div class="modal-header">
+                            <h2>Select Skill</h2>
+                            <p style="color: #ff6666;">Error loading skills. Please try again.</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    },
+
+    render(skills) {
+        const container = document.getElementById('skill-modal-container');
+        container.innerHTML = `
+            <div class="modal-overlay" onclick="SkillSelectionModal.close()">
+                <div class="skill-modal" onclick="event.stopPropagation()">
+                    <div class="modal-header">
+                        <h2>Select Skill</h2>
+                        <input type="text"
+                               class="skill-search"
+                               placeholder="Search skills..."
+                               oninput="SkillSelectionModal.filter(this.value)">
+                    </div>
+                    <div class="skill-list" id="skill-list">
+                        ${skills.map(s => this.renderSkillOption(s)).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    renderSkillOption(skill) {
+        // Use computed description (from transpiled pipeline) or fallback to pre-computed
+        const displayDescription = skill._computedDescription || skill.description;
+        return `
+            <div class="skill-option" data-skill-id="${skill.id}"
+                 onclick="SkillSelectionModal.select('${skill.id}')">
+                <div class="skill-icon-wrapper">
+                    <img src="/media/gamedata/skills/${skill.icon}.png" class="skill-icon" alt="${skill.name}">
+                    ${typeof AdvancedClassManager !== 'undefined' ? AdvancedClassManager.renderSkillIndicators(skill.id) : ''}
+                </div>
+                <div class="skill-info">
+                    <div class="skill-name">BASIC ${skill.name.toUpperCase()}</div>
+                    <div class="skill-desc">${displayDescription}</div>
+                </div>
+                <div class="subskill-previews">
+                    ${(skill.subskill_preview || []).map(sub =>
+                        `<div class="subskill-preview-wrapper tooltip-wrapper">
+                            <img src="/media/gamedata/skills/${sub.icon}.png" class="subskill-preview-icon" alt="${sub.name}">
+                            <div class="tooltip-content">
+                                <div class="tooltip-name">${sub.name}</div>
+                                <div class="tooltip-desc">${sub.description}</div>
+                            </div>
+                        </div>`
+                    ).join('')}
+                </div>
+            </div>
+        `;
+    },
+
+    filter(searchText) {
+        const search = searchText.toLowerCase();
+        const filtered = this.allSkills.filter(s =>
+            s.name.toLowerCase().includes(search) ||
+            (s._cachedDescription && s._cachedDescription.includes(search))
+        );
+        document.getElementById('skill-list').innerHTML =
+            filtered.map(s => this.renderSkillOption(s)).join('');
+    },
+
+    select(skillId) {
+        const skill = this.allSkills.find(s => s.id === skillId);
+        if (skill) {
+            SkillManager.addSkill(this.slotIndex, skill.id, skill.name, skill.icon, skill.description);
+        }
+        this.close();
+    },
+
+    close() {
+        document.getElementById('skill-modal-container').innerHTML = '';
+    }
+};
+
+const SubskillSelectionModal = {
+    slotIndex: null,
+    subskillSlot: null,  // 0 or 1, for repicking
+    isRepick: false,
+
+    async open(slotIndex) {
+        this.slotIndex = slotIndex;
+        this.subskillSlot = null;
+        this.isRepick = false;
+        const skill = heroBuild.skills[slotIndex];
+        if (!skill) return;
+
+        const nextLevel = skill.level + 1;
+        if (nextLevel > 3) return;  // Already at max level
+
+        try {
+            const response = await fetch(`/api/skills/${skill.skillId}/level/${nextLevel}/subskills/`);
+            if (!response.ok) throw new Error('Failed to fetch subskills');
+            const data = await response.json();
+            this.render(data);
+        } catch (error) {
+            console.error('Error loading subskills:', error);
+        }
+    },
+
+    async openForRepick(slotIndex, subskillSlot) {
+        this.slotIndex = slotIndex;
+        this.subskillSlot = subskillSlot;
+        this.isRepick = true;
+        const skill = heroBuild.skills[slotIndex];
+        if (!skill) return;
+
+        // subskillSlot 0 = level 2 subskills, subskillSlot 1 = level 3 subskills
+        const level = subskillSlot + 2;
+
+        try {
+            const response = await fetch(`/api/skills/${skill.skillId}/level/${level}/subskills/`);
+            if (!response.ok) throw new Error('Failed to fetch subskills');
+            const data = await response.json();
+            this.render(data);
+        } catch (error) {
+            console.error('Error loading subskills:', error);
+        }
+    },
+
+    render(data) {
+        const container = document.getElementById('skill-modal-container');
+        container.innerHTML = `
+            <div class="modal-overlay" onclick="SubskillSelectionModal.close()">
+                <div class="subskill-modal" onclick="event.stopPropagation()">
+                    <div class="upgraded-skill">
+                        <img src="/media/gamedata/skills/${data.skill.icon}.png" class="skill-icon-large">
+                        <div class="skill-info">
+                            <div class="skill-name">${data.skill.name.toUpperCase()}</div>
+                            <div class="skill-desc">${data.skill.description}</div>
+                        </div>
+                    </div>
+                    <div class="subskill-options">
+                        ${data.subskills.map(sub => this.renderSubskillOption(sub)).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    renderSubskillOption(subskill) {
+        return `
+            <div class="subskill-option" onclick="SubskillSelectionModal.select('${subskill.id}')">
+                <img src="/media/gamedata/skills/${subskill.icon}.png" class="subskill-icon">
+                <div class="subskill-info">
+                    <div class="subskill-name">${subskill.name}</div>
+                    <div class="subskill-desc">${subskill.description}</div>
+                </div>
+            </div>
+        `;
+    },
+
+    select(subskillId) {
+        // Find the subskill name and description from the rendered data
+        const subskillElement = document.querySelector(`.subskill-option[onclick*="${subskillId}"]`);
+        const subskillName = subskillElement ?
+            subskillElement.querySelector('.subskill-name')?.textContent :
+            subskillId;
+        const subskillDesc = subskillElement ?
+            subskillElement.querySelector('.subskill-desc')?.textContent :
+            '';
+
+        if (this.isRepick) {
+            SkillManager.repickSubskill(this.slotIndex, this.subskillSlot, subskillId, subskillName, subskillDesc);
+        } else {
+            SkillManager.levelUpSkill(this.slotIndex, subskillId, subskillName, subskillDesc);
+        }
+        this.close();
+    },
+
+    close() {
+        document.getElementById('skill-modal-container').innerHTML = '';
+    }
+};
+
+const ItemSelectionModal = {
+    allItems: [],
+    currentSlot: null,
+    currentSlotType: null,
+
+    // Map UI slot types (from data-slot-type) to API slot types
+    slotTypeMap: {
+        'unique': 'unic_slot',
+        'head': 'head',
+        'back': 'back',
+        'armor': 'armor',
+        'weapon': 'left_hand',
+        'shield': 'right_hand',
+        'belt': 'belt',
+        'boots': 'boots',
+        'ring': 'ring',
+        'accessory': 'item_slot'
+    },
+
+    // Rarity colors
+    rarityColors: {
+        'common': '#ffffff',
+        'uncommon': '#1eff00',
+        'rare': '#0070dd',
+        'epic': '#a335ee',
+        'legendary': '#ff8000',
+        'relic': '#e6cc80'
+    },
+
+    async open(slotId, slotType) {
+        this.currentSlot = slotId;
+        this.currentSlotType = slotType;
+
+        // Map UI slot type to API slot type
+        const apiSlotType = this.slotTypeMap[slotType] || slotType;
+
+        // Fetch items from API
+        try {
+            const response = await fetch(`/api/items/available/?slot=${apiSlotType}`);
+            if (!response.ok) throw new Error('Failed to fetch items');
+            const data = await response.json();
+            // Cache descriptions for search (computed once for performance)
+            this.allItems = (data.items || []).map(item => ({
+                ...item,
+                _cachedDescription: (EquipmentManager.formatItemDescription(item) || '').toLowerCase()
+            }));
+            this.render();
+        } catch (error) {
+            console.error('Error fetching items:', error);
+            // Show error state
+            const container = document.getElementById('skill-modal-container');
+            container.innerHTML = `
+                <div class="modal-overlay" onclick="ItemSelectionModal.close()">
+                    <div class="skill-modal" onclick="event.stopPropagation()">
+                        <div class="modal-header">
+                            <h2>Select Item</h2>
+                            <p style="color: #ff6666;">Error loading items. Please try again.</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    },
+
+    render() {
+        const container = document.getElementById('skill-modal-container');
+        container.innerHTML = `
+            <div class="modal-overlay" onclick="ItemSelectionModal.close()">
+                <div class="skill-modal" onclick="event.stopPropagation()">
+                    <div class="modal-header">
+                        <h2>Select Item - ${this.currentSlotType}</h2>
+                        <input type="text"
+                               class="skill-search"
+                               placeholder="Search items..."
+                               oninput="ItemSelectionModal.filter(this.value)">
+                    </div>
+                    <div class="skill-list" id="item-list">
+                        ${this.allItems.map(item => this.renderItemOption(item)).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    renderItemOption(item) {
+        const rarityColor = this.rarityColors[item.rarity] || '#ffffff';
+        // Always calculate description dynamically using EquipmentManager
+        const displayText = EquipmentManager.formatItemDescription(item) ||
+                           (item.bonuses || []).join(', ') ||
+                           'No description';
+
+        return `
+            <div class="skill-option" data-item-id="${item.id}"
+                 onclick="ItemSelectionModal.select('${item.id}')">
+                <div class="skill-icon-wrapper">
+                    <img src="/media/gamedata/items/${item.icon}.png" class="skill-icon" alt="${item.name}">
+                </div>
+                <div class="skill-info">
+                    <div class="skill-name" style="color: ${rarityColor};">${item.name.toUpperCase()}</div>
+                    <div class="skill-desc" style="color: ${rarityColor}; opacity: 0.7; font-size: 0.8rem; margin-bottom: 5px;">
+                        ${item.rarity.charAt(0).toUpperCase() + item.rarity.slice(1)}
+                    </div>
+                    <div class="skill-desc">${displayText}</div>
+                </div>
+            </div>
+        `;
+    },
+
+    filter(searchText) {
+        const search = searchText.toLowerCase();
+        const filtered = this.allItems.filter(item =>
+            item.name.toLowerCase().includes(search) ||
+            (item._cachedDescription && item._cachedDescription.includes(search))
+        );
+        document.getElementById('item-list').innerHTML =
+            filtered.map(item => this.renderItemOption(item)).join('');
+    },
+
+    select(itemId) {
+        const item = this.allItems.find(i => i.id === itemId);
+        if (item) {
+            // Use EquipmentManager to equip the item
+            EquipmentManager.equipItem(this.currentSlot, item);
+        }
+        this.close();
+    },
+
+    close() {
+        document.getElementById('skill-modal-container').innerHTML = '';
+    }
+};
+
+const AdvancedClassManager = {
+    advancedClasses: [],  // Cached from API
+    skillIndicators: {},  // Cached skill -> class mapping
+    baseClassName: '',     // Base class name like "Cleric"
+    baseClassDescription: '', // Base class description
+    baseClassIconUrl: '',  // Original class badge icon URL
+
+    async init() {
+        // Get hero faction and class_type from DOM
+        const heroCard = document.querySelector('[data-hero-faction]');
+        const heroFaction = heroCard?.dataset.heroFaction || '';
+        const heroClassType = heroCard?.dataset.heroClassType || '';
+
+        if (!heroFaction || !heroClassType) return;
+
+        // Fetch advanced classes (includes base class info)
+        try {
+            const response = await fetch(`/api/advanced-classes/?faction=${heroFaction}&class_type=${heroClassType}`);
+            const data = await response.json();
+            this.advancedClasses = data.advanced_classes || [];
+            this.baseClassName = data.base_class_name || heroClassType;
+            this.baseClassDescription = data.base_class_description || '';
+            this.baseClassIconUrl = data.base_class_icon_url || '';
+        } catch (e) {
+            console.error('Error fetching advanced classes:', e);
+        }
+
+        // Fetch skill indicators
+        try {
+            const indicatorResponse = await fetch(`/api/advanced-classes/skill-indicators/?faction=${heroFaction}&class_type=${heroClassType}`);
+            const indicatorData = await indicatorResponse.json();
+            this.skillIndicators = indicatorData.skill_indicators || {};
+        } catch (e) {
+            console.error('Error fetching skill indicators:', e);
+        }
+
+        // Setup tooltip
+        this.setupClassBadgeTooltip();
+
+        // Refresh skill UI to add indicators to starting skills
+        SkillManager.updateUI();
+    },
+
+    getSkillIndicators(skillId) {
+        return this.skillIndicators[skillId] || [];
+    },
+
+    renderSkillIndicators(skillId) {
+        const indicators = this.getSkillIndicators(skillId);
+        if (indicators.length === 0) return '';
+
+        return `<div class="skill-indicators">
+            ${indicators.map(ind => `<img src="${ind.icon_url}" class="skill-indicator-icon" alt="${ind.class_id}">`).join('')}
+        </div>`;
+    },
+
+    setupClassBadgeTooltip() {
+        const wrapper = document.querySelector('.class-badge-wrapper');
+        if (!wrapper) return;
+
+        // Create tooltip content
+        this.updateTooltip();
+    },
+
+    updateTooltip() {
+        const wrapper = document.querySelector('.class-badge-wrapper');
+        if (!wrapper) return;
+
+        // Remove existing tooltip
+        const existing = wrapper.querySelector('.class-tooltip');
+        if (existing) existing.remove();
+
+        // Build tooltip HTML
+        const tooltip = document.createElement('div');
+        tooltip.className = 'class-tooltip';
+        tooltip.innerHTML = this.renderTooltipContent();
+        wrapper.appendChild(tooltip);
+
+        // Also update the class badge icon if needed
+        this.updateClassBadge();
+    },
+
+    renderTooltipContent() {
+        // Use the base class name and description from API
+        const baseClass = this.baseClassName || 'Unknown';
+        const baseDesc = this.baseClassDescription || 'Hero class based on faction and specialization.';
+
+        let html = `
+            <div class="class-tooltip-header">
+                <div class="class-tooltip-name">${baseClass}</div>
+                <div class="class-tooltip-desc">${baseDesc}</div>
+            </div>
+        `;
+
+        // Advanced classes
+        if (this.advancedClasses.length > 0) {
+            html += '<div class="class-tooltip-divider"></div>';
+
+            for (const advClass of this.advancedClasses) {
+                const progress = this.calculateProgress(advClass);
+                html += `
+                    <div class="advanced-class-section">
+                        <div class="advanced-class-header">
+                            <img src="${advClass.icon_url}" class="advanced-class-icon" alt="${advClass.name}">
+                            <span class="advanced-class-name">${advClass.name}</span>
+                            <span class="advanced-class-progress">${progress}/5</span>
+                        </div>
+                        <div class="advanced-class-progress-bar">
+                            <div class="progress-fill" style="width: ${progress * 20}%"></div>
+                        </div>
+                        <div class="advanced-class-desc">${advClass.description}</div>
+                    </div>
+                `;
+            }
+        }
+
+        return html;
+    },
+
+    calculateProgress(advClass) {
+        // For now return 0, will be implemented in Slice 4
+        let count = 0;
+        for (const condition of advClass.activation_conditions) {
+            const skillId = condition.skillSid;
+            const requiredLevel = condition.skillLevel;
+
+            // Check if hero has this skill at required level
+            const heroSkill = heroBuild.skills.find(s => s && s.skillId === skillId);
+            if (heroSkill && heroSkill.level >= requiredLevel) {
+                count++;
+            }
+        }
+        return count;
+    },
+
+    checkEligibility() {
+        // Find first advanced class with 5/5 progress
+        for (const advClass of this.advancedClasses) {
+            if (this.calculateProgress(advClass) >= 5) {
+                return advClass;
+            }
+        }
+        return null;
+    },
+
+    updateClassBadge() {
+        const classBadge = document.querySelector('.class-badge');
+        if (!classBadge) return;
+
+        const achievedClass = this.checkEligibility();
+
+        if (achievedClass) {
+            // Update badge to advanced class icon
+            classBadge.src = achievedClass.icon_url;
+        } else {
+            // Revert to base class icon
+            classBadge.src = this.baseClassIconUrl;
+        }
+    }
+};
+
+// Equipment Manager
+const EquipmentManager = {
+    /**
+     * Calculate bonuses for an item at a specific level
+     * @param {Array} bonuses_raw - Raw bonus data with base, increment, levelStep
+     * @param {number} level - Current upgrade level (0-based)
+     * @returns {Array} Array of formatted bonus strings
+     */
+    // Friendly names for boolean stats
+    BOOLEAN_STAT_NAMES: {
+        'enableSquadReactionType': 'Shows Unit Initiative',
+        'enableSquadCounts': 'Shows Unit Stack Counts',
+        'enableEnemyHeroInfo': 'Shows Enemy Hero Info',
+        'enableEnemyCityInfo': 'Shows Enemy City Info',
+        'enableBansEvasion': 'Can Evade Bans',
+        'enableBansEvasionBattle': 'Can Evade Bans in Battle',
+        'enableSaveHeroByKill': 'Hero Survives Defeat',
+        'enableSavePartyByEscape': 'Party Can Escape',
+    },
+
+    // Friendly names for complex stats
+    STAT_DISPLAY_NAMES: {
+        'finalHealingBonusPercent': 'Healing',
+        'finalAbilityDamageBonusPercent': 'Ability Damage',
+        'finalSummonBonusPercent': 'Summoning',
+        'diplomacyEfficiencyPerBonus': 'Diplomacy',
+        'landscapePenaltyPerBonus': 'Terrain Penalty',
+        'flyMotionPerBonus': 'Flying Speed',
+        'hp': 'HP',
+        'offence': 'Offence',
+        'defence': 'Defence',
+    },
+
+    // Convert camelCase to Title Case
+    _camelToTitle(text) {
+        const spaced = text.replace(/([A-Z])/g, ' $1');
+        return spaced.trim().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+    },
+
+    // Calculate bonus value with upgrade scaling
+    _calculateBonusValue(baseValue, upgrade, level) {
+        if (upgrade && level > 0) {
+            const increment = upgrade.increment || 0;
+            const levelStep = upgrade.levelStep || 1;
+            if (levelStep > 0) {
+                return baseValue + (increment * Math.floor(level / levelStep));
+            }
+        }
+        return baseValue;
+    },
+
+    calculateBonusesForLevel(bonuses_raw, level) {
+        if (!bonuses_raw || bonuses_raw.length === 0) {
+            return ['No bonuses'];
+        }
+
+        const results = [];
+        for (const bonus of bonuses_raw) {
+            // If bonus is already a formatted string, use it as-is
+            if (typeof bonus === 'string') {
+                results.push(bonus);
+                continue;
+            }
+
+            const bonusType = bonus.type;
+            const parameters = bonus.parameters || [];
+            const upgrade = bonus.upgrade || {};
+
+            // Check activation level (level is 0-based, activationLevel is 1-based)
+            const activationLevel = bonus.activationLevel || 1;
+            if ((level + 1) < activationLevel) continue;
+
+            if (bonusType === 'heroStat') {
+                if (parameters.length < 2) continue;
+
+                const statName = parameters[0];
+
+                // Special handling for magicSchoolSet: [statName, school, "0", value]
+                if (statName === 'magicSchoolSet' && parameters.length >= 4) {
+                    const school = parameters[1].charAt(0).toUpperCase() + parameters[1].slice(1);
+                    const baseValue = parseFloat(parameters[3]) || 1;
+                    const value = Math.round(this._calculateBonusValue(baseValue, upgrade, level));
+                    const sign = value >= 0 ? '+' : '';
+                    results.push(`${sign}${value} ${school} Magic`);
+                    continue;
+                }
+
+                const baseValueStr = parameters[1];
+
+                // Handle boolean stats
+                if (baseValueStr === 'true' || baseValueStr === 'false' || baseValueStr === true || baseValueStr === false) {
+                    if (this.BOOLEAN_STAT_NAMES[statName]) {
+                        results.push(this.BOOLEAN_STAT_NAMES[statName]);
+                    } else {
+                        const displayName = this._camelToTitle(statName.replace('enable', ''));
+                        results.push(`Enables ${displayName}`);
+                    }
+                    continue;
+                }
+
+                // Handle numeric stats
+                const baseValue = parseFloat(baseValueStr) || 0;
+                const value = this._calculateBonusValue(baseValue, upgrade, level);
+                const displayName = this.STAT_DISPLAY_NAMES[statName] || this._camelToTitle(statName);
+
+                // Detect percentage stats (includes "Percent", "PerBonus", etc.)
+                const isPercent = statName.toLowerCase().includes('percent') || statName.toLowerCase().includes('perbonus');
+                const intValue = isPercent && Math.abs(value) < 1 ? Math.round(value * 100) : Math.round(value);
+                const sign = intValue >= 0 ? '+' : '';
+
+                if (isPercent) {
+                    results.push(`${sign}${intValue}% ${displayName}`);
+                } else {
+                    results.push(`${sign}${intValue} ${displayName}`);
+                }
+            } else if (bonusType === 'unitStat') {
+                if (parameters.length < 2) continue;
+                const statName = parameters[0];
+                const baseValue = parseFloat(parameters[1]) || 0;
+                const value = this._calculateBonusValue(baseValue, upgrade, level);
+                const displayName = this.STAT_DISPLAY_NAMES[statName] || this._camelToTitle(statName);
+
+                const allegiance = bonus.receiverAllegiance || 'ally';
+                const prefix = allegiance === 'enemy' ? 'Enemy units: ' : 'Units: ';
+
+                // Detect percentage stats (includes "Percent", "PerBonus", etc.)
+                const isPercent = statName.toLowerCase().includes('percent') || statName.toLowerCase().includes('perbonus');
+                const intValue = isPercent && Math.abs(value) < 1 ? Math.round(value * 100) : Math.round(value);
+                const sign = intValue >= 0 ? '+' : '';
+
+                if (isPercent) {
+                    results.push(`${prefix}${sign}${intValue}% ${displayName}`);
+                } else {
+                    results.push(`${prefix}${sign}${intValue} ${displayName}`);
+                }
+            } else if (bonusType === 'sideRes') {
+                if (parameters.length < 2) continue;
+                const resource = parameters[0].charAt(0).toUpperCase() + parameters[0].slice(1);
+                const baseValue = parseFloat(parameters[1]) || 0;
+                const value = Math.round(this._calculateBonusValue(baseValue, upgrade, level));
+                results.push(`+${value} ${resource}/day`);
+            } else if (bonusType === 'heroMagicAdditionMass') {
+                if (parameters.length >= 3) {
+                    const tier = parameters[2];
+                    if (tier === 'any' || tier === null) {
+                        results.push('Unlocks all spells');
+                    } else {
+                        results.push(`Unlocks all Tier ${tier} spells`);
+                    }
+                }
+            } else if (bonusType === 'heroMagicAddition') {
+                results.push('Grants spell');
+            } else if (bonusType === 'battleSubskillBonus') {
+                results.push('Grants battle skill');
+            } else if (bonusType === 'unitBoolStat') {
+                if (parameters.length >= 1) {
+                    const statName = this._camelToTitle(parameters[0]);
+                    results.push(`Units: ${statName}`);
+                }
+            } else if (bonusType === 'magicSchoolSet') {
+                if (parameters.length >= 2) {
+                    const school = parameters[0].charAt(0).toUpperCase() + parameters[0].slice(1);
+                    const baseValue = parseInt(parameters[1]) || 1;
+                    const value = Math.round(this._calculateBonusValue(baseValue, upgrade, level));
+                    const sign = value >= 0 ? '+' : '';
+                    results.push(`${sign}${value} ${school} Magic`);
+                }
+            } else if (bonusType === 'heroAbility') {
+                if (parameters.length >= 1) {
+                    const abilityName = this._camelToTitle(parameters[0]);
+                    results.push(`Grants: ${abilityName}`);
+                }
+            }
+        }
+
+        return results.length > 0 ? results : ['No bonuses'];
+    },
+
+    /**
+     * Calculate dust cost for upgrading to a specific level
+     * @param {Object} itemData - Item data with cost_base and cost_per_level
+     * @param {number} level - Target upgrade level (1-based, where 1 = base item)
+     * @returns {number} Dust cost
+     */
+    calculateDustCost(itemData, level) {
+        if (!itemData || level <= 1) {
+            return 0;
+        }
+
+        const costBase = itemData.cost_base || 0;
+        const costPerLevel = itemData.cost_per_level || 0;
+
+        return costBase + costPerLevel * (level - 1);
+    },
+
+    /**
+     * Get total dust cost for all equipped items
+     * @returns {number} Total dust cost
+     */
+    getTotalDustCost() {
+        let total = 0;
+        for (const itemData of Object.values(heroBuild.equipment.slots)) {
+            if (itemData) {
+                total += this.calculateDustCost(itemData, itemData.level);
+            }
+        }
+        return total;
+    },
+
+    /**
+     * Update the dust cost display element
+     */
+    updateDustDisplay() {
+        const displayElement = document.getElementById('total-equipment-dust');
+        if (displayElement) {
+            const totalDust = this.getTotalDustCost();
+            const dustValue = displayElement.querySelector('.dust-value');
+            if (dustValue) {
+                dustValue.textContent = totalDust;
+            }
+        }
+    },
+
+    /**
+     * Get effective hero stats including base stats and all equipment bonuses
+     * @returns {Object} Hero stats object e.g., {viewRadius: 8, offence: 5, ...}
+     */
+    getEffectiveHeroStats() {
+        // Start with base hero stats
+        const stats = {
+            viewRadius: heroBuild.heroViewRadius,
+            offence: parseInt(document.querySelector('[data-stat="offence"] .stat-value')?.textContent || '0'),
+            defence: parseInt(document.querySelector('[data-stat="defence"] .stat-value')?.textContent || '0'),
+            spellPower: parseInt(document.querySelector('[data-stat="spell-power"] .stat-value')?.textContent || '0'),
+            intelligence: parseInt(document.querySelector('[data-stat="intelligence"] .stat-value')?.textContent || '0'),
+            luck: parseInt(document.querySelector('[data-stat="luck"] .stat-value')?.textContent || '0'),
+            moral: parseInt(document.querySelector('[data-stat="moral"] .stat-value')?.textContent || '0'),
+        };
+
+        // Add bonuses from all equipped items
+        for (const itemData of Object.values(heroBuild.equipment.slots)) {
+            const bonuses = itemData?.raw_data?.bonuses;
+            if (!bonuses) continue;
+            const level = itemData.level || 1;
+
+            for (const bonus of bonuses) {
+                if (bonus.type !== 'heroStat') continue;
+                const params = bonus.parameters || [];
+                if (params.length < 2) continue;
+
+                const statName = params[0];
+                const baseValue = parseFloat(params[1]);
+                if (isNaN(baseValue)) continue;
+
+                const upgrade = bonus.upgrade || {};
+                const value = this._calculateBonusValue(baseValue, upgrade, level - 1);
+
+                // Map game stat names to our stat object keys
+                const statMap = {
+                    'viewRadius': 'viewRadius',
+                    'offence': 'offence',
+                    'defence': 'defence',
+                    'spellPower': 'spellPower',
+                    'intelligence': 'intelligence',
+                    'luck': 'luck',
+                    'moral': 'moral',
+                };
+                const key = statMap[statName];
+                if (key) {
+                    stats[key] = (stats[key] || 0) + value;
+                }
+            }
+        }
+
+        return stats;
+    },
+
+    /**
+     * Format an item's description using current effective hero stats
+     * @param {Object} itemData - Item data with description_template and description_args/description_values
+     * @param {number} level - Current upgrade level (1-based)
+     * @returns {string} Formatted description
+     */
+    formatItemDescription(itemData, level = null) {
+        if (!itemData.description_template) {
+            return itemData.description || '';
+        }
+
+        level = level || itemData.level || 1;
+
+        // Try using transpiled functions first (new system)
+        if (itemData.description_args && itemData.description_args.length > 0 &&
+            typeof DescriptionRuntime !== 'undefined' && typeof DescriptionFunctions !== 'undefined') {
+            try {
+                const effectiveStats = this.getEffectiveHeroStats();
+
+                // Create context for the transpiled functions
+                const ctx = {
+                    currentItem: {
+                        id: itemData.id,
+                        level: level,
+                        config: itemData.raw_data || { bonuses: [] }
+                    },
+                    currentHero: {
+                        stats: effectiveStats,
+                        heroStat: effectiveStats  // Alias for hero stat lookups
+                    }
+                };
+
+                // Use DescriptionRuntime to format
+                let result = DescriptionRuntime.formatDescription(
+                    itemData.description_template,
+                    itemData.description_args,
+                    ctx
+                );
+
+                // Append upgrade description only if it adds new functionality (no computed args)
+                // If upgrade has computed args, those values are already reflected in main description
+                if (level > 1 && itemData.upgrade_description_template &&
+                    (!itemData.upgrade_description_args || itemData.upgrade_description_args.length === 0)) {
+                    result += ' ' + this.formatUpgradeDescription(itemData);
+                }
+
+                return result;
+            } catch (e) {
+                console.warn('[EquipmentManager] Transpiled function error, falling back:', e);
+            }
+        }
+
+        // Fallback to legacy system using description_values
+        if (!itemData.description_values || itemData.description_values.length === 0) {
+            return itemData.description || itemData.description_template || '';
+        }
+
+        const effectiveStats = this.getEffectiveHeroStats();
+        const resolvedValues = [];
+
+        for (const valueInfo of itemData.description_values) {
+            if (valueInfo.type === 'static') {
+                resolvedValues.push(valueInfo.value);
+            } else if (valueInfo.type === 'item_param') {
+                const base = valueInfo.base || 0;
+                const increment = valueInfo.increment || 0;
+                const levelStep = valueInfo.levelStep || 1;
+                let value = base;
+                if (level > 1 && increment && levelStep > 0) {
+                    value = base + increment * Math.floor((level - 1) / levelStep);
+                }
+                if (valueInfo.isPercent && Math.abs(value) < 1) {
+                    value = value * 100;
+                }
+                resolvedValues.push(String(Math.floor(value)));
+            } else if (valueInfo.type === 'hero_stat_multiplier') {
+                const stat = valueInfo.stat;
+                const multiplier = valueInfo.multiplier || 1;
+                const statValue = effectiveStats[stat] || 6; // Default viewRadius = 6
+                resolvedValues.push(String(Math.floor(statValue * multiplier)));
+            } else {
+                resolvedValues.push('?');
+            }
+        }
+
+        // Replace {0}, {1}, etc. in template
+        let result = itemData.description_template;
+        for (let i = 0; i < resolvedValues.length; i++) {
+            result = result.replace(`{${i}}`, resolvedValues[i]);
+        }
+
+        // Append upgrade description only if it adds new functionality (no computed args)
+        // If upgrade has computed args, those values are already reflected in main description
+        if (level > 1 && itemData.upgrade_description_template &&
+            (!itemData.upgrade_description_args || itemData.upgrade_description_args.length === 0)) {
+            result += ' ' + this.formatUpgradeDescription(itemData);
+        }
+
+        return result;
+    },
+
+    /**
+     * Format an item's upgrade description.
+     * @param {Object} itemData - Item data with upgrade_description_template and upgrade_description_args
+     * @returns {string} Formatted upgrade description
+     */
+    formatUpgradeDescription(itemData) {
+        if (!itemData.upgrade_description_template) {
+            return itemData.upgrade_description || '';
+        }
+
+        // Try using transpiled functions
+        if (itemData.upgrade_description_args && itemData.upgrade_description_args.length > 0 &&
+            typeof DescriptionRuntime !== 'undefined' && typeof DescriptionFunctions !== 'undefined') {
+            try {
+                const effectiveStats = this.getEffectiveHeroStats();
+                const ctx = {
+                    currentItem: {
+                        id: itemData.id,
+                        level: itemData.level || 1,
+                        config: itemData.raw_data || { bonuses: [] }
+                    },
+                    currentHero: {
+                        stats: effectiveStats,
+                        heroStat: effectiveStats
+                    }
+                };
+
+                return DescriptionRuntime.formatDescription(
+                    itemData.upgrade_description_template,
+                    itemData.upgrade_description_args,
+                    ctx
+                );
+            } catch (e) {
+                console.warn('[EquipmentManager] Upgrade description error, falling back:', e);
+            }
+        }
+
+        // Fallback to pre-formatted
+        return itemData.upgrade_description || itemData.upgrade_description_template || '';
+    },
+
+    /**
+     * Format a skill description using the transpiled description pipeline.
+     * @param {Object} skillData - Skill data with description_template and description_args
+     * @param {number} level - Skill level (1-based, default 1)
+     * @returns {string} Formatted description
+     */
+    formatSkillDescription(skillData, level = 1) {
+        // Prefer computed description if no args
+        if (!skillData.description_args || skillData.description_args.length === 0) {
+            return skillData.description || skillData.description_template || '';
+        }
+
+        // Use transpiled functions
+        if (typeof DescriptionRuntime !== 'undefined' && typeof DescriptionFunctions !== 'undefined') {
+            try {
+                // Get level-specific parameters from raw_data
+                const params = skillData.raw_data?.parametersPerLevel || [];
+                const levelData = params[level - 1] || params[0] || {};
+
+                // Create context for the transpiled functions
+                const ctx = {
+                    currentSkill: {
+                        id: skillData.id,
+                        level: level,
+                        config: levelData
+                    },
+                    currentHero: {
+                        stats: this.getEffectiveHeroStats()
+                    }
+                };
+
+                return DescriptionRuntime.formatDescription(
+                    skillData.description_template,
+                    skillData.description_args,
+                    ctx
+                );
+            } catch (e) {
+                console.warn('[EquipmentManager] Skill description error, falling back:', e);
+            }
+        }
+
+        // Fallback to pre-computed description
+        return skillData.description || skillData.description_template || '';
+    },
+
+    /**
+     * Format a spell description using the transpiled description pipeline.
+     * @param {Object} spellData - Spell data with description_template and description_args
+     * @param {number} level - Spell level (1-based, default 1)
+     * @returns {string} Formatted description
+     */
+    formatSpellDescription(spellData, level = 1) {
+        // Prefer computed description if no args
+        if (!spellData.description_args || spellData.description_args.length === 0) {
+            return spellData.description || spellData.description_template || '';
+        }
+
+        // Use transpiled functions
+        if (typeof DescriptionRuntime !== 'undefined' && typeof DescriptionFunctions !== 'undefined') {
+            try {
+                // Create context for the transpiled functions
+                const ctx = {
+                    currentMagic: {
+                        id: spellData.id,
+                        level: level,
+                        school: spellData.school,
+                        config: spellData.raw_data || {}
+                    },
+                    currentHero: {
+                        stats: this.getEffectiveHeroStats()
+                    }
+                };
+
+                return DescriptionRuntime.formatDescription(
+                    spellData.description_template,
+                    spellData.description_args,
+                    ctx
+                );
+            } catch (e) {
+                console.warn('[EquipmentManager] Spell description error, falling back:', e);
+            }
+        }
+
+        // Fallback to pre-computed description
+        return spellData.description || spellData.description_template || '';
+    },
+
+    /**
+     * Update all equipped items' descriptions based on current effective stats
+     */
+    updateAllDescriptions() {
+        for (const [slotId, itemData] of Object.entries(heroBuild.equipment.slots)) {
+            if (itemData && (
+                (itemData.description_args && itemData.description_args.length > 0) ||
+                (itemData.description_values && itemData.description_values.length > 0)
+            )) {
+                itemData.description = this.formatItemDescription(itemData);
+            }
+        }
+    },
+
+    maxAllUpgrades() {
+        for (const [slotId, itemData] of Object.entries(heroBuild.equipment.slots)) {
+            if (itemData && itemData.max_level > 1) {
+                itemData.level = itemData.max_level;
+                const rawBonuses = itemData.raw_data?.bonuses || [];
+                itemData.bonuses = this.calculateBonusesForLevel(rawBonuses, itemData.max_level - 1);
+            }
+        }
+        this.updateAllDescriptions();
+        this.updateUI();
+        this.updateDustDisplay();
+    },
+
+    resetAllUpgrades() {
+        for (const [slotId, itemData] of Object.entries(heroBuild.equipment.slots)) {
+            if (itemData) {
+                itemData.level = 1;
+                const rawBonuses = itemData.raw_data?.bonuses || [];
+                itemData.bonuses = this.calculateBonusesForLevel(rawBonuses, 0);
+            }
+        }
+        this.updateAllDescriptions();
+        this.updateUI();
+        this.updateDustDisplay();
+    },
+
+    /**
+     * Set the upgrade level of an equipped item
+     * @param {string} slotId - Slot identifier (e.g., 'weapon', 'ring-1')
+     * @param {number} newLevel - New upgrade level (1-based)
+     */
+    setItemLevel(slotId, newLevel) {
+        const itemData = heroBuild.equipment.slots[slotId];
+        if (!itemData) return;
+
+        // Clamp level between 1 and max_level
+        const maxLevel = itemData.max_level || 1;
+        const clampedLevel = Math.max(1, Math.min(newLevel, maxLevel));
+
+        // Update the level
+        itemData.level = clampedLevel;
+
+        // Recalculate bonuses based on new level
+        // Note: level is 1-based, but calculation uses 0-based (level - 1)
+        const rawBonuses = itemData.raw_data?.bonuses || [];
+        itemData.bonuses = this.calculateBonusesForLevel(rawBonuses, clampedLevel - 1);
+
+        // Update all descriptions (hero stats and item levels may affect them)
+        this.updateAllDescriptions();
+
+        // Update UI to reflect changes
+        this.updateUI();
+        this.updateDustDisplay();
+    },
+
+    init() {
+        // Setup click handlers for all equipment slots
+        const equipSlots = document.querySelectorAll('.equip-slot[data-slot-type]');
+        equipSlots.forEach(slot => {
+            const slotId = slot.id.replace('slot-', '');
+            const slotType = slot.dataset.slotType;
+
+            slot.onclick = () => {
+                ItemSelectionModal.open(slotId, slotType);
+            };
+
+            // Add right-click handler to remove equipped items
+            slot.oncontextmenu = (e) => {
+                e.preventDefault();
+                const slotData = heroBuild.equipment.slots[slotId];
+                if (slotData) {
+                    if (confirm(`Remove ${slotData.name}?`)) {
+                        this.unequipItem(slotId);
+                    }
+                }
+            };
+        });
+
+        // Initial UI update to show any pre-equipped items
+        this.updateUI();
+        this.updateDustDisplay();
+    },
+
+    equipItem(slotId, itemData) {
+        // Initialize level (defaults to 1 if not provided)
+        const initialLevel = itemData.level || 1;
+
+        // Get bonuses from raw_data (API format) or bonuses_raw (legacy)
+        const rawBonuses = itemData.raw_data?.bonuses || itemData.bonuses_raw || itemData.bonuses || [];
+
+        // Calculate initial bonuses based on level
+        const calculatedBonuses = this.calculateBonusesForLevel(
+            rawBonuses,
+            initialLevel - 1  // Convert 1-based to 0-based
+        );
+
+        // Update heroBuild state
+        heroBuild.equipment.slots[slotId] = {
+            id: itemData.id,
+            name: itemData.name,
+            icon: itemData.icon,
+            slot: itemData.slot,
+            rarity: itemData.rarity,
+            bonuses: calculatedBonuses,
+            item_set: itemData.item_set,
+            max_level: itemData.max_level || 1,
+            cost_base: itemData.cost_base || 0,
+            cost_per_level: itemData.cost_per_level || 0,
+            description: itemData.description,
+            description_template: itemData.description_template,
+            description_values: itemData.description_values,
+            description_args: itemData.description_args || [],
+            upgrade_description: itemData.upgrade_description || '',
+            upgrade_description_template: itemData.upgrade_description_template || '',
+            upgrade_description_args: itemData.upgrade_description_args || [],
+            narrative_description: itemData.narrative_description || '',
+            raw_data: itemData.raw_data,
+            level: initialLevel
+        };
+
+        // Update all descriptions (hero stats may have changed)
+        this.updateAllDescriptions();
+
+        // Update UI
+        this.updateUI();
+        this.updateDustDisplay();
+    },
+
+    unequipItem(slotId) {
+        // Remove from heroBuild state
+        heroBuild.equipment.slots[slotId] = null;
+
+        // Update all descriptions (hero stats may have changed)
+        this.updateAllDescriptions();
+
+        // Update UI
+        this.updateUI();
+        this.updateDustDisplay();
+    },
+
+    updateUI() {
+        // Update all equipment slots to show equipped items or empty state
+        for (const [slotId, itemData] of Object.entries(heroBuild.equipment.slots)) {
+            const slotElement = document.getElementById(`slot-${slotId}`);
+            if (!slotElement) continue;
+
+            if (itemData) {
+                // Show equipped item with tooltip
+                const rarityColor = ItemSelectionModal.rarityColors[itemData.rarity] || '#ffffff';
+
+                // Get current level and max level
+                const currentLevel = itemData.level || 1;
+                const maxLevel = itemData.max_level || 1;
+
+                // Always calculate description dynamically using formatItemDescription
+                const descriptionText = this.formatItemDescription(itemData, currentLevel) ||
+                                       (itemData.bonuses || []).join(', ') ||
+                                       'No description';
+                const bonusesHTML = `<div class="bonus-line">${descriptionText}</div>`;
+
+                // Calculate dust costs
+                const canLevelUp = currentLevel < maxLevel;
+                const canLevelDown = currentLevel > 1;
+                const upgradeCost = canLevelUp ? this.calculateDustCost(itemData, currentLevel + 1) - this.calculateDustCost(itemData, currentLevel) : 0;
+                const downgradeSavings = canLevelDown ? this.calculateDustCost(itemData, currentLevel) - this.calculateDustCost(itemData, currentLevel - 1) : 0;
+
+                const upgradeControlsHTML = `
+                    <div class="tooltip-level">Level ${currentLevel}/${maxLevel}</div>
+                    <div class="tooltip-upgrade-row">
+                        <button class="tooltip-upgrade-btn ${!canLevelUp ? 'disabled' : ''}"
+                                onclick="event.stopPropagation(); if (${canLevelUp}) EquipmentManager.setItemLevel('${slotId}', ${currentLevel + 1});">
+                            ⏫ ${upgradeCost} <img src="/media/gamedata/ui/resource_dust.png" class="dust-icon-small" alt="dust">
+                        </button>
+                        <button class="tooltip-upgrade-btn ${!canLevelDown ? 'disabled' : ''}"
+                                onclick="event.stopPropagation(); if (${canLevelDown}) EquipmentManager.setItemLevel('${slotId}', ${currentLevel - 1});">
+                            ⏬ ${downgradeSavings} <img src="/media/gamedata/ui/resource_dust.png" class="dust-icon-small" alt="dust">
+                        </button>
+                    </div>
+                    <button class="tooltip-remove-btn" onclick="event.stopPropagation(); EquipmentManager.unequipItem('${slotId}');">
+                        Remove Item
+                    </button>
+                `;
+
+                // Add narrative description (flavor text) if available
+                const narrativeHTML = itemData.narrative_description
+                    ? `<div class="tooltip-narrative">${itemData.narrative_description}</div>`
+                    : '';
+
+                slotElement.innerHTML = `
+                    <img src="/media/gamedata/items/${itemData.icon}.png"
+                         alt="${itemData.name}"
+                         style="opacity: 1; width: 90%; height: 90%;">
+                    <div class="item-tooltip">
+                        <div class="tooltip-header">
+                            <span class="item-name" style="color: ${rarityColor}">${itemData.name}</span>
+                            <span class="item-rarity">${itemData.rarity}</span>
+                        </div>
+                        <div class="tooltip-bonuses">
+                            ${bonusesHTML}
+                        </div>
+                        ${narrativeHTML}
+                        ${upgradeControlsHTML}
+                    </div>
+                `;
+                slotElement.style.borderColor = rarityColor;
+            } else {
+                // Show empty slot with default icon
+                const slotType = slotElement.dataset.slotType;
+                const defaultIcons = {
+                    'unique': 'slot_unique.png',
+                    'head': 'slot_head.png',
+                    'back': 'slot_cloak.png',
+                    'armor': 'slot_armor.png',
+                    'weapon': 'slot_left_hand.png',
+                    'shield': 'slot_right_hand.png',
+                    'belt': 'slot_belt.png',
+                    'boots': 'slot_boots.png',
+                    'ring': 'slot_ring.png',
+                    'accessory': 'slot_item.png'
+                };
+
+                const defaultIcon = defaultIcons[slotType] || 'slot_item.png';
+
+                slotElement.innerHTML = `
+                    <img src="/media/gamedata/ui/${defaultIcon}" alt="${slotType}">
+                `;
+                slotElement.style.borderColor = '#3a4555';
+            }
+        }
+    }
+};
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    SkillManager.init();
+    AdvancedClassManager.init();
+    EquipmentManager.init();
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            SkillSelectionModal.close();
+            SubskillSelectionModal.close();
+            ItemSelectionModal.close();
+        }
+    });
+});
+</script>

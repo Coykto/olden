@@ -1,0 +1,135 @@
+<!-- Equipment + Backpack Row -->
+<div class="equip-spells-row">
+    <!-- Equipment - 5 rows around hero silhouette -->
+    <div class="equipment-section" id="equipment-panel">
+        <div class="equipment-silhouette">
+            <!-- Row 1: Unique, Head (offset down), Back -->
+            <div class="equip-row">
+                <div class="equip-col-left">
+                    <div class="equip-slot" id="slot-unique" data-slot-type="unique">
+                        <img src="/media/gamedata/ui/slot_unique.png" alt="Unique">
+                    </div>
+                </div>
+                <div class="equip-col-center offset-down">
+                    <div class="equip-slot" id="slot-head" data-slot-type="head">
+                        <img src="/media/gamedata/ui/slot_head.png" alt="Head">
+                    </div>
+                </div>
+                <div class="equip-col-right">
+                    <div class="equip-slot" id="slot-back" data-slot-type="back">
+                        <img src="/media/gamedata/ui/slot_cloak.png" alt="Back">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 2: Ring, Armor, Ring -->
+            <div class="equip-row">
+                <div class="equip-col-left">
+                    <div class="equip-slot" id="slot-ring-1" data-slot-type="ring">
+                        <img src="/media/gamedata/ui/slot_ring.png" alt="Ring">
+                    </div>
+                </div>
+                <div class="equip-col-center">
+                    <div class="equip-slot" id="slot-armor" data-slot-type="armor">
+                        <img src="/media/gamedata/ui/slot_armor.png" alt="Armor">
+                    </div>
+                </div>
+                <div class="equip-col-right">
+                    <div class="equip-slot" id="slot-ring-2" data-slot-type="ring">
+                        <img src="/media/gamedata/ui/slot_ring.png" alt="Ring">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 3: Weapon, Belt, Shield -->
+            <div class="equip-row">
+                <div class="equip-col-left">
+                    <div class="equip-slot" id="slot-weapon" data-slot-type="weapon">
+                        <img src="/media/gamedata/ui/slot_left_hand.png" alt="Weapon">
+                    </div>
+                </div>
+                <div class="equip-col-center">
+                    <div class="equip-slot" id="slot-belt" data-slot-type="belt">
+                        <img src="/media/gamedata/ui/slot_belt.png" alt="Belt">
+                    </div>
+                </div>
+                <div class="equip-col-right">
+                    <div class="equip-slot" id="slot-shield" data-slot-type="shield">
+                        <img src="/media/gamedata/ui/slot_right_hand.png" alt="Shield">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 4: Accessory, (empty), Accessory -->
+            <div class="equip-row">
+                <div class="equip-col-left offset-down">
+                    <div class="equip-slot" id="slot-accessory-1" data-slot-type="accessory">
+                        <img src="/media/gamedata/ui/slot_item.png" alt="Accessory">
+                    </div>
+                </div>
+                <div class="equip-col-center equip-col-empty">
+                    <div class="equip-slot"></div>
+                </div>
+                <div class="equip-col-right offset-down">
+                    <div class="equip-slot" id="slot-accessory-2" data-slot-type="accessory">
+                        <img src="/media/gamedata/ui/slot_item.png" alt="Accessory">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 5: Accessory, Boots, Accessory -->
+            <div class="equip-row">
+                <div class="equip-col-left">
+                    <div class="equip-slot" id="slot-accessory-3" data-slot-type="accessory">
+                        <img src="/media/gamedata/ui/slot_item.png" alt="Accessory">
+                    </div>
+                </div>
+                <div class="equip-col-center">
+                    <div class="equip-slot" id="slot-boots" data-slot-type="boots">
+                        <img src="/media/gamedata/ui/slot_boots.png" alt="Boots">
+                    </div>
+                </div>
+                <div class="equip-col-right">
+                    <div class="equip-slot" id="slot-accessory-4" data-slot-type="accessory">
+                        <img src="/media/gamedata/ui/slot_item.png" alt="Accessory">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Dust Cost Summary -->
+        <div class="equipment-dust-summary">
+            <div class="dust-total" id="total-equipment-dust">
+                <span>Total</span>
+                <img src="/media/gamedata/ui/resource_dust.png" alt="Dust" class="dust-icon">
+                <span class="dust-value">0</span>
+            </div>
+            <div class="bulk-upgrade-controls">
+                <button class="bulk-upgrade-btn" onclick="EquipmentManager.maxAllUpgrades()">Max All</button>
+                <button class="bulk-upgrade-btn" onclick="EquipmentManager.resetAllUpgrades()">Reset All</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Backpack Grid (4x6) -->
+    <div class="backpack-section">
+        <div class="backpack-grid">
+            {% for i in "123456789012345678901234"|make_list %}
+            <div class="backpack-slot">
+                <span class="add-text"></span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Units Row -->
+<div class="units-section">
+    <div class="units-grid">
+        {% for i in "1234567"|make_list %}
+        <div class="unit-slot">
+            <span class="add-text">+</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
