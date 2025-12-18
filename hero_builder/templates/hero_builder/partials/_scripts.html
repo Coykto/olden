@@ -2,10 +2,10 @@
 
 <!-- Generated description functions from .script files -->
 {% load static %}
-<script src="{% static 'js/description-runtime.js' %}?v=6"></script>
-<script src="{% static 'js/generated/game_data.js' %}?v=6"></script>
-<script src="{% static 'js/generated/description_functions.js' %}?v=6"></script>
-<script src="{% static 'js/hero-state.js' %}?v=6"></script>
+<script src="{% static 'js/description-runtime.js' %}?v=7"></script>
+<script src="{% static 'js/generated/game_data.js' %}?v=7"></script>
+<script src="{% static 'js/generated/description_functions.js' %}?v=7"></script>
+<script src="{% static 'js/hero-state.js' %}?v=7"></script>
 
 <script>
 // Client-side state for hero build
@@ -69,6 +69,7 @@ const SkillManager = {
                     subskills: [null, null],
                     subskillNames: [null, null],
                     subskillDescs: [null, null],
+                    subskillRawData: [null, null],
                     name: name,
                     description: tooltipDesc
                 };
@@ -122,6 +123,7 @@ const SkillManager = {
             subskills: [null, null],
             subskillNames: [null, null],
             subskillDescs: [null, null],
+            subskillRawData: [null, null],
             name: skillData.name,
             icon: skillData.icon,
             description: skillData.description || '',
@@ -140,7 +142,7 @@ const SkillManager = {
             .map(s => s.skillId);
     },
 
-    levelUpSkill(slotIndex, subskillId, subskillName, subskillDesc) {
+    levelUpSkill(slotIndex, subskillId, subskillName, subskillDesc, subskillRawData) {
         const skill = heroBuild.skills[slotIndex];
         if (!skill || skill.level >= 3) return;
 
@@ -149,6 +151,7 @@ const SkillManager = {
         skill.subskills[subskillIndex] = subskillId;
         skill.subskillNames[subskillIndex] = subskillName;
         skill.subskillDescs[subskillIndex] = subskillDesc || '';
+        skill.subskillRawData[subskillIndex] = subskillRawData || null;
 
         // Increase level
         skill.level++;
@@ -158,7 +161,7 @@ const SkillManager = {
         EquipmentManager.updateAllDescriptions();
     },
 
-    repickSubskill(slotIndex, subskillSlot, subskillId, subskillName, subskillDesc) {
+    repickSubskill(slotIndex, subskillSlot, subskillId, subskillName, subskillDesc, subskillRawData) {
         const skill = heroBuild.skills[slotIndex];
         if (!skill) return;
 
@@ -166,6 +169,7 @@ const SkillManager = {
         skill.subskills[subskillSlot] = subskillId;
         skill.subskillNames[subskillSlot] = subskillName;
         skill.subskillDescs[subskillSlot] = subskillDesc || '';
+        skill.subskillRawData[subskillSlot] = subskillRawData || null;
 
         // Update UI and descriptions (subskill bonuses may affect item descriptions)
         this.updateUI();
@@ -432,6 +436,7 @@ const SubskillSelectionModal = {
     slotIndex: null,
     subskillSlot: null,  // 0 or 1, for repicking
     isRepick: false,
+    currentSubskills: [],  // Store fetched subskills for raw_data access
 
     async open(slotIndex) {
         this.slotIndex = slotIndex;
@@ -474,6 +479,9 @@ const SubskillSelectionModal = {
     },
 
     render(data) {
+        // Store subskills for raw_data access in select()
+        this.currentSubskills = data.subskills;
+
         // Get the skill from heroBuild to use its template/args for dynamic formatting
         const skill = heroBuild.skills[this.slotIndex];
         // Compute description dynamically at the new level
@@ -516,19 +524,16 @@ const SubskillSelectionModal = {
     },
 
     select(subskillId) {
-        // Find the subskill name and description from the rendered data
-        const subskillElement = document.querySelector(`.subskill-option[onclick*="${subskillId}"]`);
-        const subskillName = subskillElement ?
-            subskillElement.querySelector('.subskill-name')?.textContent :
-            subskillId;
-        const subskillDesc = subskillElement ?
-            subskillElement.querySelector('.subskill-desc')?.textContent :
-            '';
+        // Find the full subskill data from stored subskills
+        const subskill = this.currentSubskills.find(s => s.id === subskillId);
+        const subskillName = subskill?.name || subskillId;
+        const subskillDesc = subskill ? EquipmentManager.formatSubskillDescription(subskill) : '';
+        const subskillRawData = subskill?.raw_data || null;
 
         if (this.isRepick) {
-            SkillManager.repickSubskill(this.slotIndex, this.subskillSlot, subskillId, subskillName, subskillDesc);
+            SkillManager.repickSubskill(this.slotIndex, this.subskillSlot, subskillId, subskillName, subskillDesc, subskillRawData);
         } else {
-            SkillManager.levelUpSkill(this.slotIndex, subskillId, subskillName, subskillDesc);
+            SkillManager.levelUpSkill(this.slotIndex, subskillId, subskillName, subskillDesc, subskillRawData);
         }
         this.close();
     },
@@ -1134,6 +1139,41 @@ const EquipmentManager = {
                 const key = statMap[statName];
                 if (key) {
                     stats[key] = (stats[key] || 0) + value;
+                }
+            }
+        }
+
+        // Add bonuses from subskills
+        for (const skillData of heroBuild.skills) {
+            if (!skillData) continue;
+
+            for (let i = 0; i < 2; i++) {
+                const subskillRawData = skillData.subskillRawData?.[i];
+                if (!subskillRawData?.bonuses) continue;
+
+                for (const bonus of subskillRawData.bonuses) {
+                    if (bonus.type !== 'heroStat') continue;
+                    const params = bonus.parameters || [];
+                    if (params.length < 2) continue;
+
+                    const statName = params[0];
+                    const value = parseFloat(params[1]);
+                    if (isNaN(value)) continue;
+
+                    // Map game stat names to our stat object keys
+                    const statMap = {
+                        'viewRadius': 'viewRadius',
+                        'offence': 'offence',
+                        'defence': 'defence',
+                        'spellPower': 'spellPower',
+                        'intelligence': 'intelligence',
+                        'luck': 'luck',
+                        'moral': 'moral',
+                    };
+                    const key = statMap[statName];
+                    if (key) {
+                        stats[key] = (stats[key] || 0) + value;
+                    }
                 }
             }
         }
