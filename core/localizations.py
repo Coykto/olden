@@ -422,11 +422,22 @@ def get_skill_info(skill_id: str, level: int = 1) -> dict:
 
 
 def get_advanced_class_info(class_id: str) -> dict:
-    """Get display info for an advanced class."""
+    """Get display info for an advanced class with template and args for dynamic descriptions."""
     localizations = get_localizations()
+    args_data = get_skill_args()  # Advanced class args are in heroSkills.json
+
     name = localizations.get(f"{class_id}_name", class_id.replace("_", " ").title())
-    description = localizations.get(f"{class_id}_desc", "")
-    return {"id": class_id, "name": name, "description": description}
+    desc_key = f"{class_id}_desc"
+    description_template = localizations.get(desc_key, "")
+    description_args = args_data.get(desc_key, [])
+
+    return {
+        "id": class_id,
+        "name": name,
+        "description": description_template,  # Raw template with placeholders
+        "description_template": description_template,
+        "description_args": description_args,
+    }
 
 
 @lru_cache(maxsize=1)
@@ -436,6 +447,26 @@ def get_item_args(lang: str = "english") -> dict:
     Returns a dict mapping sid -> list of function names.
     """
     args_file = settings.GAME_DATA_PATH / "StreamingAssets" / "Lang" / "args" / "artifacts.json"
+
+    if not args_file.exists():
+        return {}
+
+    try:
+        with open(args_file, 'r', encoding='utf-8-sig') as f:
+            data = json.load(f)
+            tokens_args = data.get("tokensArgs", [])
+            return {item["sid"]: item.get("args", []) for item in tokens_args}
+    except Exception:
+        return {}
+
+
+@lru_cache(maxsize=1)
+def get_hero_spec_args(lang: str = "english") -> dict:
+    """
+    Load hero specialization description args from game files.
+    Returns a dict mapping sid -> list of function names.
+    """
+    args_file = settings.GAME_DATA_PATH / "StreamingAssets" / "Lang" / "args" / "heroInfo.json"
 
     if not args_file.exists():
         return {}
@@ -507,4 +538,75 @@ def get_item_info(item_id: str) -> dict:
         "upgrade_description_template": upgrade_description_template,
         "upgrade_description_args": upgrade_description_args,
         "narrative_description": narrative_description,
+    }
+
+
+@lru_cache(maxsize=1)
+def get_specialization_data() -> dict:
+    """
+    Load all hero specialization data from game files.
+    Returns a dict mapping specialization_id -> specialization data (with bonuses).
+    """
+    possible_paths = [
+        Path("/tmp/DB/heroes_specializations"),
+        Path(settings.GAME_DATA_PATH) / "DB" / "heroes_specializations",
+    ]
+
+    spec_dir = None
+    for path in possible_paths:
+        if path.exists():
+            spec_dir = path
+            break
+
+    if spec_dir is None:
+        return {}
+
+    specializations = {}
+    for json_file in spec_dir.glob("specializations_*.json"):
+        try:
+            with open(json_file, 'r', encoding='utf-8-sig') as f:
+                data = json.load(f)
+                for spec in data.get('array', []):
+                    spec_id = spec.get('id')
+                    if spec_id:
+                        specializations[spec_id] = spec
+        except Exception:
+            continue
+
+    return specializations
+
+
+def get_hero_specialization_info(hero_id: str) -> dict:
+    """
+    Get display info for a hero's specialization including name, description template, args, and raw data.
+
+    Args:
+        hero_id: The hero's id_key (e.g., 'human_hero_1')
+
+    Returns:
+        dict with name, description_template, description_args, raw_data
+    """
+    localizations = get_localizations()
+    args_data = get_hero_spec_args()
+    spec_data = get_specialization_data()
+
+    # Hero specialization localization keys follow pattern: {hero_id}_spec_{field}
+    name_key = f"{hero_id}_spec_name"
+    desc_key = f"{hero_id}_spec_description"
+    spec_id = f"{hero_id}_specialization"
+
+    name = localizations.get(name_key, "")
+    description_template = localizations.get(desc_key, "")
+
+    # Get args for description
+    description_args = args_data.get(desc_key, [])
+
+    # Get raw specialization data with bonuses
+    raw_data = spec_data.get(spec_id, {})
+
+    return {
+        "name": name,
+        "description_template": description_template,
+        "description_args": description_args,
+        "raw_data": raw_data,
     }

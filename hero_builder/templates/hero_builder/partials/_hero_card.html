@@ -1,5 +1,6 @@
+{% load json_filters %}
 <!-- Hero Card -->
-<div class="hero-card" data-hero-faction="{{ hero.faction.slug }}" data-hero-class-type="{{ hero.class_type }}" data-hero-id="{{ hero.game_id }}" data-hero-view-radius="{{ hero.start_view_radius }}">
+<div class="hero-card" data-hero-faction="{{ hero.faction.slug }}" data-hero-class-type="{{ hero.class_type }}" data-hero-id="{{ hero.game_id }}" data-hero-view-radius="{{ hero.start_view_radius }}" data-hero-level="{{ hero.start_level }}" data-hero-spec='{{ hero.specialization_info.raw_data|to_json }}'>
     <div class="hero-header">
         <!-- Portrait Column -->
         <div class="portrait-column">
@@ -10,7 +11,11 @@
                 <div class="hero-portrait" style="background: linear-gradient(180deg, #333 0%, #222 100%);"></div>
                 {% endif %}
             </div>
-            <div class="class-badge-wrapper">
+            <div class="class-badge-wrapper"
+                 data-spec-name="{{ hero.specialization_name }}"
+                 data-spec-template="{{ hero.specialization_info.description_template|escapejs }}"
+                 data-spec-args='{{ hero.specialization_info.description_args|to_json }}'
+                 data-spec-raw='{{ hero.specialization_info.raw_data|to_json }}'>
                 <img src="{{ hero.class_icon_url }}" alt="{{ hero.class_type }}" class="class-badge">
             </div>
         </div>
@@ -22,7 +27,7 @@
                 <img src="{{ hero.faction.icon_url }}" alt="{{ hero.faction.name }}" class="faction-badge">
                 <div class="name-text">
                     <span class="hero-name">{{ hero.display_name }}</span>
-                    <span class="hero-specialty">{{ hero.specialization_name|default:hero.class_type }}</span>
+                    <span class="hero-specialty">{{ hero.specialization_name }}</span>
                 </div>
             </div>
 
@@ -65,9 +70,12 @@
                             <img src="/media/gamedata/skills/{{ skill.id }}{{ skill.icon_suffix }}.png" alt="{{ skill.level_prefix }}{{ skill.name }}">
                             <div class="tooltip-content">
                                 <div class="tooltip-name">{{ skill.level_prefix }}{{ skill.name }}</div>
-                                {% if skill.description %}
-                                <div class="tooltip-desc">{{ skill.description }}</div>
-                                {% endif %}
+                                <div class="tooltip-desc"
+                                     data-skill-template="{{ skill.description_template|escapejs }}"
+                                     data-skill-args='{{ skill.description_args|to_json }}'
+                                     data-skill-raw='{{ skill.raw_data|to_json }}'
+                                     data-skill-level="{{ skill.level }}">
+                                </div>
                             </div>
                         </div>
                         <div class="subskill-column">

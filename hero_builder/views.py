@@ -610,9 +610,13 @@ def api_advanced_classes(request):
             'id': adv_class.id_key,
             'name': info['name'],
             'description': info['description'],
+            'description_template': info.get('description_template', info['description']),
+            'description_args': info.get('description_args', []),
             'icon_url': adv_class.icon_url,
             'required_skills': adv_class.required_skill_ids,
             'activation_conditions': adv_class.activation_conditions,
+            'bonuses': adv_class.bonuses or [],
+            'raw_data': adv_class.raw_data or {},
         })
 
     return JsonResponse({

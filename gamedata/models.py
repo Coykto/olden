@@ -54,8 +54,22 @@ class Faction(models.Model):
     def skill_info(self):
         """Get display info for the faction skill including name and description."""
         if self.faction_skill:
-            from core.localizations import get_skill_info
-            return get_skill_info(self.faction_skill)
+            from core.localizations import get_skill_info, get_localizations, get_skill_args
+
+            info = get_skill_info(self.faction_skill)
+
+            # Add fields for dynamic description pipeline
+            localizations = get_localizations()
+            skill_args = get_skill_args()
+            skill = Skill.objects.filter(id_key=self.faction_skill).first()
+
+            if skill and skill.raw_data:
+                desc_key = skill.raw_data.get('parametersPerLevel', [{}])[0].get('desc', f"{self.faction_skill}_desc")
+                info['description_template'] = localizations.get(desc_key, '')
+                info['description_args'] = skill_args.get(desc_key, [])
+                info['raw_data'] = skill.raw_data
+
+            return info
         return None
 
 
@@ -158,6 +172,49 @@ class Hero(models.Model):
     specialization_name = models.CharField(max_length=200, default="", blank=True)
     specialization_desc = models.TextField(default="", blank=True)
 
+    @property
+    def specialization_info(self):
+        """Get specialization info with description template and args for JS rendering."""
+        from core.localizations import get_hero_specialization_info
+        return get_hero_specialization_info(self.id_key)
+
+    @property
+    def advanced_classes_info(self):
+        """Get advanced class info for this hero's faction and class type."""
+        from core.localizations import get_localizations
+        localizations = get_localizations()
+
+        # Get base class name and icon
+        base_class_name_key = f"{self.class_type}_{self.faction.id_key}_name"
+        base_class_name = localizations.get(base_class_name_key, self.class_type.title())
+        base_class_icon_url = f"/media/gamedata/ui/{self.class_type}_icon.png"
+
+        # Get advanced classes for this faction and class type
+        advanced_classes = AdvancedClass.objects.filter(
+            version=self.version,
+            faction=self.faction,
+            class_type=self.class_type
+        )
+
+        classes_data = []
+        for adv_class in advanced_classes:
+            info = adv_class.display_info
+            classes_data.append({
+                'id': adv_class.id_key,
+                'name': info.get('name', adv_class.id_key),
+                'description': info.get('description', ''),
+                'description_template': info.get('description_template', ''),
+                'description_args': info.get('description_args', []),
+                'icon_url': adv_class.icon_url,
+                'activation_conditions': adv_class.activation_conditions,
+            })
+
+        return {
+            'base_class_name': base_class_name,
+            'base_class_icon_url': base_class_icon_url,
+            'advanced_classes': classes_data,
+        }
+
     # Sort order (extracted from id_key number, e.g., human_hero_1 -> 1)
     sort_order = models.IntegerField(default=0)
 
@@ -196,9 +253,13 @@ class Hero(models.Model):
     @property
     def starting_skills_with_levels(self):
         """Get starting skills with their levels from raw_data for hero builder."""
-        from core.localizations import get_skill_info
+        from core.localizations import get_skill_info, get_localizations, get_skill_args
         skills = []
         raw_skills = self.raw_data.get('startSkills', []) if self.raw_data else []
+        
+        localizations = get_localizations()
+        skill_args = get_skill_args()
+        
         for skill_data in raw_skills:
             skill_id = skill_data.get('sid', '')
             level = skill_data.get('skillLevel', 1)
@@ -208,15 +269,42 @@ class Hero(models.Model):
             info['icon_suffix'] = '' if level == 1 else f'_{level}'
             # Level prefix for display: Basic (1), Advanced (2), Expert (3)
             info['level_prefix'] = {1: '', 2: 'Advanced ', 3: 'Expert '}.get(level, '')
+            
+            # Add description pipeline fields for dynamic descriptions
+            skill_obj = Skill.objects.filter(id_key=skill_id).first()
+            if skill_obj and skill_obj.raw_data:
+                params = skill_obj.raw_data.get('parametersPerLevel', [])
+                if len(params) >= level:
+                    desc_key = params[level - 1].get('desc', f"{skill_id}_desc")
+                    info['description_template'] = localizations.get(desc_key, '')
+                    info['description_args'] = skill_args.get(desc_key, [])
+                    info['raw_data'] = skill_obj.raw_data
+            
             skills.append(info)
         return skills
 
     @property
     def hero_card_skill(self):
         """Get the skill to display on hero card - specialty faction skill OR first non-faction skill."""
-        from core.localizations import get_skill_info
+        from core.localizations import get_skill_info, get_localizations, get_skill_args
         faction_skill_id = self.faction.faction_skill if self.faction else None
         raw_skills = self.raw_data.get('startSkills', []) if self.raw_data else []
+
+        def add_description_fields(info, skill_id, level):
+            """Add description pipeline fields to skill info."""
+            localizations = get_localizations()
+            skill_args = get_skill_args()
+            skill_obj = Skill.objects.filter(id_key=skill_id).first()
+
+            if skill_obj and skill_obj.raw_data:
+                params = skill_obj.raw_data.get('parametersPerLevel', [])
+                if len(params) >= level:
+                    desc_key = params[level - 1].get('desc', f"{skill_id}_desc")
+                    info['description_template'] = localizations.get(desc_key, '')
+                    info['description_args'] = skill_args.get(desc_key, [])
+                    info['raw_data'] = skill_obj.raw_data
+
+            return info
 
         # First check if faction skill is a specialty (level 2+)
         for skill_data in raw_skills:
@@ -227,7 +315,7 @@ class Hero(models.Model):
                 info['level'] = level
                 info['icon_suffix'] = f'_{level}'
                 info['level_prefix'] = {2: 'Advanced ', 3: 'Expert '}.get(level, '')
-                return info
+                return add_description_fields(info, skill_id, level)
 
         # Otherwise, return first non-faction skill
         for skill_data in raw_skills:
@@ -238,7 +326,7 @@ class Hero(models.Model):
                 info['level'] = level
                 info['icon_suffix'] = '' if level == 1 else f'_{level}'
                 info['level_prefix'] = {1: '', 2: 'Advanced ', 3: 'Expert '}.get(level, '')
-                return info
+                return add_description_fields(info, skill_id, level)
 
         return None
 

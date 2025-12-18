@@ -55,15 +55,13 @@ const DescriptionRuntime = {
   },
 
   /**
-   * Format as modifier percent (values < 1 are multiplied by 100)
+   * Format as modifier percent - values are multipliers (3.0 = 300%)
    * Returns just the number - templates already include % sign
    */
   formatModPercentNumeric(value) {
     let num = Number(value) || 0;
-    // If value is a decimal (0.15), convert to percentage (15)
-    if (Math.abs(num) < 1 && num !== 0) {
-      num = num * 100;
-    }
+    // Values are multipliers: 3.0 = 300%, 0.15 = 15%
+    num = num * 100;
     num = Math.round(num);
     return String(num);
   },
@@ -74,9 +72,8 @@ const DescriptionRuntime = {
    */
   formatModFloatPercentF1(value) {
     let num = Number(value) || 0;
-    if (Math.abs(num) < 1 && num !== 0) {
-      num = num * 100;
-    }
+    // Values are multipliers: 3.0 = 300%, 0.15 = 15%
+    num = num * 100;
     return num.toFixed(1);
   },
 
@@ -109,9 +106,8 @@ const DescriptionRuntime = {
    */
   formatPercent(value) {
     let num = Number(value) || 0;
-    if (Math.abs(num) < 1 && num !== 0) {
-      num = num * 100;
-    }
+    // Values are multipliers: 3.0 = 300%, 0.15 = 15%
+    num = num * 100;
     return `${Math.round(num)}%`;
   },
 
@@ -120,9 +116,8 @@ const DescriptionRuntime = {
    */
   formatModPercent(value) {
     let num = Number(value) || 0;
-    if (Math.abs(num) < 1 && num !== 0) {
-      num = num * 100;
-    }
+    // Values are multipliers: 3.0 = 300%, 0.15 = 15%
+    num = num * 100;
     num = Math.round(num);
     return num >= 0 ? `+${num}%` : `${num}%`;
   },
@@ -136,10 +131,16 @@ const DescriptionRuntime = {
    */
   formatDescription(template, argFunctions, ctx) {
     if (!template) return '';
-    if (!argFunctions || argFunctions.length === 0) return template;
+
+    // Helper to convert newlines to HTML line breaks
+    const convertNewlines = (text) => text
+      .replace(/\\u000A/g, '<br>')
+      .replace(/\n/g, '<br>');
+
+    if (!argFunctions || argFunctions.length === 0) return convertNewlines(template);
 
     // Match all placeholders {N}
-    return template.replace(/\{(\d+)\}/g, (placeholder, index, offset) => {
+    const result = template.replace(/\{(\d+)\}/g, (placeholder, index, offset) => {
       const funcSpec = argFunctions[parseInt(index, 10)];
       if (!funcSpec) {
         console.error(`[DescriptionRuntime] Placeholder ${placeholder}: No function specified in description_args array (index ${index})`);
@@ -207,6 +208,8 @@ const DescriptionRuntime = {
       console.error(`[DescriptionRuntime] Placeholder ${placeholder}: All functions failed. Tried: ${triedFuncs}. Context keys: ${ctx ? Object.keys(ctx).join(', ') : 'null'}`);
       return fullMatch;
     });
+
+    return convertNewlines(result);
   }
 };
 

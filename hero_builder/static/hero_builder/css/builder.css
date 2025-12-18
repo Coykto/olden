@@ -54,6 +54,12 @@
     border-radius: 12px;
 }
 
+.no-border {
+    background: none;
+    border: none;
+    border-radius: 12px;
+}
+
 /* Hero Header - Portrait + Name + Stats + Skills */
 .hero-header {
     display: flex;

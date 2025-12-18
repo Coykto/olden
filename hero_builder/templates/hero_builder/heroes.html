@@ -1,8 +1,10 @@
 {% extends "hero_builder/base.html" %}
+{% load static json_filters %}
 
 {% block title %}{{ faction.name }} Heroes - Olden Era Calculator{% endblock %}
 
 {% block extra_styles %}
+<link rel="stylesheet" href="{% static 'hero_builder/css/builder.css' %}">
 <style>
     .page-header {
         text-align: center;
@@ -128,6 +130,30 @@
         background: #222;
     }
 
+    /* Override class-badge-wrapper positioning for hero cards */
+    .hero-card .class-badge-wrapper {
+        position: absolute;
+        top: -5px;
+        left: -12px;
+    }
+
+    .hero-card .class-badge-wrapper .class-icon {
+        position: static;
+        width: 38px;
+        height: 38px;
+    }
+
+    /* Override tooltip position for hero cards - appears to the left */
+    .hero-card .class-tooltip {
+        left: auto;
+        right: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        margin-left: 0;
+        margin-right: 15px;
+        text-align: left;
+    }
+
     .skill-icon {
         position: absolute;
         bottom: -1px;
@@ -235,9 +261,12 @@
                 {% if skill %}
                 <div class="tooltip-content tooltip-above">
                     <div class="tooltip-name">{{ skill.name }}</div>
-                    {% if skill.description %}
-                    <div class="tooltip-desc">{{ skill.description }}</div>
-                    {% endif %}
+                    <div class="tooltip-desc"
+                         data-skill-template="{{ skill.description_template|escapejs }}"
+                         data-skill-args='{{ skill.description_args|to_json }}'
+                         data-skill-raw='{{ skill.raw_data|to_json }}'
+                         data-skill-level="1">
+                    </div>
                 </div>
                 {% endif %}
                 {% endwith %}
@@ -247,7 +276,7 @@
     </div>
 
     {% for hero in heroes %}
-    <a href="{% url 'hero_builder:builder' hero.slug %}" class="hero-card">
+    <a href="{% url 'hero_builder:builder' hero.slug %}" class="hero-card no-border">
         <div class="portrait-container">
             {% if hero.portrait_url %}
             <img src="{{ hero.portrait_url }}" alt="{{ hero.display_name }}" class="hero-portrait">
@@ -255,7 +284,10 @@
             <div class="hero-portrait" style="background: #333;"></div>
             {% endif %}
 
-            <img src="{{ hero.class_icon_url }}" alt="{{ hero.class_type }}" class="class-icon">
+            <div class="class-badge-wrapper">
+                <img src="{{ hero.class_icon_url }}" alt="{{ hero.class_type }}" class="class-icon">
+                {% include "hero_builder/partials/_class_tooltip.html" with hero=hero %}
+            </div>
 
             {% with hero.hero_card_skill as skill %}
             {% if skill %}
@@ -263,9 +295,12 @@
                 <img src="/media/gamedata/skills/{{ skill.id }}{{ skill.icon_suffix }}.png" alt="{{ skill.name }}" class="skill-icon">
                 <div class="tooltip-content">
                     <div class="tooltip-name">{{ skill.level_prefix }}{{ skill.name }}</div>
-                    {% if skill.description %}
-                    <div class="tooltip-desc">{{ skill.description }}</div>
-                    {% endif %}
+                    <div class="tooltip-desc"
+                         data-skill-template="{{ skill.description_template|escapejs }}"
+                         data-skill-args='{{ skill.description_args|to_json }}'
+                         data-skill-raw='{{ skill.raw_data|to_json }}'
+                         data-skill-level="{{ skill.level }}">
+                    </div>
                 </div>
             </div>
             {% endif %}
@@ -281,4 +316,79 @@
 </div>
 
 <div class="click-hint">Click to select</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'js/description-runtime.js' %}?v=8"></script>
+<script src="{% static 'js/generated/game_data.js' %}?v=7"></script>
+<script src="{% static 'js/generated/description_functions.js' %}?v=7"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Format all dynamic skill descriptions using the entity description pipeline
+    document.querySelectorAll('[data-skill-template]').forEach(el => {
+        const template = el.dataset.skillTemplate;
+        const args = JSON.parse(el.dataset.skillArgs || '[]');
+        const rawData = JSON.parse(el.dataset.skillRaw || '{}');
+        const level = parseInt(el.dataset.skillLevel) || 1;
+
+        if (!template) return;
+
+        // Static description (no args) - use template directly
+        if (!args.length) {
+            el.textContent = template;
+            return;
+        }
+
+        // Dynamic description - compute with args
+        const params = rawData.parametersPerLevel || [];
+        const levelData = params[level - 1] || params[0] || {};
+
+        const ctx = {
+            currentSkill: {
+                id: rawData.sid || '',
+                level: level,
+                ...levelData
+            }
+        };
+
+        el.textContent = DescriptionRuntime.formatDescription(template, args, ctx);
+    });
+
+    // Format all dynamic specialization descriptions
+    document.querySelectorAll('[data-spec-template]').forEach(el => {
+        const template = el.dataset.specTemplate;
+        const args = JSON.parse(el.dataset.specArgs || '[]');
+        const rawData = JSON.parse(el.dataset.specRaw || '{}');
+
+        if (!template) return;
+
+        // Static description (no args) - use template directly
+        if (!args.length) {
+            el.innerHTML = template;
+            return;
+        }
+
+        // Dynamic description - compute with args
+        const ctx = {
+            currentSpecialization: rawData
+        };
+
+        el.innerHTML = DescriptionRuntime.formatDescription(template, args, ctx);
+    });
+
+    // Format all advanced class descriptions
+    document.querySelectorAll('[data-adv-class-template]').forEach(el => {
+        const template = el.dataset.advClassTemplate;
+        const args = JSON.parse(el.dataset.advClassArgs || '[]');
+
+        if (!template) return;
+
+        // Static description (no args) - already has content
+        if (!args.length) return;
+
+        // Dynamic description - compute with args
+        el.innerHTML = DescriptionRuntime.formatDescription(template, args, {});
+    });
+});
+</script>
 {% endblock %}

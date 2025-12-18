@@ -2,7 +2,7 @@
 
 <!-- Generated description functions from .script files -->
 {% load static %}
-<script src="{% static 'js/description-runtime.js' %}?v=7"></script>
+<script src="{% static 'js/description-runtime.js' %}?v=8"></script>
 <script src="{% static 'js/generated/game_data.js' %}?v=7"></script>
 <script src="{% static 'js/generated/description_functions.js' %}?v=7"></script>
 <script src="{% static 'js/hero-state.js' %}?v=7"></script>
@@ -13,8 +13,11 @@ const heroBuild = {
     heroId: '',
     heroFaction: '',
     heroViewRadius: 6,  // Hero's view radius for item description calculations
+    baseHeroLevel: 1,   // Starting hero level from DOM
+    heroSpecialization: null,  // Raw specialization data with bonuses
     skills: [],  // Array of 8 slots: {skillId, level, subskills} or null
     startingSkillIds: [],
+    startingSkillLevels: {},  // Map of skillId -> starting level, to track upgrades
     // Equipment state
     equipment: {
         slots: {
@@ -37,6 +40,32 @@ const heroBuild = {
     }
 };
 
+/**
+ * Calculate current hero level based on skill changes.
+ * Hero level = base level + new skills acquired + skill upgrades
+ */
+function getHeroLevel() {
+    let level = heroBuild.baseHeroLevel;
+
+    for (const skill of heroBuild.skills) {
+        if (!skill) continue;
+
+        const startingLevel = heroBuild.startingSkillLevels[skill.skillId];
+
+        if (startingLevel === undefined) {
+            // New skill (not in starting skills) - +1 for acquiring at Basic
+            level += 1;
+            // Plus any upgrades from Basic (level 1)
+            level += (skill.level - 1);
+        } else {
+            // Starting skill - count only the upgrades from starting level
+            level += (skill.level - startingLevel);
+        }
+    }
+
+    return level;
+}
+
 const SkillManager = {
     init() {
         // Get hero info from DOM
@@ -44,9 +73,12 @@ const SkillManager = {
         heroBuild.heroFaction = heroCard?.dataset.heroFaction || '';
         heroBuild.heroId = heroCard?.dataset.heroId || '';
         heroBuild.heroViewRadius = parseInt(heroCard?.dataset.heroViewRadius || '6', 10);
+        heroBuild.baseHeroLevel = parseInt(heroCard?.dataset.heroLevel || '1', 10);
+        heroBuild.heroSpecialization = heroCard?.dataset.heroSpec ? JSON.parse(heroCard.dataset.heroSpec) : null;
 
         // Initialize skills array with 8 slots
         heroBuild.skills = new Array(8).fill(null);
+        heroBuild.startingSkillLevels = {};
 
         // Get starting skills from DOM
         const skillSlots = document.querySelectorAll('.skill-with-subs');
@@ -56,9 +88,14 @@ const SkillManager = {
             const skillLevel = parseInt(skillMain?.dataset.skillLevel) || 1;
 
             if (skillId) {
-                // Extract name and description from tooltip if present
+                // Extract name from tooltip if present
                 const tooltipName = skillMain.querySelector('.tooltip-name')?.textContent || skillId;
-                const tooltipDesc = skillMain.querySelector('.tooltip-desc')?.textContent || '';
+                const tooltipDescEl = skillMain.querySelector('.tooltip-desc');
+
+                // Extract description pipeline fields from data attributes
+                const descTemplate = tooltipDescEl?.dataset.skillTemplate || '';
+                const descArgs = tooltipDescEl?.dataset.skillArgs ? JSON.parse(tooltipDescEl.dataset.skillArgs) : [];
+                const rawData = tooltipDescEl?.dataset.skillRaw ? JSON.parse(tooltipDescEl.dataset.skillRaw) : null;
 
                 // Remove level prefix from name if it exists
                 const name = tooltipName.replace(/^(Basic|Advanced|Expert)\s+/, '');
@@ -71,9 +108,13 @@ const SkillManager = {
                     subskillDescs: [null, null],
                     subskillRawData: [null, null],
                     name: name,
-                    description: tooltipDesc
+                    description: '', // Will be computed dynamically
+                    description_template: descTemplate,
+                    description_args: descArgs,
+                    raw_data: rawData
                 };
                 heroBuild.startingSkillIds.push(skillId);
+                heroBuild.startingSkillLevels[skillId] = skillLevel;  // Track starting level
             }
         });
 
@@ -758,14 +799,25 @@ const AdvancedClassManager = {
     },
 
     renderTooltipContent() {
-        // Use the base class name and description from API
-        const baseClass = this.baseClassName || 'Unknown';
-        const baseDesc = this.baseClassDescription || 'Hero class based on faction and specialization.';
+        // Get specialization data from DOM
+        const wrapper = document.querySelector('.class-badge-wrapper');
+        const specName = wrapper?.dataset.specName || '';
+        const specTemplate = wrapper?.dataset.specTemplate || '';
+        const specArgs = JSON.parse(wrapper?.dataset.specArgs || '[]');
+        const specRaw = JSON.parse(wrapper?.dataset.specRaw || '{}');
+
+        // Format specialization description using the entity description pipeline
+        // Pass the raw specialization data as currentSpecialization context
+        let specDesc = specTemplate;
+        if (specArgs.length > 0 && typeof DescriptionRuntime !== 'undefined') {
+            const ctx = { currentSpecialization: specRaw };
+            specDesc = DescriptionRuntime.formatDescription(specTemplate, specArgs, ctx);
+        }
 
         let html = `
             <div class="class-tooltip-header">
-                <div class="class-tooltip-name">${baseClass}</div>
-                <div class="class-tooltip-desc">${baseDesc}</div>
+                <div class="class-tooltip-name">${specName}</div>
+                <div class="class-tooltip-desc">${specDesc}</div>
             </div>
         `;
 
@@ -775,6 +827,11 @@ const AdvancedClassManager = {
 
             for (const advClass of this.advancedClasses) {
                 const progress = this.calculateProgress(advClass);
+                // Format advanced class description using the entity description pipeline
+                let advDesc = advClass.description;
+                if (advClass.description_args?.length > 0 && typeof DescriptionRuntime !== 'undefined') {
+                    advDesc = DescriptionRuntime.formatDescription(advClass.description_template || advClass.description, advClass.description_args, {});
+                }
                 html += `
                     <div class="advanced-class-section">
                         <div class="advanced-class-header">
@@ -785,7 +842,7 @@ const AdvancedClassManager = {
                         <div class="advanced-class-progress-bar">
                             <div class="progress-fill" style="width: ${progress * 20}%"></div>
                         </div>
-                        <div class="advanced-class-desc">${advClass.description}</div>
+                        <div class="advanced-class-desc">${advDesc}</div>
                     </div>
                 `;
             }
@@ -1173,6 +1230,91 @@ const EquipmentManager = {
                     const key = statMap[statName];
                     if (key) {
                         stats[key] = (stats[key] || 0) + value;
+                    }
+                }
+            }
+        }
+
+        // Add bonuses from hero specialization
+        const spec = heroBuild.heroSpecialization;
+        if (spec?.bonuses) {
+            const heroLevel = getHeroLevel();
+            for (const bonus of spec.bonuses) {
+                // Skip bonuses that require a higher activation level
+                if (bonus.activationLevel && bonus.activationLevel > heroLevel) continue;
+
+                if (bonus.type !== 'heroStat') continue;
+                const params = bonus.parameters || [];
+                if (params.length < 2) continue;
+
+                const statName = params[0];
+                const baseValue = parseFloat(params[1]);
+                if (isNaN(baseValue)) continue;
+
+                // Calculate level-based upgrades (triggers at 5, 10, 15, etc.)
+                let value = baseValue;
+                const upgrade = bonus.upgrade;
+                if (upgrade && upgrade.increment && upgrade.levelStep) {
+                    const upgradeCount = Math.floor(heroLevel / upgrade.levelStep);
+                    value += upgrade.increment * upgradeCount;
+                }
+
+                // Map game stat names to our stat object keys
+                const statMap = {
+                    'viewRadius': 'viewRadius',
+                    'offence': 'offence',
+                    'defence': 'defence',
+                    'spellPower': 'spellPower',
+                    'intelligence': 'intelligence',
+                    'luck': 'luck',
+                    'moral': 'moral',
+                    'morale': 'moral',
+                };
+                const key = statMap[statName];
+                if (key) {
+                    stats[key] = (stats[key] || 0) + value;
+                }
+            }
+        }
+
+        // Add bonuses from unlocked advanced class (subclass)
+        if (typeof AdvancedClassManager !== 'undefined') {
+            const unlockedClass = AdvancedClassManager.checkEligibility();
+            if (unlockedClass?.bonuses) {
+                for (const bonus of unlockedClass.bonuses) {
+                    if (bonus.type !== 'heroStat') continue;
+                    const params = bonus.parameters || [];
+                    if (params.length < 2) continue;
+
+                    const statName = params[0];
+                    const value = parseFloat(params[1]);
+                    if (isNaN(value)) continue;
+
+                    // Map game stat names to our stat object keys
+                    // Note: percentage stats like 'offencePer' multiply base stat
+                    const statMap = {
+                        'viewRadius': 'viewRadius',
+                        'offence': 'offence',
+                        'defence': 'defence',
+                        'spellPower': 'spellPower',
+                        'intelligence': 'intelligence',
+                        'luck': 'luck',
+                        'moral': 'moral',
+                        'morale': 'moral',
+                    };
+
+                    // Handle percentage bonuses (e.g., offencePer, defencePer)
+                    if (statName.endsWith('Per')) {
+                        const baseStat = statName.slice(0, -3);
+                        const key = statMap[baseStat];
+                        if (key && stats[key]) {
+                            stats[key] = stats[key] * (1 + value);
+                        }
+                    } else {
+                        const key = statMap[statName];
+                        if (key) {
+                            stats[key] = (stats[key] || 0) + value;
+                        }
                     }
                 }
             }
