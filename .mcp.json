@@ -16,6 +16,10 @@
         "false"
       ],
       "env": {}
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest", "--headless"]
     }
   }
 }

@@ -201,7 +201,7 @@ const SkillManager = {
                     ${typeof AdvancedClassManager !== 'undefined' ? AdvancedClassManager.renderSkillIndicators(skill.skillId) : ''}
                     <div class="tooltip-content">
                         <div class="tooltip-name">${levelPrefix}${skill.name || skill.skillId}</div>
-                        ${skill.description ? `<div class="tooltip-desc">${skill.description}</div>` : ''}
+                        ${(() => { const desc = EquipmentManager.formatSkillDescription(skill, skill.level); return desc ? `<div class="tooltip-desc">${desc}</div>` : ''; })()}
                     </div>
                 `;
                 skillMain.dataset.skillId = skill.skillId;
