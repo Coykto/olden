@@ -2,7 +2,6 @@
  * Description Runtime - Support functions for transpiled description functions
  *
  * Provides:
- * - Memoization with LRU cache
  * - Value formatters for different return types
  * - Path-based property accessor
  */
@@ -12,80 +11,15 @@
 
 const DescriptionRuntime = {
   /**
-   * Create a memoized version of a function with LRU cache.
-   * @param {Function} fn - The function to memoize
-   * @param {number} maxSize - Maximum cache size (default: 5)
-   * @returns {Function} Memoized function
+   * Wrapper function for description functions.
+   * Previously did memoization, now just passes through directly.
+   * @param {Function} fn - The function to wrap
+   * @returns {Function} The same function (no caching)
    */
-  memoize(fn, maxSize = 5) {
-    const cache = new Map();
-    const keys = [];
-
-    return function(ctx) {
-      // Create a cache key from context
-      const key = DescriptionRuntime.createCacheKey(ctx);
-
-      if (cache.has(key)) {
-        return cache.get(key);
-      }
-
-      const result = fn(ctx);
-
-      // LRU eviction
-      if (keys.length >= maxSize) {
-        const oldestKey = keys.shift();
-        cache.delete(oldestKey);
-      }
-
-      cache.set(key, result);
-      keys.push(key);
-
-      return result;
-    };
-  },
-
-  /**
-   * Create a cache key from context object.
-   * Uses item ID, level, and relevant hero stats.
-   */
-  createCacheKey(ctx) {
-    if (!ctx) return 'empty';
-
-    const parts = [];
-
-    if (ctx.currentItem) {
-      parts.push(`item:${ctx.currentItem.id || 'unknown'}`);
-      parts.push(`lvl:${ctx.currentItem.level || 1}`);
-    }
-
-    if (ctx.currentHero) {
-      // Include stats that affect descriptions
-      const stats = ctx.currentHero.stats || {};
-      parts.push(`vr:${stats.viewRadius || 6}`);
-      parts.push(`off:${stats.offence || 0}`);
-      parts.push(`def:${stats.defence || 0}`);
-      parts.push(`sp:${stats.spellPower || 0}`);
-    }
-
-    if (ctx.currentMagic) {
-      parts.push(`magic:${ctx.currentMagic.id || 'unknown'}`);
-      parts.push(`mlvl:${ctx.currentMagic.level || 1}`);
-    }
-
-    if (ctx.currentSkill) {
-      parts.push(`skill:${ctx.currentSkill.id || 'unknown'}`);
-      parts.push(`slvl:${ctx.currentSkill.level || 1}`);
-    }
-
-    if (ctx.currentBuff) {
-      parts.push(`buff:${ctx.currentBuff.id || 'unknown'}`);
-    }
-
-    if (ctx.currentUnit) {
-      parts.push(`unit:${ctx.currentUnit.id || 'unknown'}`);
-    }
-
-    return parts.join('|') || 'default';
+  memoize(fn) {
+    // No memoization - just return the function as-is
+    // Caching was causing issues with stale hero stats
+    return fn;
   },
 
   /**

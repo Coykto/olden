@@ -10,7 +10,7 @@ from gamedata.models import GameVersion, Hero, Faction, Item, Skill, Unit
 from core.damage_calculator import (
     DamageCalculator, create_unit_stack_from_db, create_hero_build_from_db
 )
-from core.localizations import get_skill_info, get_localizations, get_item_info, get_skill_args
+from core.localizations import get_skill_info, get_localizations, get_item_info, get_skill_args, get_subskill_configs
 
 
 def index(request):
@@ -529,13 +529,27 @@ def api_skill_subskills(request, skill_id, level):
 
     subskill_ids = params[level - 1].get('subSkills', [])
 
+    # Get localizations and args for dynamic descriptions
+    localizations = get_localizations()
+    skill_args = get_skill_args()
+    subskill_configs = get_subskill_configs()
+
     subskills_data = []
     for sub_id in subskill_ids:
         sub_info = get_skill_info(sub_id, level=1)
+        sub_config = subskill_configs.get(sub_id, {})
+
+        # Get description template and args for dynamic formatting
+        desc_key = sub_config.get('desc', f'{sub_id}_desc')
+        description_template = localizations.get(desc_key, '')
+        description_args = skill_args.get(desc_key, [])
+
         subskills_data.append({
             'id': sub_id,
             'name': sub_info['name'],
-            'description': sub_info['description'],
+            'description_template': description_template,
+            'description_args': description_args,
+            'raw_data': sub_config,
             'icon': f'{sub_id}_icon',  # Subskill icons have _icon suffix
         })
 

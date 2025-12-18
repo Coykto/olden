@@ -2,10 +2,10 @@
 
 <!-- Generated description functions from .script files -->
 {% load static %}
-<script src="{% static 'js/description-runtime.js' %}?v=5"></script>
-<script src="{% static 'js/generated/game_data.js' %}?v=5"></script>
-<script src="{% static 'js/generated/description_functions.js' %}?v=5"></script>
-<script src="{% static 'js/hero-state.js' %}?v=5"></script>
+<script src="{% static 'js/description-runtime.js' %}?v=6"></script>
+<script src="{% static 'js/generated/game_data.js' %}?v=6"></script>
+<script src="{% static 'js/generated/description_functions.js' %}?v=6"></script>
+<script src="{% static 'js/hero-state.js' %}?v=6"></script>
 
 <script>
 // Client-side state for hero build
@@ -76,6 +76,28 @@ const SkillManager = {
             }
         });
 
+        // Fetch full skill data and enrich starting skills with template/args/raw_data
+        fetch(`/api/skills/available/?hero_slug=${heroBuild.heroId}`)
+            .then(response => response.json())
+            .then(data => {
+                const skillsMap = {};
+                data.skills.forEach(s => { skillsMap[s.id] = s; });
+
+                // Enrich starting skills with full data for dynamic descriptions
+                heroBuild.skills.forEach((skill, index) => {
+                    if (skill && skillsMap[skill.skillId]) {
+                        const fullData = skillsMap[skill.skillId];
+                        skill.description_template = fullData.description_template || '';
+                        skill.description_args = fullData.description_args || [];
+                        skill.raw_data = fullData.raw_data || null;
+                    }
+                });
+
+                // Re-render UI now that skills have full data
+                this.updateUI();
+            })
+            .catch(err => console.warn('Could not enrich starting skills:', err));
+
         // Set up all click handlers (including subskill buttons for starting skills)
         this.updateUI();
     },
@@ -145,8 +167,9 @@ const SkillManager = {
         skill.subskillNames[subskillSlot] = subskillName;
         skill.subskillDescs[subskillSlot] = subskillDesc || '';
 
-        // Update UI
+        // Update UI and descriptions (subskill bonuses may affect item descriptions)
         this.updateUI();
+        EquipmentManager.updateAllDescriptions();
     },
 
     removeSkill(slotIndex) {
@@ -451,6 +474,13 @@ const SubskillSelectionModal = {
     },
 
     render(data) {
+        // Get the skill from heroBuild to use its template/args for dynamic formatting
+        const skill = heroBuild.skills[this.slotIndex];
+        // Compute description dynamically at the new level
+        const skillDesc = skill ?
+            EquipmentManager.formatSkillDescription(skill, data.skill.level) :
+            data.skill.description;
+
         const container = document.getElementById('skill-modal-container');
         container.innerHTML = `
             <div class="modal-overlay" onclick="SubskillSelectionModal.close()">
@@ -459,7 +489,7 @@ const SubskillSelectionModal = {
                         <img src="/media/gamedata/skills/${data.skill.icon}.png" class="skill-icon-large">
                         <div class="skill-info">
                             <div class="skill-name">${data.skill.name.toUpperCase()}</div>
-                            <div class="skill-desc">${data.skill.description}</div>
+                            <div class="skill-desc">${skillDesc}</div>
                         </div>
                     </div>
                     <div class="subskill-options">
@@ -471,12 +501,15 @@ const SubskillSelectionModal = {
     },
 
     renderSubskillOption(subskill) {
+        // Compute description dynamically using the Entity Description Pipeline
+        const subskillDesc = EquipmentManager.formatSubskillDescription(subskill);
+
         return `
             <div class="subskill-option" onclick="SubskillSelectionModal.select('${subskill.id}')">
                 <img src="/media/gamedata/skills/${subskill.icon}.png" class="subskill-icon">
                 <div class="subskill-info">
                     <div class="subskill-name">${subskill.name}</div>
-                    <div class="subskill-desc">${subskill.description}</div>
+                    <div class="subskill-desc">${subskillDesc}</div>
                 </div>
             </div>
         `;
@@ -1135,8 +1168,7 @@ const EquipmentManager = {
                         config: itemData.raw_data || { bonuses: [] }
                     },
                     currentHero: {
-                        stats: effectiveStats,
-                        heroStat: effectiveStats  // Alias for hero stat lookups
+                        heroStat: effectiveStats
                     }
                 };
 
@@ -1231,7 +1263,6 @@ const EquipmentManager = {
                         config: itemData.raw_data || { bonuses: [] }
                     },
                     currentHero: {
-                        stats: effectiveStats,
                         heroStat: effectiveStats
                     }
                 };
@@ -1257,43 +1288,75 @@ const EquipmentManager = {
      * @returns {string} Formatted description
      */
     formatSkillDescription(skillData, level = 1) {
-        // Prefer computed description if no args
+        // If no args, return template as-is (no placeholders to fill)
         if (!skillData.description_args || skillData.description_args.length === 0) {
-            return skillData.description || skillData.description_template || '';
+            return skillData.description_template || '';
         }
 
-        // Use transpiled functions
-        if (typeof DescriptionRuntime !== 'undefined' && typeof DescriptionFunctions !== 'undefined') {
-            try {
-                // Get level-specific parameters from raw_data
-                const params = skillData.raw_data?.parametersPerLevel || [];
-                const levelData = params[level - 1] || params[0] || {};
+        // Use transpiled functions - no fallback, errors should be visible
+        if (typeof DescriptionRuntime === 'undefined' || typeof DescriptionFunctions === 'undefined') {
+            console.error('[EquipmentManager] DescriptionRuntime or DescriptionFunctions not loaded');
+            return '';
+        }
 
-                // Create context for the transpiled functions
-                // Note: skill functions expect bonuses directly on currentSkill (not in config)
-                const ctx = {
-                    currentSkill: {
-                        id: skillData.id,
-                        level: level,
-                        ...levelData  // Spread levelData so bonuses are directly accessible
-                    },
-                    currentHero: {
-                        stats: this.getEffectiveHeroStats()
-                    }
-                };
+        // Get level-specific parameters from raw_data
+        const params = skillData.raw_data?.parametersPerLevel || [];
+        const levelData = params[level - 1] || params[0] || {};
 
-                return DescriptionRuntime.formatDescription(
-                    skillData.description_template,
-                    skillData.description_args,
-                    ctx
-                );
-            } catch (e) {
-                console.warn('[EquipmentManager] Skill description error, falling back:', e);
+        // Create context for the transpiled functions
+        // Note: skill functions expect bonuses directly on currentSkill (not in config)
+        const ctx = {
+            currentSkill: {
+                id: skillData.skillId || skillData.id,
+                level: level,
+                ...levelData  // Spread levelData so bonuses are directly accessible
+            },
+            currentHero: {
+                heroStat: this.getEffectiveHeroStats()
             }
+        };
+
+        return DescriptionRuntime.formatDescription(
+            skillData.description_template,
+            skillData.description_args,
+            ctx
+        );
+    },
+
+    /**
+     * Format a subskill description using the transpiled description pipeline.
+     * @param {Object} subskillData - Subskill data with description_template and description_args
+     * @returns {string} Formatted description
+     */
+    formatSubskillDescription(subskillData) {
+        // If no args, return template as-is (no placeholders to fill)
+        if (!subskillData.description_args || subskillData.description_args.length === 0) {
+            return subskillData.description_template || '';
         }
 
-        // Fallback to pre-computed description
-        return skillData.description || skillData.description_template || '';
+        // Use transpiled functions - no fallback, errors should be visible
+        if (typeof DescriptionRuntime === 'undefined' || typeof DescriptionFunctions === 'undefined') {
+            console.error('[EquipmentManager] DescriptionRuntime or DescriptionFunctions not loaded');
+            return '';
+        }
+
+        // Create context for the transpiled functions
+        // Subskills use currentSubSkill context (not currentSkill)
+        const ctx = {
+            currentSubSkill: {
+                id: subskillData.id,
+                ...subskillData.raw_data  // Spread raw_data so bonuses are accessible
+            },
+            currentHero: {
+                heroStat: this.getEffectiveHeroStats()
+            }
+        };
+
+        return DescriptionRuntime.formatDescription(
+            subskillData.description_template,
+            subskillData.description_args,
+            ctx
+        );
     },
 
     /**
@@ -1350,6 +1413,8 @@ const EquipmentManager = {
                 itemData.description = this.formatItemDescription(itemData);
             }
         }
+        // Re-render equipment UI to show updated descriptions
+        this.updateUI();
     },
 
     maxAllUpgrades() {
