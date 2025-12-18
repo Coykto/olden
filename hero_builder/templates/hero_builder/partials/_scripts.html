@@ -1617,11 +1617,11 @@ const EquipmentManager = {
                     <div class="tooltip-upgrade-row">
                         <button class="tooltip-upgrade-btn ${!canLevelUp ? 'disabled' : ''}"
                                 onclick="event.stopPropagation(); if (${canLevelUp}) EquipmentManager.setItemLevel('${slotId}', ${currentLevel + 1});">
-                            ⏫ ${upgradeCost} <img src="/media/gamedata/ui/resource_dust.png" class="dust-icon-small" alt="dust">
+                            ⏫ ${upgradeCost} <img src="/media/gamedata/resources/dust.png" class="dust-icon-small" alt="dust">
                         </button>
                         <button class="tooltip-upgrade-btn ${!canLevelDown ? 'disabled' : ''}"
                                 onclick="event.stopPropagation(); if (${canLevelDown}) EquipmentManager.setItemLevel('${slotId}', ${currentLevel - 1});">
-                            ⏬ ${downgradeSavings} <img src="/media/gamedata/ui/resource_dust.png" class="dust-icon-small" alt="dust">
+                            ⏬ ${downgradeSavings} <img src="/media/gamedata/resources/dust.png" class="dust-icon-small" alt="dust">
                         </button>
                     </div>
                     <button class="tooltip-remove-btn" onclick="event.stopPropagation(); EquipmentManager.unequipItem('${slotId}');">

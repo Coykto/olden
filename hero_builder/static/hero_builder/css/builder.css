@@ -632,6 +632,7 @@
     font-size: 0.8rem;
     cursor: pointer;
     transition: all 0.2s;
+    width: 100%;
 }
 
 .tooltip-upgrade-btn:hover {
@@ -682,10 +683,10 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    color: #7ec8e3;
-    font-size: 1rem;
     font-weight: 500;
     margin-bottom: 10px;
+    color: #c9a227;
+    font-size: 0.8rem;
 }
 
 .dust-icon {
@@ -694,14 +695,9 @@
 }
 
 .dust-icon-small {
-    width: 16px;
-    height: 16px;
+    width: 24px !important;
+    height: 24px !important;;
     vertical-align: middle;
-}
-
-.dust-value {
-    font-weight: 600;
-    min-width: 40px;
 }
 
 .bulk-upgrade-controls {

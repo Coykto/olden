@@ -71,8 +71,11 @@ class AssetExtractor:
         # Extract advanced class icons
         results['advanced_classes'] = self._extract_advanced_class_icons(force)
 
-        # Extract item icons
-        results['items'] = self._extract_by_pattern('items', self.PATTERNS['item_icons'], force)
+        # Extract item icons (512x512 only, skip minimap icons)
+        results['items'] = self._extract_item_icons(force)
+
+        # Extract resource icons (256x256 clean icons)
+        results['resources'] = self._extract_resource_icons(force)
 
         # Extract UI icons (factions, classes)
         results['ui_icons'] = self._extract_ui_icons(force)
@@ -293,6 +296,95 @@ class AssetExtractor:
                     image = data.image
                     image.save(str(out_file))
                     count += 1
+
+            except Exception:
+                pass
+
+        return count
+
+    def _extract_item_icons(self, force: bool = False) -> int:
+        """Extract item icons (512x512 artifact textures only, skip minimap icons)."""
+        output_path = self.output_dir / "items"
+        output_path.mkdir(parents=True, exist_ok=True)
+
+        count = 0
+        pattern = self.PATTERNS['item_icons']
+
+        for asset_file in self.game_data_path.glob("*.assets"):
+            try:
+                env = UnityPy.load(str(asset_file))
+
+                for obj in env.objects:
+                    if obj.type.name != 'Texture2D':
+                        continue
+
+                    try:
+                        data = obj.read()
+                        name = data.m_Name
+
+                        # Match artifact pattern AND filter for 512x512 (skip 64x64 minimap icons)
+                        if pattern.search(name) and data.m_Width == 512:
+                            out_file = output_path / f"{name}.png"
+
+                            if not force and out_file.exists():
+                                continue
+
+                            image = data.image
+                            image.save(str(out_file))
+                            count += 1
+
+                    except Exception:
+                        pass
+
+            except Exception:
+                pass
+
+        return count
+
+    def _extract_resource_icons(self, force: bool = False) -> int:
+        """Extract clean resource icons (256x256 versions without map background)."""
+        output_path = self.output_dir / "resources"
+        output_path.mkdir(parents=True, exist_ok=True)
+
+        # Map of texture name -> output filename
+        # These are the clean 256x256 resource icons (not the 64x64 map versions)
+        resource_icons = {
+            'dust': 'dust.png',
+            'gold': 'gold.png',
+            'ore': 'ore.png',
+            'mercury': 'mercury.png',
+            'wood': 'wood.png',
+            'crystals': 'crystals.png',
+            'gemstones': 'gemstones.png',
+        }
+
+        count = 0
+
+        for asset_file in self.game_data_path.glob("*.assets"):
+            try:
+                env = UnityPy.load(str(asset_file))
+
+                for obj in env.objects:
+                    if obj.type.name != 'Texture2D':
+                        continue
+
+                    try:
+                        data = obj.read()
+                        name = data.m_Name
+
+                        # Only extract exact matches for clean 256x256 icons
+                        if name in resource_icons and data.m_Width == 256:
+                            out_file = output_path / resource_icons[name]
+
+                            if not force and out_file.exists():
+                                continue
+
+                            image = data.image
+                            image.save(str(out_file))
+                            count += 1
+
+                    except Exception:
+                        pass
 
             except Exception:
                 pass
