@@ -1,0 +1,38 @@
+{% load json_filters %}
+{# Class tooltip showing specialization and advanced classes #}
+{# Usage: {% include "hero_builder/partials/_class_tooltip.html" with hero=hero %} #}
+
+{% with hero.specialization_info as spec %}
+{% with hero.advanced_classes_info as adv_info %}
+<div class="class-tooltip">
+    <div class="class-tooltip-header">
+        <div class="class-tooltip-name">{{ hero.specialization_name }}</div>
+        <div class="class-tooltip-desc"
+             data-spec-template="{{ spec.description_template|escapejs }}"
+             data-spec-args='{{ spec.description_args|to_json }}'
+             data-spec-raw='{{ spec.raw_data|to_json }}'>
+        </div>
+    </div>
+
+    {% if adv_info.advanced_classes %}
+    <div class="class-tooltip-divider"></div>
+
+    {% for adv_class in adv_info.advanced_classes %}
+    <div class="advanced-class-section">
+        <div class="advanced-class-header">
+            <img src="{{ adv_class.icon_url }}" class="advanced-class-icon" alt="{{ adv_class.name }}">
+            <span class="advanced-class-name">{{ adv_class.name }}</span>
+            <span class="advanced-class-progress">0/5</span>
+        </div>
+        <div class="advanced-class-progress-bar">
+            <div class="progress-fill" style="width: 0%"></div>
+        </div>
+        <div class="advanced-class-desc"
+             data-adv-class-template="{{ adv_class.description_template|escapejs }}"
+             data-adv-class-args='{{ adv_class.description_args|to_json }}'>{{ adv_class.description|safe }}</div>
+    </div>
+    {% endfor %}
+    {% endif %}
+</div>
+{% endwith %}
+{% endwith %}
