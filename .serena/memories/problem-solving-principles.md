@@ -26,6 +26,22 @@ When you encounter an issue, ask: "What is the underlying system or pattern that
 - **BAD**: Add special handling for "Spellbinder's Hat"
 - **GOOD**: Recognize that ANY template with `word-{0}` pattern will have this issue, and fix the sign-stripping logic to handle hyphens in compound words.
 
+### 6. Buff alias naming mismatch (`+0%` instead of `+20%`)
+- **BAD (Specific)**: Hardcode pattern `_unit_bonus` → `_bonus` at runtime:
+  ```javascript
+  if (id.endsWith("_unit_bonus")) {
+    aliases[id.replace("_unit_bonus", "_bonus")] = buff;
+  }
+  ```
+- **GOOD (General)**: Analyze actual data at build time:
+  1. Extract skill data
+  2. Collect all buff references from skills
+  3. Compare against actual buff IDs
+  4. Build aliases only for missing references
+  5. Log warnings for unfound references (visibility)
+  
+  This approach is data-driven: it discovers mismatches from the source data rather than assuming patterns. New naming conventions are automatically handled as long as transformation rules exist.
+
 ## How to Apply This Principle
 
 1. **Reproduce the issue** - Understand exactly what's happening

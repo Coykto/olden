@@ -2,10 +2,10 @@
 
 <!-- Generated description functions from .script files -->
 {% load static %}
-<script src="{% static 'js/description-runtime.js' %}"></script>
-<script src="{% static 'js/generated/game_data.js' %}"></script>
-<script src="{% static 'js/generated/description_functions.js' %}"></script>
-<script src="{% static 'js/hero-state.js' %}"></script>
+<script src="{% static 'js/description-runtime.js' %}?v=5"></script>
+<script src="{% static 'js/generated/game_data.js' %}?v=5"></script>
+<script src="{% static 'js/generated/description_functions.js' %}?v=5"></script>
+<script src="{% static 'js/hero-state.js' %}?v=5"></script>
 
 <script>
 // Client-side state for hero build
@@ -93,18 +93,23 @@ const SkillManager = {
         });
     },
 
-    addSkill(slotIndex, skillId, skillName, skillIcon, skillDescription) {
+    addSkill(slotIndex, skillData) {
         heroBuild.skills[slotIndex] = {
-            skillId: skillId,
+            skillId: skillData.id,
             level: 1,
             subskills: [null, null],
             subskillNames: [null, null],
             subskillDescs: [null, null],
-            name: skillName,
-            icon: skillIcon,
-            description: skillDescription || ''
+            name: skillData.name,
+            icon: skillData.icon,
+            description: skillData.description || '',
+            description_template: skillData.description_template || '',
+            description_args: skillData.description_args || [],
+            raw_data: skillData.raw_data || null
         };
         this.updateUI();
+        // Update all descriptions since skill bonuses may affect them
+        EquipmentManager.updateAllDescriptions();
     },
 
     getSelectedSkillIds() {
@@ -126,8 +131,9 @@ const SkillManager = {
         // Increase level
         skill.level++;
 
-        // Update UI
+        // Update UI and descriptions (skill level affects bonuses)
         this.updateUI();
+        EquipmentManager.updateAllDescriptions();
     },
 
     repickSubskill(slotIndex, subskillSlot, subskillId, subskillName, subskillDesc) {
@@ -156,6 +162,8 @@ const SkillManager = {
         // Reset slot
         heroBuild.skills[slotIndex] = null;
         this.updateUI();
+        // Update descriptions since skill bonuses are removed
+        EquipmentManager.updateAllDescriptions();
     },
 
     updateUI() {
@@ -387,7 +395,7 @@ const SkillSelectionModal = {
     select(skillId) {
         const skill = this.allSkills.find(s => s.id === skillId);
         if (skill) {
-            SkillManager.addSkill(this.slotIndex, skill.id, skill.name, skill.icon, skill.description);
+            SkillManager.addSkill(this.slotIndex, skill);
         }
         this.close();
     },
@@ -1064,6 +1072,39 @@ const EquipmentManager = {
             }
         }
 
+        // Add bonuses from equipped skills
+        for (const skillData of heroBuild.skills) {
+            if (!skillData || !skillData.raw_data) continue;
+            const level = skillData.level || 1;
+            const levelData = skillData.raw_data.parametersPerLevel?.[level - 1];
+            if (!levelData?.bonuses) continue;
+
+            for (const bonus of levelData.bonuses) {
+                if (bonus.type !== 'heroStat') continue;
+                const params = bonus.parameters || [];
+                if (params.length < 2) continue;
+
+                const statName = params[0];
+                const value = parseFloat(params[1]);
+                if (isNaN(value)) continue;
+
+                // Map game stat names to our stat object keys
+                const statMap = {
+                    'viewRadius': 'viewRadius',
+                    'offence': 'offence',
+                    'defence': 'defence',
+                    'spellPower': 'spellPower',
+                    'intelligence': 'intelligence',
+                    'luck': 'luck',
+                    'moral': 'moral',
+                };
+                const key = statMap[statName];
+                if (key) {
+                    stats[key] = (stats[key] || 0) + value;
+                }
+            }
+        }
+
         return stats;
     },
 
@@ -1229,11 +1270,12 @@ const EquipmentManager = {
                 const levelData = params[level - 1] || params[0] || {};
 
                 // Create context for the transpiled functions
+                // Note: skill functions expect bonuses directly on currentSkill (not in config)
                 const ctx = {
                     currentSkill: {
                         id: skillData.id,
                         level: level,
-                        config: levelData
+                        ...levelData  // Spread levelData so bonuses are directly accessible
                     },
                     currentHero: {
                         stats: this.getEffectiveHeroStats()
@@ -1374,17 +1416,6 @@ const EquipmentManager = {
 
             slot.onclick = () => {
                 ItemSelectionModal.open(slotId, slotType);
-            };
-
-            // Add right-click handler to remove equipped items
-            slot.oncontextmenu = (e) => {
-                e.preventDefault();
-                const slotData = heroBuild.equipment.slots[slotId];
-                if (slotData) {
-                    if (confirm(`Remove ${slotData.name}?`)) {
-                        this.unequipItem(slotId);
-                    }
-                }
             };
         });
 

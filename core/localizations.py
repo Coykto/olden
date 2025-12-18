@@ -449,6 +449,26 @@ def get_item_args(lang: str = "english") -> dict:
         return {}
 
 
+@lru_cache(maxsize=1)
+def get_skill_args(lang: str = "english") -> dict:
+    """
+    Load skill description args from game files.
+    Returns a dict mapping sid -> list of function names.
+    """
+    args_file = settings.GAME_DATA_PATH / "StreamingAssets" / "Lang" / "args" / "heroSkills.json"
+
+    if not args_file.exists():
+        return {}
+
+    try:
+        with open(args_file, 'r', encoding='utf-8-sig') as f:
+            data = json.load(f)
+            tokens_args = data.get("tokensArgs", [])
+            return {item["sid"]: item.get("args", []) for item in tokens_args}
+    except Exception:
+        return {}
+
+
 def get_item_info(item_id: str) -> dict:
     """
     Get display info for an item including name, descriptions, and narrative.

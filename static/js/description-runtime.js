@@ -122,6 +122,7 @@ const DescriptionRuntime = {
 
   /**
    * Format as modifier percent (values < 1 are multiplied by 100)
+   * Returns just the number - templates already include % sign
    */
   formatModPercentNumeric(value) {
     let num = Number(value) || 0;
@@ -130,19 +131,19 @@ const DescriptionRuntime = {
       num = num * 100;
     }
     num = Math.round(num);
-    return num >= 0 ? `+${num}%` : `${num}%`;
+    return String(num);
   },
 
   /**
    * Format as modifier float percent with one decimal
+   * Returns just the number - templates already include % sign
    */
   formatModFloatPercentF1(value) {
     let num = Number(value) || 0;
     if (Math.abs(num) < 1 && num !== 0) {
       num = num * 100;
     }
-    const formatted = num.toFixed(1);
-    return num >= 0 ? `+${formatted}%` : `${formatted}%`;
+    return num.toFixed(1);
   },
 
   /**

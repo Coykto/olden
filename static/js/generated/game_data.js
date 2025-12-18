@@ -1,6 +1,6 @@
 /**
  * Auto-generated game data lookups for description functions
- * Generated at: 2025-12-17T23:37:26.565Z
+ * Generated at: 2025-12-18T01:26:28.724Z
  * DO NOT EDIT - This file is regenerated during import_gamedata
  */
 
@@ -335,7 +335,43 @@ const GameData = {
       "stats": {
         "defence": -2,
         "offence": -2
-      }
+      },
+      "actions": [
+        {
+          "trigger": "start_round",
+          "damageDealer": {
+            "tags": [
+              "passive"
+            ],
+            "triggerCounter": false,
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "attackPatternSid": "attack_single_x100",
+            "damageTarget_": "none",
+            "damageType_": "none",
+            "buffTarget_": "all",
+            "buff": {
+              "sid": "magic_shorten_shadow_effect_1_bonus",
+              "duration": 1
+            },
+            "targetMechanics": []
+          }
+        }
+      ]
     },
     "magic_shorten_shadow_effect_1_bonus": {
       "id": "magic_shorten_shadow_effect_1_bonus",
@@ -490,13 +526,187 @@ const GameData = {
       }
     },
     "magic_vengeance_effect_0": {
-      "id": "magic_vengeance_effect_0"
+      "id": "magic_vengeance_effect_0",
+      "actions": [
+        {
+          "trigger": "unit_took_damage",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [
+              "passive"
+            ],
+            "triggerCounter": false,
+            "damageTarget_": "none",
+            "statDmgMult": 0,
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "all"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "all"
+            },
+            "targetMechanics": [
+              {
+                "mech": "revenge_damage",
+                "values": [
+                  "flat",
+                  "magic_pure",
+                  "100",
+                  "15",
+                  "1",
+                  "8",
+                  "melee"
+                ]
+              }
+            ]
+          }
+        }
+      ]
     },
     "magic_vengeance_effect_1": {
-      "id": "magic_vengeance_effect_1"
+      "id": "magic_vengeance_effect_1",
+      "actions": [
+        {
+          "trigger": "unit_took_damage",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [
+              "passive"
+            ],
+            "triggerCounter": false,
+            "damageTarget_": "none",
+            "statDmgMult": 0,
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "all"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "all"
+            },
+            "targetMechanics": [
+              {
+                "mech": "revenge_damage",
+                "values": [
+                  "flat",
+                  "magic_pure",
+                  "100",
+                  "20",
+                  "1",
+                  "8",
+                  "melee"
+                ]
+              }
+            ]
+          }
+        }
+      ]
     },
     "magic_vengeance_effect_2": {
-      "id": "magic_vengeance_effect_2"
+      "id": "magic_vengeance_effect_2",
+      "actions": [
+        {
+          "trigger": "unit_took_damage",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [
+              "passive"
+            ],
+            "triggerCounter": false,
+            "damageTarget_": "none",
+            "statDmgMult": 0,
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "all"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "all"
+            },
+            "targetMechanics": [
+              {
+                "mech": "revenge_damage",
+                "values": [
+                  "flat",
+                  "magic_pure",
+                  "100",
+                  "20",
+                  "1",
+                  "8",
+                  "melee"
+                ]
+              },
+              {
+                "mech": "revenge_damage",
+                "values": [
+                  "flat",
+                  "magic_pure",
+                  "100",
+                  "20",
+                  "1",
+                  "8",
+                  "range"
+                ]
+              },
+              {
+                "mech": "revenge_damage",
+                "values": [
+                  "flat",
+                  "magic_pure",
+                  "100",
+                  "20",
+                  "1",
+                  "8",
+                  "shoot"
+                ]
+              }
+            ]
+          }
+        }
+      ]
     },
     "magic_radiant_armor_effect_0": {
       "id": "magic_radiant_armor_effect_0",
@@ -533,15 +743,320 @@ const GameData = {
     },
     "magic_holy_arms_effect_0": {
       "id": "magic_holy_arms_effect_0",
-      "data": {}
+      "data": {},
+      "actions": [
+        {
+          "trigger": "unit_took_damage",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance_both",
+              "values": [
+                "self",
+                "enemy"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [
+              "passive"
+            ],
+            "triggerCounter": false,
+            "damageTarget_": "none",
+            "statDmgMult": 0,
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive"
+            },
+            "targetMechanics": [
+              {
+                "mech": "damage",
+                "values": [
+                  "50",
+                  "0",
+                  "1",
+                  "none",
+                  "0",
+                  "true"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "trigger": "unit_took_damage",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance_both",
+              "values": [
+                "self",
+                "enemy"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [
+              "passive",
+              "undead_immunities",
+              "embodiment_immunities",
+              "construct_immunities"
+            ],
+            "triggerCounter": false,
+            "damageTarget_": "none",
+            "statDmgMult": 0,
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive"
+            },
+            "targetMechanics": [
+              {
+                "mech": "heal",
+                "values": [
+                  "50",
+                  "0",
+                  "0",
+                  "without respawn"
+                ]
+              }
+            ]
+          }
+        }
+      ]
     },
     "magic_holy_arms_effect_1": {
       "id": "magic_holy_arms_effect_1",
-      "data": {}
+      "data": {},
+      "actions": [
+        {
+          "trigger": "unit_took_damage",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance_both",
+              "values": [
+                "self",
+                "enemy"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [
+              "passive"
+            ],
+            "triggerCounter": false,
+            "damageTarget_": "none",
+            "statDmgMult": 0,
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive"
+            },
+            "targetMechanics": [
+              {
+                "mech": "damage",
+                "values": [
+                  "100",
+                  "0",
+                  "1",
+                  "none",
+                  "0",
+                  "true"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "trigger": "unit_took_damage",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance_both",
+              "values": [
+                "self",
+                "enemy"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [
+              "passive",
+              "undead_immunities",
+              "embodiment_immunities",
+              "construct_immunities"
+            ],
+            "triggerCounter": false,
+            "damageTarget_": "none",
+            "statDmgMult": 0,
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive"
+            },
+            "targetMechanics": [
+              {
+                "mech": "heal",
+                "values": [
+                  "100",
+                  "0",
+                  "0",
+                  "without respawn"
+                ]
+              }
+            ]
+          }
+        }
+      ]
     },
     "magic_holy_arms_effect_2": {
       "id": "magic_holy_arms_effect_2",
-      "data": {}
+      "data": {},
+      "actions": [
+        {
+          "trigger": "unit_took_damage",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance_both",
+              "values": [
+                "self",
+                "enemy"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [
+              "passive"
+            ],
+            "triggerCounter": false,
+            "damageTarget_": "none",
+            "statDmgMult": 0,
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive"
+            },
+            "targetMechanics": [
+              {
+                "mech": "damage",
+                "values": [
+                  "100",
+                  "0",
+                  "1",
+                  "none",
+                  "0",
+                  "true"
+                ]
+              },
+              {
+                "mech": "destroy_summon",
+                "values": []
+              },
+              {
+                "mech": "destroy_temp_stacks",
+                "values": []
+              }
+            ]
+          }
+        },
+        {
+          "trigger": "unit_took_damage",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance_both",
+              "values": [
+                "self",
+                "enemy"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [
+              "passive",
+              "undead_immunities",
+              "embodiment_immunities",
+              "construct_immunities"
+            ],
+            "triggerCounter": false,
+            "damageTarget_": "none",
+            "statDmgMult": 0,
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive"
+            },
+            "targetMechanics": [
+              {
+                "mech": "heal",
+                "values": [
+                  "100",
+                  "0",
+                  "0",
+                  "without respawn"
+                ]
+              }
+            ]
+          }
+        }
+      ]
     },
     "magic_arinas_chosen_effect_0": {
       "id": "magic_arinas_chosen_effect_0",
@@ -577,19 +1092,279 @@ const GameData = {
       }
     },
     "day_1_magic_healing_water_effect": {
-      "id": "day_1_magic_healing_water_effect"
+      "id": "day_1_magic_healing_water_effect",
+      "actions": [
+        {
+          "trigger": "start_round",
+          "damageDealer": {
+            "tags": [
+              "passive",
+              "overTime_effect"
+            ],
+            "triggerCounter": false,
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "attackPatternSid": "attack_single_x100",
+            "damageTarget_": "none",
+            "damageType_": "none",
+            "targetMechanics": [
+              {
+                "mech": "heal",
+                "values": [
+                  "25",
+                  "1",
+                  "10",
+                  "without respawn"
+                ]
+              }
+            ]
+          }
+        }
+      ]
     },
     "day_1_magic_healing_water_effect_special": {
-      "id": "day_1_magic_healing_water_effect_special"
+      "id": "day_1_magic_healing_water_effect_special",
+      "actions": [
+        {
+          "trigger": "start_round",
+          "damageDealer": {
+            "tags": [
+              "passive",
+              "overTime_effect"
+            ],
+            "triggerCounter": false,
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "attackPatternSid": "attack_single_x100",
+            "damageTarget_": "none",
+            "damageType_": "none",
+            "targetMechanics": [
+              {
+                "mech": "heal",
+                "values": [
+                  "25",
+                  "1",
+                  "10",
+                  "without respawn"
+                ]
+              },
+              {
+                "mech": "dispel",
+                "values": [
+                  "negative"
+                ]
+              }
+            ]
+          }
+        }
+      ]
     },
     "day_1_magic_healing_water_effect_0_special": {
-      "id": "day_1_magic_healing_water_effect_0_special"
+      "id": "day_1_magic_healing_water_effect_0_special",
+      "actions": [
+        {
+          "trigger": "start_turn",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [
+              "passive",
+              "overTime_effect"
+            ],
+            "triggerCounter": false,
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "attackPatternSid": "attack_single_x100",
+            "damageTarget_": "none",
+            "damageType_": "none",
+            "targetMechanics": [
+              {
+                "mech": "heal",
+                "values": [
+                  "25",
+                  "1",
+                  "5",
+                  "without respawn"
+                ]
+              }
+            ]
+          }
+        }
+      ]
     },
     "day_1_magic_healing_water_effect_1_special": {
-      "id": "day_1_magic_healing_water_effect_1_special"
+      "id": "day_1_magic_healing_water_effect_1_special",
+      "actions": [
+        {
+          "trigger": "start_turn",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [
+              "passive",
+              "overTime_effect"
+            ],
+            "triggerCounter": false,
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "attackPatternSid": "attack_single_x100",
+            "damageTarget_": "none",
+            "damageType_": "none",
+            "targetMechanics": [
+              {
+                "mech": "heal",
+                "values": [
+                  "25",
+                  "1",
+                  "5",
+                  "without respawn"
+                ]
+              },
+              {
+                "mech": "add_buff_duration",
+                "values": [
+                  "negative",
+                  "-2",
+                  "0",
+                  "1",
+                  "negative"
+                ]
+              }
+            ]
+          }
+        }
+      ]
     },
     "day_1_magic_healing_water_effect_2_special": {
-      "id": "day_1_magic_healing_water_effect_2_special"
+      "id": "day_1_magic_healing_water_effect_2_special",
+      "actions": [
+        {
+          "trigger": "start_turn",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [
+              "passive",
+              "overTime_effect"
+            ],
+            "triggerCounter": false,
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "attackPatternSid": "attack_single_x100",
+            "damageTarget_": "none",
+            "damageType_": "none",
+            "targetMechanics": [
+              {
+                "mech": "heal",
+                "values": [
+                  "25",
+                  "1",
+                  "10",
+                  "without respawn"
+                ]
+              },
+              {
+                "mech": "add_buff_duration",
+                "values": [
+                  "negative",
+                  "-2",
+                  "0",
+                  "1",
+                  "negative"
+                ]
+              }
+            ]
+          }
+        }
+      ]
     },
     "magic_sharp_edge_effect_0_special": {
       "id": "magic_sharp_edge_effect_0_special",
@@ -927,7 +1702,43 @@ const GameData = {
       "stats": {
         "offence": 2,
         "defence": 2
-      }
+      },
+      "actions": [
+        {
+          "trigger": "start_round",
+          "damageDealer": {
+            "tags": [
+              "passive"
+            ],
+            "triggerCounter": false,
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "attackPatternSid": "attack_single_x100",
+            "damageTarget_": "none",
+            "damageType_": "none",
+            "buffTarget_": "all",
+            "buff": {
+              "sid": "magic_enlarge_shadow_effect_1_bonus",
+              "duration": 1
+            },
+            "targetMechanics": []
+          }
+        }
+      ]
     },
     "magic_enlarge_shadow_effect_1_bonus": {
       "id": "magic_enlarge_shadow_effect_1_bonus",
@@ -967,16 +1778,192 @@ const GameData = {
       }
     },
     "magic_despair_effect": {
-      "id": "magic_despair_effect"
+      "id": "magic_despair_effect",
+      "actions": [
+        {
+          "trigger": "start_turn",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [
+              "passive",
+              "absolute_damage",
+              "overTime_effect",
+              "overTime_effect_curse"
+            ],
+            "triggerCounter": false,
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "damageTarget_": "all",
+            "damageType_": "absolute",
+            "statDmgMult": 0,
+            "minStackDmg": 6,
+            "maxStackDmg": 6
+          }
+        }
+      ]
     },
     "magic_despair_effect_1": {
-      "id": "magic_despair_effect_1"
+      "id": "magic_despair_effect_1",
+      "actions": [
+        {
+          "trigger": "start_turn",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [
+              "passive",
+              "absolute_damage",
+              "overTime_effect",
+              "overTime_effect_curse"
+            ],
+            "triggerCounter": false,
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "damageTarget_": "all",
+            "damageType_": "absolute",
+            "statDmgMult": 0,
+            "minStackDmg": 12,
+            "maxStackDmg": 12
+          }
+        }
+      ]
     },
     "magic_despair_effect_special": {
-      "id": "magic_despair_effect_special"
+      "id": "magic_despair_effect_special",
+      "actions": [
+        {
+          "trigger": "start_turn",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [
+              "passive",
+              "absolute_damage",
+              "overTime_effect",
+              "overTime_effect_curse"
+            ],
+            "triggerCounter": false,
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "damageTarget_": "all",
+            "damageType_": "absolute",
+            "statDmgMult": 0,
+            "minStackDmg": 12,
+            "maxStackDmg": 12
+          }
+        }
+      ]
     },
     "magic_despair_effect_1_special": {
-      "id": "magic_despair_effect_1_special"
+      "id": "magic_despair_effect_1_special",
+      "actions": [
+        {
+          "trigger": "start_turn",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [
+              "passive",
+              "absolute_damage",
+              "overTime_effect",
+              "overTime_effect_curse"
+            ],
+            "triggerCounter": false,
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "damageTarget_": "all",
+            "damageType_": "absolute",
+            "statDmgMult": 0,
+            "minStackDmg": 24,
+            "maxStackDmg": 24
+          }
+        }
+      ]
     },
     "magic_twilight_effect": {
       "id": "magic_twilight_effect",
@@ -1066,7 +2053,8 @@ const GameData = {
       },
       "stats": {
         "untargetable": true
-      }
+      },
+      "actions": []
     },
     "magic_shade_cloak_effect_1": {
       "id": "magic_shade_cloak_effect_1",
@@ -1079,7 +2067,8 @@ const GameData = {
       "stats": {
         "untargetable": true,
         "outAllDmgMod": 0.15
-      }
+      },
+      "actions": []
     },
     "magic_shade_cloak_effect_2": {
       "id": "magic_shade_cloak_effect_2",
@@ -1092,7 +2081,8 @@ const GameData = {
       "stats": {
         "untargetable": true,
         "outAllDmgMod": 0.3
-      }
+      },
+      "actions": []
     },
     "magic_fatal_decay_effect_0": {
       "id": "magic_fatal_decay_effect_0",
@@ -1317,16 +2307,680 @@ const GameData = {
       }
     },
     "magic_nairas_kiss_effect_0": {
-      "id": "magic_nairas_kiss_effect_0"
+      "id": "magic_nairas_kiss_effect_0",
+      "actions": [
+        {
+          "trigger": "unit_wait",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [],
+            "triggerCounter": false,
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "attackPatternSid": "attack_single_x100",
+            "damageTarget_": "none",
+            "damageType_": "magic_pure",
+            "buffTarget_": "none",
+            "minBaseDmg": 100,
+            "maxBaseDmg": 100,
+            "minStackDmg": 15,
+            "maxStackDmg": 15,
+            "targetMechanics": []
+          }
+        },
+        {
+          "trigger": "unit_skip",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [],
+            "triggerCounter": false,
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "attackPatternSid": "attack_single_x100",
+            "damageTarget_": "none",
+            "damageType_": "magic_pure",
+            "buffTarget_": "none",
+            "minBaseDmg": 100,
+            "maxBaseDmg": 100,
+            "minStackDmg": 15,
+            "maxStackDmg": 15,
+            "targetMechanics": []
+          }
+        },
+        {
+          "trigger": "unit_end_move",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [],
+            "triggerCounter": false,
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "attackPatternSid": "attack_single_x100",
+            "damageTarget_": "none",
+            "damageType_": "magic_pure",
+            "buffTarget_": "none",
+            "minBaseDmg": 100,
+            "maxBaseDmg": 100,
+            "minStackDmg": 15,
+            "maxStackDmg": 15,
+            "targetMechanics": []
+          }
+        },
+        {
+          "trigger": "unit_cast_ability",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [],
+            "triggerCounter": false,
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "attackPatternSid": "attack_single_x100",
+            "damageTarget_": "none",
+            "damageType_": "magic_pure",
+            "buffTarget_": "none",
+            "minBaseDmg": 100,
+            "maxBaseDmg": 100,
+            "minStackDmg": 15,
+            "maxStackDmg": 15,
+            "targetMechanics": []
+          }
+        }
+      ]
     },
     "magic_nairas_kiss_effect_1": {
-      "id": "magic_nairas_kiss_effect_1"
+      "id": "magic_nairas_kiss_effect_1",
+      "actions": [
+        {
+          "trigger": "unit_wait",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [],
+            "triggerCounter": false,
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "attackPatternSid": "attack_single_x100",
+            "damageTarget_": "all",
+            "damageType_": "magic_pure",
+            "buffTarget_": "none",
+            "minBaseDmg": 200,
+            "maxBaseDmg": 200,
+            "minStackDmg": 15,
+            "maxStackDmg": 15,
+            "targetMechanics": []
+          }
+        },
+        {
+          "trigger": "unit_skip",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [],
+            "triggerCounter": false,
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "attackPatternSid": "attack_single_x100",
+            "damageTarget_": "all",
+            "damageType_": "magic_pure",
+            "buffTarget_": "none",
+            "minBaseDmg": 200,
+            "maxBaseDmg": 200,
+            "minStackDmg": 15,
+            "maxStackDmg": 15,
+            "targetMechanics": []
+          }
+        },
+        {
+          "trigger": "unit_end_move",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [],
+            "triggerCounter": false,
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "attackPatternSid": "attack_single_x100",
+            "damageTarget_": "all",
+            "damageType_": "magic_pure",
+            "buffTarget_": "none",
+            "minBaseDmg": 200,
+            "maxBaseDmg": 200,
+            "minStackDmg": 15,
+            "maxStackDmg": 15,
+            "targetMechanics": []
+          }
+        },
+        {
+          "trigger": "unit_cast_ability",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [],
+            "triggerCounter": false,
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "attackPatternSid": "attack_single_x100",
+            "damageTarget_": "all",
+            "damageType_": "magic_pure",
+            "buffTarget_": "none",
+            "minBaseDmg": 200,
+            "maxBaseDmg": 200,
+            "minStackDmg": 15,
+            "maxStackDmg": 15,
+            "targetMechanics": []
+          }
+        }
+      ]
     },
     "magic_nairas_kiss_effect_2": {
-      "id": "magic_nairas_kiss_effect_2"
+      "id": "magic_nairas_kiss_effect_2",
+      "actions": [
+        {
+          "trigger": "unit_wait",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [],
+            "triggerCounter": false,
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "attackPatternSid": "attack_single_x100",
+            "damageTarget_": "all",
+            "damageType_": "magic_pure",
+            "buffTarget_": "all",
+            "minBaseDmg": 200,
+            "maxBaseDmg": 200,
+            "minStackDmg": 20,
+            "maxStackDmg": 20,
+            "targetMechanics": []
+          }
+        },
+        {
+          "trigger": "unit_skip",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [],
+            "triggerCounter": false,
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "attackPatternSid": "attack_single_x100",
+            "damageTarget_": "all",
+            "damageType_": "magic_pure",
+            "buffTarget_": "all",
+            "minBaseDmg": 200,
+            "maxBaseDmg": 200,
+            "minStackDmg": 20,
+            "maxStackDmg": 20,
+            "targetMechanics": []
+          }
+        },
+        {
+          "trigger": "unit_end_move",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [],
+            "triggerCounter": false,
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "attackPatternSid": "attack_single_x100",
+            "damageTarget_": "all",
+            "damageType_": "magic_pure",
+            "buffTarget_": "all",
+            "minBaseDmg": 200,
+            "maxBaseDmg": 200,
+            "minStackDmg": 20,
+            "maxStackDmg": 20,
+            "targetMechanics": []
+          }
+        },
+        {
+          "trigger": "unit_cast_ability",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [],
+            "triggerCounter": false,
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "attackPatternSid": "attack_single_x100",
+            "damageTarget_": "all",
+            "damageType_": "magic_pure",
+            "buffTarget_": "all",
+            "minBaseDmg": 200,
+            "maxBaseDmg": 200,
+            "minStackDmg": 20,
+            "maxStackDmg": 20,
+            "targetMechanics": []
+          }
+        }
+      ]
     },
     "magic_nairas_kiss_effect_3": {
-      "id": "magic_nairas_kiss_effect_3"
+      "id": "magic_nairas_kiss_effect_3",
+      "actions": [
+        {
+          "trigger": "unit_wait",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [],
+            "triggerCounter": false,
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "attackPatternSid": "attack_single_x100",
+            "damageTarget_": "all",
+            "damageType_": "magic_pure",
+            "buffTarget_": "all",
+            "minBaseDmg": 200,
+            "maxBaseDmg": 200,
+            "minStackDmg": 20,
+            "maxStackDmg": 20,
+            "buff": {
+              "sid": "magic_nairas_kiss_slow_effect",
+              "duration": 1
+            },
+            "targetMechanics": []
+          }
+        },
+        {
+          "trigger": "unit_skip",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [],
+            "triggerCounter": false,
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "attackPatternSid": "attack_single_x100",
+            "damageTarget_": "all",
+            "damageType_": "magic_pure",
+            "buffTarget_": "all",
+            "minBaseDmg": 200,
+            "maxBaseDmg": 200,
+            "minStackDmg": 20,
+            "maxStackDmg": 20,
+            "buff": {
+              "sid": "magic_nairas_kiss_slow_effect",
+              "duration": 1
+            },
+            "targetMechanics": []
+          }
+        },
+        {
+          "trigger": "unit_end_move",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [],
+            "triggerCounter": false,
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "attackPatternSid": "attack_single_x100",
+            "damageTarget_": "all",
+            "damageType_": "magic_pure",
+            "buffTarget_": "all",
+            "minBaseDmg": 200,
+            "maxBaseDmg": 200,
+            "minStackDmg": 20,
+            "maxStackDmg": 20,
+            "buff": {
+              "sid": "magic_nairas_kiss_slow_effect",
+              "duration": 1
+            },
+            "targetMechanics": []
+          }
+        },
+        {
+          "trigger": "unit_cast_ability",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [],
+            "triggerCounter": false,
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "attackPatternSid": "attack_single_x100",
+            "damageTarget_": "all",
+            "damageType_": "magic_pure",
+            "buffTarget_": "all",
+            "minBaseDmg": 200,
+            "maxBaseDmg": 200,
+            "minStackDmg": 20,
+            "maxStackDmg": 20,
+            "buff": {
+              "sid": "magic_nairas_kiss_slow_effect",
+              "duration": 1
+            },
+            "targetMechanics": []
+          }
+        }
+      ]
     },
     "magic_nairas_kiss_slow_effect": {
       "id": "magic_nairas_kiss_slow_effect",
@@ -1376,13 +3030,151 @@ const GameData = {
       }
     },
     "magic_deaths_call_effect_0": {
-      "id": "magic_deaths_call_effect_0"
+      "id": "magic_deaths_call_effect_0",
+      "actions": [
+        {
+          "trigger": "unit_took_damage",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [],
+            "triggerCounter": false,
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "attackPatternSid": "attack_single_x100",
+            "damageTarget_": "none",
+            "damageType_": "none",
+            "buffTarget_": "none",
+            "targetMechanics": [
+              {
+                "mech": "assasinate",
+                "values": [
+                  "0.20",
+                  "0.0"
+                ]
+              }
+            ]
+          }
+        }
+      ]
     },
     "magic_deaths_call_effect_1": {
-      "id": "magic_deaths_call_effect_1"
+      "id": "magic_deaths_call_effect_1",
+      "actions": [
+        {
+          "trigger": "unit_took_damage",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [],
+            "triggerCounter": false,
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "attackPatternSid": "attack_single_x100",
+            "damageTarget_": "none",
+            "damageType_": "none",
+            "buffTarget_": "none",
+            "targetMechanics": [
+              {
+                "mech": "assasinate",
+                "values": [
+                  "0.30",
+                  "0.0"
+                ]
+              }
+            ]
+          }
+        }
+      ]
     },
     "magic_deaths_call_effect_2": {
-      "id": "magic_deaths_call_effect_2"
+      "id": "magic_deaths_call_effect_2",
+      "actions": [
+        {
+          "trigger": "unit_took_damage",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [],
+            "triggerCounter": false,
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "attackPatternSid": "attack_single_x100",
+            "damageTarget_": "none",
+            "damageType_": "none",
+            "buffTarget_": "none",
+            "targetMechanics": [
+              {
+                "mech": "assasinate",
+                "values": [
+                  "0.40",
+                  "0.0"
+                ]
+              }
+            ]
+          }
+        }
+      ]
     },
     "magic_mind_control_effect_0": {
       "id": "magic_mind_control_effect_0",
@@ -1672,7 +3464,31 @@ const GameData = {
       }
     },
     "magic_fire_globe_effect": {
-      "id": "magic_fire_globe_effect"
+      "id": "magic_fire_globe_effect",
+      "actions": [
+        {
+          "trigger": "start_turn",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [
+              "magic_damage"
+            ],
+            "damageType_": "magic_pure",
+            "minBaseDmg": 50,
+            "maxBaseDmg": 50,
+            "minStackDmg": 10,
+            "maxStackDmg": 10,
+            "attackPatternSid": "attack_single_x100"
+          }
+        }
+      ]
     },
     "magic_thick_hide_effect_0": {
       "id": "magic_thick_hide_effect_0",
@@ -1959,7 +3775,21 @@ const GameData = {
       }
     },
     "magic_fire_globe_effect_special": {
-      "id": "magic_fire_globe_effect_special"
+      "id": "magic_fire_globe_effect_special",
+      "actions": [
+        {
+          "trigger": "start_turn",
+          "damageDealer": {
+            "tags": [
+              "magic_damage"
+            ],
+            "damageType_": "magic_pure",
+            "minBaseDmg": 100,
+            "maxBaseDmg": 100,
+            "attackPatternSid": "attack_single_x100"
+          }
+        }
+      ]
     },
     "magic_early_start_effect_0": {
       "id": "magic_early_start_effect_0",
@@ -2290,7 +4120,43 @@ const GameData = {
       },
       "stats": {
         "accumulateDamage": true
-      }
+      },
+      "actions": [
+        {
+          "trigger": "start_round",
+          "damageDealer": {
+            "tags": [
+              "passive"
+            ],
+            "triggerCounter": false,
+            "damageTarget_": "none",
+            "statDmgMult": 0,
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "all"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "all"
+            },
+            "targetMechanics": [
+              {
+                "mech": "take_accumulated_damage",
+                "values": [
+                  "1.0"
+                ]
+              }
+            ]
+          }
+        }
+      ]
     },
     "magic_reality_distortion_effect_1": {
       "id": "magic_reality_distortion_effect_1",
@@ -2301,7 +4167,43 @@ const GameData = {
       },
       "stats": {
         "accumulateDamage": true
-      }
+      },
+      "actions": [
+        {
+          "trigger": "start_round",
+          "damageDealer": {
+            "tags": [
+              "passive"
+            ],
+            "triggerCounter": false,
+            "damageTarget_": "none",
+            "statDmgMult": 0,
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "all"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "all"
+            },
+            "targetMechanics": [
+              {
+                "mech": "take_accumulated_damage",
+                "values": [
+                  "0.8"
+                ]
+              }
+            ]
+          }
+        }
+      ]
     },
     "magic_reality_distortion_effect_2": {
       "id": "magic_reality_distortion_effect_2",
@@ -2312,7 +4214,43 @@ const GameData = {
       },
       "stats": {
         "accumulateDamage": true
-      }
+      },
+      "actions": [
+        {
+          "trigger": "start_round",
+          "damageDealer": {
+            "tags": [
+              "passive"
+            ],
+            "triggerCounter": false,
+            "damageTarget_": "none",
+            "statDmgMult": 0,
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "all"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "all"
+            },
+            "targetMechanics": [
+              {
+                "mech": "take_accumulated_damage",
+                "values": [
+                  "0.6"
+                ]
+              }
+            ]
+          }
+        }
+      ]
     },
     "magic_doreaths_tide_enemy_effect": {
       "id": "magic_doreaths_tide_enemy_effect",
@@ -2581,7 +4519,52 @@ const GameData = {
       }
     },
     "skill_dungeon_hero_3_debuff": {
-      "id": "skill_dungeon_hero_3_debuff"
+      "id": "skill_dungeon_hero_3_debuff",
+      "actions": [
+        {
+          "trigger": "start_turn",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [
+              "passive",
+              "magic_damage",
+              "overTime_effect",
+              "overTime_effect_poison"
+            ],
+            "triggerCounter": false,
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "damageTarget_": "all",
+            "damageType_": "magic_pure",
+            "statDmgMult": 0,
+            "minBaseDmg": 25,
+            "maxBaseDmg": 25,
+            "damageMultiplerPerHeroLevel": 0.1
+          }
+        }
+      ]
     },
     "skill_summon_1_bonus": {
       "id": "skill_summon_1_bonus",
@@ -2765,7 +4748,56 @@ const GameData = {
       }
     },
     "elixir_of_life_item_set_unit_bonus": {
-      "id": "elixir_of_life_item_set_unit_bonus"
+      "id": "elixir_of_life_item_set_unit_bonus",
+      "actions": [
+        {
+          "trigger": "start_turn",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [
+              "passive",
+              "heal_damage"
+            ],
+            "triggerCounter": false,
+            "damageTarget_": "none",
+            "statDmgMult": 0,
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "targetCondition_": "alive",
+              "castTarget_": "self"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "targetCondition_": "alive",
+              "castTarget_": "self"
+            },
+            "targetMechanics": [
+              {
+                "mech": "heal_percent",
+                "values": [
+                  "until start amount",
+                  "start_squad",
+                  "0.05",
+                  "0.00",
+                  "true"
+                ]
+              }
+            ]
+          }
+        }
+      ]
     },
     "ring_of_neutrality_artifact_unit_bonus": {
       "id": "ring_of_neutrality_artifact_unit_bonus"
@@ -2782,10 +4814,94 @@ const GameData = {
       }
     },
     "sub_class_undead_magic_1_unit_bonus": {
-      "id": "sub_class_undead_magic_1_unit_bonus"
+      "id": "sub_class_undead_magic_1_unit_bonus",
+      "actions": [
+        {
+          "trigger": "unit_died",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive"
+            },
+            "targetMechanics": [
+              {
+                "mech": "summon_percent",
+                "values": [
+                  "unit",
+                  "flicker",
+                  "enemy",
+                  "start_squad",
+                  0.5,
+                  "",
+                  "true",
+                  "2",
+                  "0",
+                  "1"
+                ]
+              }
+            ]
+          }
+        }
+      ]
     },
     "skill_faction_humans_1_unit_bonus": {
-      "id": "skill_faction_humans_1_unit_bonus"
+      "id": "skill_faction_humans_1_unit_bonus",
+      "actions": [
+        {
+          "trigger": "unit_died",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "ally"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "buffTarget_": "ally",
+            "buff": {
+              "sid": "skill_faction_humans_1_unit_bonus_additionbuff",
+              "duration": 2
+            }
+          }
+        }
+      ]
     },
     "skill_faction_humans_1_unit_bonus_additionbuff": {
       "id": "skill_faction_humans_1_unit_bonus_additionbuff",
@@ -2799,7 +4915,44 @@ const GameData = {
       }
     },
     "skill_faction_humans_2_unit_bonus": {
-      "id": "skill_faction_humans_2_unit_bonus"
+      "id": "skill_faction_humans_2_unit_bonus",
+      "actions": [
+        {
+          "trigger": "unit_died",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "ally"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "buffTarget_": "ally",
+            "buff": {
+              "sid": "skill_faction_humans_2_unit_bonus_additionbuff",
+              "duration": 2
+            }
+          }
+        }
+      ]
     },
     "skill_faction_humans_2_unit_bonus_additionbuff": {
       "id": "skill_faction_humans_2_unit_bonus_additionbuff",
@@ -2813,7 +4966,44 @@ const GameData = {
       }
     },
     "skill_faction_humans_3_unit_bonus": {
-      "id": "skill_faction_humans_3_unit_bonus"
+      "id": "skill_faction_humans_3_unit_bonus",
+      "actions": [
+        {
+          "trigger": "unit_died",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "ally"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "buffTarget_": "ally",
+            "buff": {
+              "sid": "skill_faction_humans_3_unit_bonus_additionbuff",
+              "duration": 2
+            }
+          }
+        }
+      ]
     },
     "skill_faction_humans_3_unit_bonus_additionbuff": {
       "id": "skill_faction_humans_3_unit_bonus_additionbuff",
@@ -2827,7 +5017,44 @@ const GameData = {
       }
     },
     "sub_skill_faction_humans_2_unit_bonus": {
-      "id": "sub_skill_faction_humans_2_unit_bonus"
+      "id": "sub_skill_faction_humans_2_unit_bonus",
+      "actions": [
+        {
+          "trigger": "unit_died",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "ally"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "buffTarget_": "ally",
+            "buff": {
+              "sid": "sub_skill_faction_humans_2_unit_bonus_additionbuff",
+              "duration": 2
+            }
+          }
+        }
+      ]
     },
     "sub_skill_faction_humans_2_unit_bonus_additionbuff": {
       "id": "sub_skill_faction_humans_2_unit_bonus_additionbuff",
@@ -2841,19 +5068,271 @@ const GameData = {
       }
     },
     "sub_skill_faction_humans_4_unit_bonus": {
-      "id": "sub_skill_faction_humans_4_unit_bonus"
+      "id": "sub_skill_faction_humans_4_unit_bonus",
+      "actions": [
+        {
+          "trigger": "unit_died",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive"
+            },
+            "targetMechanics": [
+              {
+                "mech": "summon_percent",
+                "values": [
+                  "unit",
+                  "self_copy",
+                  "ally",
+                  "start_squad",
+                  0.1,
+                  "self_destruct_buff_sid",
+                  "true",
+                  "1",
+                  "0",
+                  "1"
+                ]
+              }
+            ]
+          }
+        }
+      ]
     },
     "sub_skill_faction_humans_5_unit_bonus": {
-      "id": "sub_skill_faction_humans_5_unit_bonus"
+      "id": "sub_skill_faction_humans_5_unit_bonus",
+      "actions": [
+        {
+          "trigger": "unit_died",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "ally"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [
+              "passive",
+              "heal_damage"
+            ],
+            "triggerCounter": false,
+            "damageTarget_": "none",
+            "statDmgMult": 0,
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "ally"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "ally"
+            },
+            "targetMechanics": [
+              {
+                "mech": "heal_percent",
+                "values": [
+                  "without respawn",
+                  "max_unit",
+                  "1.0",
+                  "0.00",
+                  "false"
+                ]
+              }
+            ]
+          }
+        }
+      ]
     },
     "skill_formation_1_unit_bonus": {
-      "id": "skill_formation_1_unit_bonus"
+      "id": "skill_formation_1_unit_bonus",
+      "actions": [
+        {
+          "trigger": "unit_wait",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "castTarget_": "self"
+            },
+            "affectTargetParams": {
+              "castTarget_": "self"
+            },
+            "buffTarget_": "all",
+            "buff": {
+              "sid": "skill_formation_1_offence_buff",
+              "duration": 1
+            }
+          }
+        },
+        {
+          "trigger": "unit_skip",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "castTarget_": "self"
+            },
+            "affectTargetParams": {
+              "castTarget_": "self"
+            },
+            "buffTarget_": "all",
+            "buff": {
+              "sid": "skill_formation_1_defence_buff",
+              "duration": 1
+            }
+          }
+        }
+      ]
     },
     "skill_formation_2_unit_bonus": {
-      "id": "skill_formation_2_unit_bonus"
+      "id": "skill_formation_2_unit_bonus",
+      "actions": [
+        {
+          "trigger": "unit_wait",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "castTarget_": "self"
+            },
+            "affectTargetParams": {
+              "castTarget_": "self"
+            },
+            "buffTarget_": "all",
+            "buff": {
+              "sid": "skill_formation_2_offence_buff",
+              "duration": 1
+            }
+          }
+        },
+        {
+          "trigger": "unit_skip",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "castTarget_": "self"
+            },
+            "affectTargetParams": {
+              "castTarget_": "self"
+            },
+            "buffTarget_": "all",
+            "buff": {
+              "sid": "skill_formation_2_defence_buff",
+              "duration": 1
+            }
+          }
+        }
+      ]
     },
     "skill_formation_3_unit_bonus": {
-      "id": "skill_formation_3_unit_bonus"
+      "id": "skill_formation_3_unit_bonus",
+      "actions": [
+        {
+          "trigger": "unit_wait",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "castTarget_": "self"
+            },
+            "affectTargetParams": {
+              "castTarget_": "self"
+            },
+            "buffTarget_": "all",
+            "buff": {
+              "sid": "skill_formation_3_offence_buff",
+              "duration": 1
+            }
+          }
+        },
+        {
+          "trigger": "unit_skip",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "castTarget_": "self"
+            },
+            "affectTargetParams": {
+              "castTarget_": "self"
+            },
+            "buffTarget_": "all",
+            "buff": {
+              "sid": "skill_formation_3_defence_buff",
+              "duration": 1
+            }
+          }
+        }
+      ]
     },
     "skill_formation_1_offence_buff": {
       "id": "skill_formation_1_offence_buff",
@@ -2922,10 +5401,64 @@ const GameData = {
       }
     },
     "sub_skill_formation_4_overwatch_unit_bonus": {
-      "id": "sub_skill_formation_4_overwatch_unit_bonus"
+      "id": "sub_skill_formation_4_overwatch_unit_bonus",
+      "actions": [
+        {
+          "trigger": "unit_wait",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "castTarget_": "self"
+            },
+            "affectTargetParams": {
+              "castTarget_": "self"
+            },
+            "buffTarget_": "all",
+            "buff": {
+              "sid": "sub_skill_formation_4_overwatch_buff",
+              "duration": 1
+            }
+          }
+        }
+      ]
     },
     "sub_skill_formation_5_preparation_unit_bonus": {
-      "id": "sub_skill_formation_5_preparation_unit_bonus"
+      "id": "sub_skill_formation_5_preparation_unit_bonus",
+      "actions": [
+        {
+          "trigger": "unit_skip",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "castTarget_": "self"
+            },
+            "affectTargetParams": {
+              "castTarget_": "self"
+            },
+            "buffTarget_": "all",
+            "buff": {
+              "sid": "sub_skill_formation_5_preparation_buff",
+              "duration": 1
+            }
+          }
+        }
+      ]
     },
     "sub_skill_formation_4_overwatch_buff": {
       "id": "sub_skill_formation_4_overwatch_buff",
@@ -2936,7 +5469,38 @@ const GameData = {
       },
       "stats": {
         "maxOverwatchStrikes": 999
-      }
+      },
+      "actions": [
+        {
+          "trigger": "continue_after_wait",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "castTarget_": "self"
+            },
+            "affectTargetParams": {
+              "castTarget_": "self"
+            },
+            "buffTarget_": "all",
+            "targetMechanics": [
+              {
+                "mech": "dispel",
+                "values": [
+                  "sub_skill_formation_4_overwatch_buff"
+                ]
+              }
+            ]
+          }
+        }
+      ]
     },
     "sub_skill_formation_5_preparation_buff": {
       "id": "sub_skill_formation_5_preparation_buff",
@@ -2945,19 +5509,279 @@ const GameData = {
       }
     },
     "campaign_skill_formation_1_unit_bonus": {
-      "id": "campaign_skill_formation_1_unit_bonus"
+      "id": "campaign_skill_formation_1_unit_bonus",
+      "actions": [
+        {
+          "trigger": "unit_wait",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "castTarget_": "self"
+            },
+            "affectTargetParams": {
+              "castTarget_": "self"
+            },
+            "buffTarget_": "all",
+            "buff": {
+              "sid": "campaign_skill_formation_1_offence_buff",
+              "duration": 1
+            }
+          }
+        },
+        {
+          "trigger": "unit_skip",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "castTarget_": "self"
+            },
+            "affectTargetParams": {
+              "castTarget_": "self"
+            },
+            "buffTarget_": "all",
+            "buff": {
+              "sid": "campaign_skill_formation_1_defence_buff",
+              "duration": 1
+            }
+          }
+        }
+      ]
     },
     "campaign_skill_formation_2_unit_bonus": {
-      "id": "campaign_skill_formation_2_unit_bonus"
+      "id": "campaign_skill_formation_2_unit_bonus",
+      "actions": [
+        {
+          "trigger": "unit_wait",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "castTarget_": "self"
+            },
+            "affectTargetParams": {
+              "castTarget_": "self"
+            },
+            "buffTarget_": "all",
+            "buff": {
+              "sid": "campaign_skill_formation_2_offence_buff",
+              "duration": 1
+            }
+          }
+        },
+        {
+          "trigger": "unit_skip",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "castTarget_": "self"
+            },
+            "affectTargetParams": {
+              "castTarget_": "self"
+            },
+            "buffTarget_": "all",
+            "buff": {
+              "sid": "campaign_skill_formation_2_defence_buff",
+              "duration": 1
+            }
+          }
+        }
+      ]
     },
     "campaign_skill_formation_3_unit_bonus": {
-      "id": "campaign_skill_formation_3_unit_bonus"
+      "id": "campaign_skill_formation_3_unit_bonus",
+      "actions": [
+        {
+          "trigger": "unit_wait",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "castTarget_": "self"
+            },
+            "affectTargetParams": {
+              "castTarget_": "self"
+            },
+            "buffTarget_": "all",
+            "buff": {
+              "sid": "campaign_skill_formation_3_offence_buff",
+              "duration": 1
+            }
+          }
+        },
+        {
+          "trigger": "unit_skip",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "castTarget_": "self"
+            },
+            "affectTargetParams": {
+              "castTarget_": "self"
+            },
+            "buffTarget_": "all",
+            "buff": {
+              "sid": "campaign_skill_formation_3_defence_buff",
+              "duration": 1
+            }
+          }
+        }
+      ]
     },
     "campaign_skill_formation_4_unit_bonus": {
-      "id": "campaign_skill_formation_4_unit_bonus"
+      "id": "campaign_skill_formation_4_unit_bonus",
+      "actions": [
+        {
+          "trigger": "unit_wait",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "castTarget_": "self"
+            },
+            "affectTargetParams": {
+              "castTarget_": "self"
+            },
+            "buffTarget_": "all",
+            "buff": {
+              "sid": "campaign_skill_formation_4_offence_buff",
+              "duration": 1
+            }
+          }
+        },
+        {
+          "trigger": "unit_skip",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "castTarget_": "self"
+            },
+            "affectTargetParams": {
+              "castTarget_": "self"
+            },
+            "buffTarget_": "all",
+            "buff": {
+              "sid": "campaign_skill_formation_4_defence_buff",
+              "duration": 1
+            }
+          }
+        }
+      ]
     },
     "campaign_skill_formation_5_unit_bonus": {
-      "id": "campaign_skill_formation_5_unit_bonus"
+      "id": "campaign_skill_formation_5_unit_bonus",
+      "actions": [
+        {
+          "trigger": "unit_wait",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "castTarget_": "self"
+            },
+            "affectTargetParams": {
+              "castTarget_": "self"
+            },
+            "buffTarget_": "all",
+            "buff": {
+              "sid": "campaign_skill_formation_5_offence_buff",
+              "duration": 1
+            }
+          }
+        },
+        {
+          "trigger": "unit_skip",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "castTarget_": "self"
+            },
+            "affectTargetParams": {
+              "castTarget_": "self"
+            },
+            "buffTarget_": "all",
+            "buff": {
+              "sid": "campaign_skill_formation_5_defence_buff",
+              "duration": 1
+            }
+          }
+        }
+      ]
     },
     "campaign_skill_formation_1_offence_buff": {
       "id": "campaign_skill_formation_1_offence_buff",
@@ -3070,7 +5894,34 @@ const GameData = {
       }
     },
     "sub_skill_leadership_3_unit_bonus": {
-      "id": "sub_skill_leadership_3_unit_bonus"
+      "id": "sub_skill_leadership_3_unit_bonus",
+      "actions": [
+        {
+          "trigger": "fail_turn",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "castTarget_": "self"
+            },
+            "affectTargetParams": {
+              "castTarget_": "self"
+            },
+            "buffTarget_": "all",
+            "buff": {
+              "sid": "sub_skill_leadership_3_moral_buff",
+              "duration": 1
+            }
+          }
+        }
+      ]
     },
     "sub_skill_leadership_3_moral_buff": {
       "id": "sub_skill_leadership_3_moral_buff",
@@ -3084,10 +5935,70 @@ const GameData = {
       }
     },
     "sub_skill_tactics_2_unit_bonus": {
-      "id": "sub_skill_tactics_2_unit_bonus"
+      "id": "sub_skill_tactics_2_unit_bonus",
+      "actions": [
+        {
+          "trigger": "unit_wait",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "enemy"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "castTarget_": "self"
+            },
+            "affectTargetParams": {
+              "castTarget_": "self"
+            },
+            "buffTarget_": "all",
+            "buff": {
+              "sid": "sub_skill_tactics_2_initiative_buff",
+              "duration": 1
+            }
+          }
+        }
+      ]
     },
     "sub_skill_tactics_3_unit_bonus": {
-      "id": "sub_skill_tactics_3_unit_bonus"
+      "id": "sub_skill_tactics_3_unit_bonus",
+      "actions": [
+        {
+          "trigger": "cast_magic",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "enemy"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "castTarget_": "self"
+            },
+            "affectTargetParams": {
+              "castTarget_": "self"
+            },
+            "buffTarget_": "all",
+            "targetMechanics": [
+              {
+                "mech": "add_energy",
+                "values": [
+                  "1",
+                  "0",
+                  "1"
+                ]
+              }
+            ]
+          }
+        }
+      ]
     },
     "sub_skill_tactics_5_unit_bonus": {
       "id": "sub_skill_tactics_5_unit_bonus"
@@ -3192,13 +6103,127 @@ const GameData = {
       }
     },
     "burning": {
-      "id": "burning"
+      "id": "burning",
+      "actions": [
+        {
+          "trigger": "start_turn",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [
+              "passive",
+              "heal_damage"
+            ],
+            "triggerCounter": false,
+            "damageTarget_": "all",
+            "damageType_": "absolute",
+            "statDmgMult": 0,
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "castTarget_": "self",
+              "targetTags": [
+                "unit"
+              ]
+            },
+            "affectTargetParams": {
+              "castTarget_": "self",
+              "targetTags": [
+                "unit"
+              ]
+            },
+            "minBaseDmg": 77,
+            "maxBaseDmg": 77
+          }
+        }
+      ]
     },
     "burning_2": {
-      "id": "burning_2"
+      "id": "burning_2",
+      "actions": [
+        {
+          "trigger": "start_turn",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [
+              "passive",
+              "heal_damage"
+            ],
+            "triggerCounter": false,
+            "damageTarget_": "all",
+            "damageType_": "absolute",
+            "statDmgMult": 0,
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "castTarget_": "self",
+              "targetTags": [
+                "unit"
+              ]
+            },
+            "affectTargetParams": {
+              "castTarget_": "self",
+              "targetTags": [
+                "unit"
+              ]
+            },
+            "minBaseDmg": 100,
+            "maxBaseDmg": 100
+          }
+        }
+      ]
     },
     "burning_3": {
-      "id": "burning_3"
+      "id": "burning_3",
+      "actions": [
+        {
+          "trigger": "start_turn",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [
+              "passive",
+              "heal_damage"
+            ],
+            "triggerCounter": false,
+            "damageTarget_": "all",
+            "damageType_": "normal",
+            "statDmgMult": 0,
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "castTarget_": "self",
+              "targetTags": [
+                "unit"
+              ]
+            },
+            "affectTargetParams": {
+              "castTarget_": "self",
+              "targetTags": [
+                "unit"
+              ]
+            },
+            "minBaseDmg": 10,
+            "maxBaseDmg": 10
+          }
+        }
+      ]
     },
     "god_mode": {
       "id": "god_mode",
@@ -3789,7 +6814,60 @@ const GameData = {
       }
     },
     "black_dragon_buff": {
-      "id": "black_dragon_buff"
+      "id": "black_dragon_buff",
+      "actions": [
+        {
+          "trigger": "unit_took_damage",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [
+              "passive"
+            ],
+            "triggerCounter": false,
+            "damageTarget_": "none",
+            "statDmgMult": 0,
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "all"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "all"
+            },
+            "targetMechanics": [
+              {
+                "mech": "revenge_damage",
+                "values": [
+                  "flat",
+                  "magic_pure",
+                  "0",
+                  "50",
+                  "1",
+                  "8",
+                  "melee"
+                ],
+                "additionalValues": [
+                  "magic_damage"
+                ]
+              }
+            ]
+          }
+        }
+      ]
     },
     "esquire_additionbuff": {
       "id": "esquire_additionbuff",
@@ -4082,7 +7160,57 @@ const GameData = {
       }
     },
     "ent_passive_buff": {
-      "id": "ent_passive_buff"
+      "id": "ent_passive_buff",
+      "actions": [
+        {
+          "trigger": "unit_took_damage",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance_both",
+              "values": [
+                "enemy",
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [
+              "passive"
+            ],
+            "triggerCounter": false,
+            "damageTarget_": "none",
+            "statDmgMult": 0,
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive"
+            },
+            "targetMechanics": [
+              {
+                "mech": "revenge_damage",
+                "values": [
+                  "percent",
+                  "max_unit",
+                  "1",
+                  "0",
+                  "6",
+                  "melee"
+                ]
+              }
+            ]
+          }
+        }
+      ]
     },
     "aqualotl_wisp_buff_1": {
       "id": "aqualotl_wisp_buff_1",
@@ -4121,7 +7249,51 @@ const GameData = {
       }
     },
     "druid_bees": {
-      "id": "druid_bees"
+      "id": "druid_bees",
+      "actions": [
+        {
+          "trigger": "start_turn",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [
+              "passive",
+              "normal_damage",
+              "overTime_effect",
+              "overTime_effect_normal"
+            ],
+            "triggerCounter": false,
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "damageTarget_": "all",
+            "damageType_": "normal",
+            "statDmgMult": 0,
+            "minStackDmg": 8,
+            "maxStackDmg": 8
+          }
+        }
+      ]
     },
     "qilin_wisp_buff_1": {
       "id": "qilin_wisp_buff_1",
@@ -4298,7 +7470,51 @@ const GameData = {
       }
     },
     "phoenix_ignition": {
-      "id": "phoenix_ignition"
+      "id": "phoenix_ignition",
+      "actions": [
+        {
+          "trigger": "start_turn",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [
+              "passive",
+              "magic_damage",
+              "overTime_effect",
+              "overTime_effect_fire"
+            ],
+            "triggerCounter": false,
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "damageTarget_": "all",
+            "damageType_": "magic_pure",
+            "statDmgMult": 0,
+            "minStackDmg": 50,
+            "maxStackDmg": 50
+          }
+        }
+      ]
     },
     "lich_dragon_corpse_buff": {
       "id": "lich_dragon_corpse_buff",
@@ -4394,7 +7610,52 @@ const GameData = {
     },
     "primal_remnant_copy_buff": {
       "id": "primal_remnant_copy_buff",
-      "data": {}
+      "data": {},
+      "actions": [
+        {
+          "trigger": "unit_took_damage",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [
+              "buff_attack"
+            ],
+            "triggerCounter": false,
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "damageTarget_": "none",
+            "damageType_": "normal",
+            "targetMechanics": [
+              {
+                "mech": "destroy_self",
+                "values": [],
+                "afterAttack": false
+              }
+            ]
+          }
+        }
+      ]
     },
     "frog_debuff": {
       "id": "frog_debuff",
@@ -4408,10 +7669,98 @@ const GameData = {
       }
     },
     "frog_poison": {
-      "id": "frog_poison"
+      "id": "frog_poison",
+      "actions": [
+        {
+          "trigger": "start_turn",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [
+              "passive",
+              "magic_damage",
+              "overTime_effect",
+              "overTime_effect_poison"
+            ],
+            "triggerCounter": false,
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "damageTarget_": "all",
+            "damageType_": "magic_pure",
+            "statDmgMult": 0,
+            "minStackDmg": 7,
+            "maxStackDmg": 7
+          }
+        }
+      ]
     },
     "dragon_hunter_blood": {
-      "id": "dragon_hunter_blood"
+      "id": "dragon_hunter_blood",
+      "actions": [
+        {
+          "trigger": "start_turn",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [
+              "passive",
+              "normal_damage",
+              "overTime_effect",
+              "overTime_effect_blood"
+            ],
+            "triggerCounter": false,
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "damageTarget_": "all",
+            "damageType_": "normal",
+            "statDmgMult": 0,
+            "minStackDmg": 7,
+            "maxStackDmg": 7
+          }
+        }
+      ]
     },
     "dragon_hunter_buff": {
       "id": "dragon_hunter_buff",
@@ -4445,7 +7794,51 @@ const GameData = {
       }
     },
     "flicker_curse": {
-      "id": "flicker_curse"
+      "id": "flicker_curse",
+      "actions": [
+        {
+          "trigger": "start_turn",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [
+              "passive",
+              "absolute_damage",
+              "overTime_effect",
+              "overTime_effect_curse"
+            ],
+            "triggerCounter": false,
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "damageTarget_": "all",
+            "damageType_": "absolute",
+            "statDmgMult": 0,
+            "minStackDmg": 1,
+            "maxStackDmg": 1
+          }
+        }
+      ]
     },
     "pet_buff": {
       "id": "pet_buff",
@@ -4481,7 +7874,51 @@ const GameData = {
       }
     },
     "pet_blood": {
-      "id": "pet_blood"
+      "id": "pet_blood",
+      "actions": [
+        {
+          "trigger": "start_turn",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [
+              "passive",
+              "normal_damage",
+              "overTime_effect",
+              "overTime_effect_blood"
+            ],
+            "triggerCounter": false,
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "damageTarget_": "all",
+            "damageType_": "normal",
+            "statDmgMult": 0,
+            "minStackDmg": 2,
+            "maxStackDmg": 2
+          }
+        }
+      ]
     },
     "graverobber_debuff": {
       "id": "graverobber_debuff",
@@ -4495,7 +7932,51 @@ const GameData = {
       }
     },
     "graverobber_poison": {
-      "id": "graverobber_poison"
+      "id": "graverobber_poison",
+      "actions": [
+        {
+          "trigger": "start_turn",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [
+              "passive",
+              "magic_damage",
+              "overTime_effect",
+              "overTime_effect_poison"
+            ],
+            "triggerCounter": false,
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "damageTarget_": "all",
+            "damageType_": "magic_pure",
+            "statDmgMult": 0,
+            "minStackDmg": 3,
+            "maxStackDmg": 3
+          }
+        }
+      ]
     },
     "lich_debuff": {
       "id": "lich_debuff",
@@ -4584,7 +8065,51 @@ const GameData = {
       }
     },
     "unfrozen_cultist_curse": {
-      "id": "unfrozen_cultist_curse"
+      "id": "unfrozen_cultist_curse",
+      "actions": [
+        {
+          "trigger": "start_turn",
+          "triggerConditions": [
+            {
+              "checkFunction": "allegiance",
+              "values": [
+                "self"
+              ]
+            }
+          ],
+          "damageDealer": {
+            "tags": [
+              "passive",
+              "absolute_damage",
+              "overTime_effect",
+              "overTime_effect_curse"
+            ],
+            "triggerCounter": false,
+            "attackPatternSid": "attack_single_x100",
+            "castTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "affectTargetParams": {
+              "targetTags": [
+                "unit"
+              ],
+              "castTarget_": "self",
+              "targetCondition_": "alive",
+              "selection": "object"
+            },
+            "damageTarget_": "all",
+            "damageType_": "absolute",
+            "statDmgMult": 0,
+            "minStackDmg": 2,
+            "maxStackDmg": 2
+          }
+        }
+      ]
     },
     "frostworm_rider_debuff": {
       "id": "frostworm_rider_debuff",
@@ -6824,6 +10349,21 @@ const GameData = {
     }
   },
 };
+
+// Alias for description functions that use "sidebuffs" lookup
+GameData.sidebuffs = GameData.buffs;
+
+// Apply pre-computed buff aliases (discovered by analyzing skill references vs actual buffs)
+// This handles cases where skills reference buffs by a different ID than they are stored
+(function() {
+  const buffAliases = {"skill_formation_1_bonus":"skill_formation_1_unit_bonus","skill_formation_2_bonus":"skill_formation_2_unit_bonus","skill_formation_3_bonus":"skill_formation_3_unit_bonus","skill_faction_humans_1_bonus":"skill_faction_humans_1_unit_bonus","skill_faction_humans_2_bonus":"skill_faction_humans_2_unit_bonus","skill_faction_humans_3_bonus":"skill_faction_humans_3_unit_bonus","campaign_skill_formation_1_bonus":"campaign_skill_formation_1_unit_bonus","campaign_skill_formation_2_bonus":"campaign_skill_formation_2_unit_bonus","campaign_skill_formation_3_bonus":"campaign_skill_formation_3_unit_bonus","campaign_skill_formation_4_bonus":"campaign_skill_formation_4_unit_bonus","campaign_skill_formation_5_bonus":"campaign_skill_formation_5_unit_bonus"};
+  for (const [aliasId, actualId] of Object.entries(buffAliases)) {
+    if (GameData.buffs[actualId] && !GameData.buffs[aliasId]) {
+      GameData.buffs[aliasId] = GameData.buffs[actualId];
+      GameData.sidebuffs[aliasId] = GameData.buffs[actualId];
+    }
+  }
+})();
 
 // Export for use in browser and Node.js
 if (typeof module !== "undefined" && module.exports) {

@@ -538,6 +538,7 @@
 
 /* Item Tooltip */
 .item-tooltip {
+    display: none;
     position: absolute;
     transform: translateY(-50%);
     min-width: 280px;
@@ -547,7 +548,6 @@
     border-radius: 8px;
     padding: 15px;
     z-index: 100;
-    display: none;
     white-space: normal;
     text-align: left;
 }

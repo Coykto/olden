@@ -12,6 +12,8 @@ export interface GameDataLookups {
   abilities: Record<string, any>;
   obstacles: Record<string, any>;
   traps: Record<string, any>;
+  skills: Record<string, any>;
+  buffAliases: Record<string, string>;  // Maps referenced ID -> actual buff ID
 }
 
 export class DataExtractor {
@@ -27,6 +29,8 @@ export class DataExtractor {
       abilities: {},
       obstacles: {},
       traps: {},
+      skills: {},
+      buffAliases: {},
     };
 
     // Extract buffs from DB/buffs/
@@ -40,6 +44,12 @@ export class DataExtractor {
 
     // Extract traps from DB/field_objects/traps/
     this.extractTraps(data);
+
+    // Extract skills from DB/heroes_skills/skills/
+    this.extractSkills(data);
+
+    // Build buff aliases by comparing skill references to actual buffs
+    this.buildBuffAliases(data);
 
     return data;
   }
@@ -107,6 +117,8 @@ export class DataExtractor {
       config: buffData.config,
       // Include stats directly if present
       stats: buffData.data?.stats,
+      // Include actions for sidebuff lookups (formation skills, etc.)
+      actions: buffData.actions,
     };
   }
 
@@ -204,6 +216,108 @@ export class DataExtractor {
     console.log(`[DataExtractor] Extracted ${Object.keys(data.traps).length} traps`);
   }
 
+  private extractSkills(data: GameDataLookups): void {
+    const skillsDir = 'DB/heroes_skills/skills/';
+
+    try {
+      const entries = this.zip.getEntries();
+      for (const entry of entries) {
+        if (entry.entryName.startsWith(skillsDir) && entry.entryName.endsWith('.json')) {
+          const content = entry.getData().toString('utf-8');
+          const items = this.extractArrayItems(content);
+
+          for (const item of items) {
+            if (item.id) {
+              data.skills[item.id] = item;
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Error extracting skills:', e);
+    }
+
+    console.log(`[DataExtractor] Extracted ${Object.keys(data.skills).length} skills`);
+  }
+
+  /**
+   * Build buff aliases by finding buff references in skills that don't exist
+   * in the extracted buffs, then trying to match them to actual buffs.
+   *
+   * This handles cases like:
+   * - Skill references "skill_formation_1_bonus"
+   * - Actual buff is "skill_formation_1_unit_bonus"
+   */
+  private buildBuffAliases(data: GameDataLookups): void {
+    const buffRefs = new Set<string>();
+    const existingBuffIds = new Set(Object.keys(data.buffs));
+
+    // Collect all buff references from skills
+    for (const skill of Object.values(data.skills)) {
+      for (const level of (skill as any).parametersPerLevel || []) {
+        for (const bonus of level.bonuses || []) {
+          if (bonus.type === 'battleSubskillBonus') {
+            const params = bonus.parameters || [];
+            if (params.length >= 2) {
+              const buffType = params[0];  // e.g., "unit_buff", "hero_ability"
+              const buffRef = params[1];   // e.g., "skill_formation_1_bonus"
+
+              // If the reference doesn't exist directly, we need to find it
+              if (!existingBuffIds.has(buffRef)) {
+                buffRefs.add(buffRef);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Try to find actual buffs for each missing reference
+    let aliasCount = 0;
+    for (const ref of buffRefs) {
+      const actualId = this.findActualBuffId(ref, existingBuffIds);
+      if (actualId) {
+        data.buffAliases[ref] = actualId;
+        aliasCount++;
+      } else {
+        console.warn(`[DataExtractor] Could not find buff for reference: ${ref}`);
+      }
+    }
+
+    console.log(`[DataExtractor] Built ${aliasCount} buff aliases from ${buffRefs.size} missing references`);
+  }
+
+  /**
+   * Try to find the actual buff ID for a given reference.
+   * Applies known naming transformations.
+   */
+  private findActualBuffId(ref: string, existingBuffIds: Set<string>): string | null {
+    // Transformation 1: unit_buff type uses _unit_bonus suffix
+    // Reference: "skill_formation_1_bonus" -> Actual: "skill_formation_1_unit_bonus"
+    if (ref.endsWith('_bonus')) {
+      const transformed = ref.replace(/_bonus$/, '_unit_bonus');
+      if (existingBuffIds.has(transformed)) {
+        return transformed;
+      }
+    }
+
+    // Transformation 2: Try adding _unit suffix before the last word
+    // This handles more general cases
+    const parts = ref.split('_');
+    if (parts.length >= 2) {
+      const lastPart = parts.pop()!;
+      const withUnit = [...parts, 'unit', lastPart].join('_');
+      if (existingBuffIds.has(withUnit)) {
+        return withUnit;
+      }
+    }
+
+    // Add more transformations here as patterns are discovered
+    // ...
+
+    return null;
+  }
+
   generateGameDataJs(data: GameDataLookups): string {
     const output: string[] = [];
 
@@ -222,6 +336,25 @@ export class DataExtractor {
     output.push(`  obstacles: ${JSON.stringify(data.obstacles, null, 2).split('\n').join('\n  ')},`);
     output.push(`  traps: ${JSON.stringify(data.traps, null, 2).split('\n').join('\n  ')},`);
     output.push('};');
+    output.push('');
+    output.push('// Alias for description functions that use "sidebuffs" lookup');
+    output.push('GameData.sidebuffs = GameData.buffs;');
+    output.push('');
+    output.push('// Apply pre-computed buff aliases (discovered by analyzing skill references vs actual buffs)');
+    output.push('// This handles cases where skills reference buffs by a different ID than they are stored');
+    if (Object.keys(data.buffAliases).length > 0) {
+      output.push('(function() {');
+      output.push('  const buffAliases = ' + JSON.stringify(data.buffAliases) + ';');
+      output.push('  for (const [aliasId, actualId] of Object.entries(buffAliases)) {');
+      output.push('    if (GameData.buffs[actualId] && !GameData.buffs[aliasId]) {');
+      output.push('      GameData.buffs[aliasId] = GameData.buffs[actualId];');
+      output.push('      GameData.sidebuffs[aliasId] = GameData.buffs[actualId];');
+      output.push('    }');
+      output.push('  }');
+      output.push('})();');
+    } else {
+      output.push('// No buff aliases needed');
+    }
     output.push('');
     output.push('// Export for use in browser and Node.js');
     output.push('if (typeof module !== "undefined" && module.exports) {');

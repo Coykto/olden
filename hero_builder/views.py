@@ -10,7 +10,7 @@ from gamedata.models import GameVersion, Hero, Faction, Item, Skill, Unit
 from core.damage_calculator import (
     DamageCalculator, create_unit_stack_from_db, create_hero_build_from_db
 )
-from core.localizations import get_skill_info, get_localizations, get_item_info
+from core.localizations import get_skill_info, get_localizations, get_item_info, get_skill_args
 
 
 def index(request):
@@ -456,11 +456,23 @@ def api_available_skills(request):
                 'icon': f'{sub_id}_icon',  # Subskill icons have _icon suffix
             })
 
+        # Get description args for dynamic description computation
+        localizations = get_localizations()
+        skill_args = get_skill_args()
+
+        # Try multiple desc key patterns (skill_id_desc or from parametersPerLevel)
+        desc_key = skill.raw_data.get('parametersPerLevel', [{}])[0].get('desc', f"{skill.id_key}_desc")
+        description_template = localizations.get(desc_key, "")
+        description_args = skill_args.get(desc_key, [])
+
         skills_data.append({
             'id': skill.id_key,
             'type': skill.skill_type,
             'name': info['name'],
-            'description': info['description'],
+            'description': info['description'],  # Keep for fallback
+            'description_template': description_template,
+            'description_args': description_args,
+            'raw_data': skill.raw_data,
             'icon': skill.id_key,
             'subskill_preview': subskill_preview,
         })
