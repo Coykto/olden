@@ -339,6 +339,7 @@ class Hero(models.Model):
     start_intelligence = models.IntegerField(default=0)
     start_luck = models.IntegerField(default=0)
     start_moral = models.IntegerField(default=0)
+    start_view_radius = models.IntegerField(default=6, help_text="Hero's sight radius on the map")
 
     # Raw JSON data for specialization, starting squad, etc.
     raw_data = models.JSONField(help_text="Complete raw hero data from game files")

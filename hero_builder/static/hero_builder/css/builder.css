@@ -853,6 +853,38 @@
     color: #5a6575;
 }
 
+.modal-controls {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.modal-controls .skill-search {
+    flex: 1;
+}
+
+.scroll-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #8a9aaa;
+    font-size: 0.9rem;
+    cursor: pointer;
+    white-space: nowrap;
+    user-select: none;
+}
+
+.scroll-toggle input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: #c9a227;
+}
+
+.scroll-toggle:hover {
+    color: #c9a227;
+}
+
 .skill-list {
     flex: 1;
     overflow-y: auto;

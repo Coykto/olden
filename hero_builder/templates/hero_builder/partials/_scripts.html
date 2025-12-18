@@ -588,19 +588,20 @@ const ItemSelectionModal = {
     allItems: [],
     currentSlot: null,
     currentSlotType: null,
+    showScrolls: false,  // Hide scrolls by default in accessory slot
 
     // Map UI slot types (from data-slot-type) to API slot types
     slotTypeMap: {
-        'unique': 'unic_slot',
+        'unique': 'unique',
         'head': 'head',
         'back': 'back',
         'armor': 'armor',
-        'weapon': 'left_hand',
-        'shield': 'right_hand',
+        'weapon': 'weapon',
+        'shield': 'shield',
         'belt': 'belt',
         'boots': 'boots',
         'ring': 'ring',
-        'accessory': 'item_slot'
+        'accessory': 'accessory'
     },
 
     // Rarity colors
@@ -648,20 +649,88 @@ const ItemSelectionModal = {
         }
     },
 
+    // Check if an item is a scroll
+    isScroll(item) {
+        return item.id && item.id.toLowerCase().includes('scroll');
+    },
+
+    // Rarity sort order (lower = higher priority)
+    rarityOrder: {
+        'legendary': 0,
+        'epic': 1,
+        'rare': 2,
+        'uncommon': 3,
+        'common': 4
+    },
+
+    // Get filtered items based on search and scroll toggle, sorted by rarity
+    getFilteredItems(searchText = '') {
+        const search = searchText.toLowerCase();
+        const filtered = this.allItems.filter(item => {
+            // Filter by scroll toggle (only for accessory slot)
+            if (this.currentSlotType === 'accessory' && !this.showScrolls && this.isScroll(item)) {
+                return false;
+            }
+            // Filter by search text
+            if (search) {
+                return item.name.toLowerCase().includes(search) ||
+                       (item._cachedDescription && item._cachedDescription.includes(search));
+            }
+            return true;
+        });
+
+        // Sort by rarity: Legendary > Epic > Rare > Uncommon > Common
+        return filtered.sort((a, b) => {
+            const orderA = this.rarityOrder[a.rarity] ?? 99;
+            const orderB = this.rarityOrder[b.rarity] ?? 99;
+            return orderA - orderB;
+        });
+    },
+
+    toggleScrolls() {
+        this.showScrolls = !this.showScrolls;
+        // Re-render with current search text
+        const searchInput = document.querySelector('.skill-search');
+        const searchText = searchInput ? searchInput.value : '';
+        this.updateItemList(searchText);
+        // Update checkbox state
+        const checkbox = document.getElementById('show-scrolls-toggle');
+        if (checkbox) checkbox.checked = this.showScrolls;
+    },
+
+    updateItemList(searchText = '') {
+        const filtered = this.getFilteredItems(searchText);
+        document.getElementById('item-list').innerHTML =
+            filtered.map(item => this.renderItemOption(item)).join('');
+    },
+
     render() {
         const container = document.getElementById('skill-modal-container');
+        const isAccessory = this.currentSlotType === 'accessory';
+        const scrollToggleHtml = isAccessory ? `
+            <label class="scroll-toggle">
+                <input type="checkbox" id="show-scrolls-toggle"
+                       ${this.showScrolls ? 'checked' : ''}
+                       onchange="ItemSelectionModal.toggleScrolls()">
+                Show scrolls
+            </label>
+        ` : '';
+
         container.innerHTML = `
             <div class="modal-overlay" onclick="ItemSelectionModal.close()">
                 <div class="skill-modal" onclick="event.stopPropagation()">
                     <div class="modal-header">
                         <h2>Select Item - ${this.currentSlotType}</h2>
-                        <input type="text"
-                               class="skill-search"
-                               placeholder="Search items..."
-                               oninput="ItemSelectionModal.filter(this.value)">
+                        <div class="modal-controls">
+                            <input type="text"
+                                   class="skill-search"
+                                   placeholder="Search items..."
+                                   oninput="ItemSelectionModal.filter(this.value)">
+                            ${scrollToggleHtml}
+                        </div>
                     </div>
                     <div class="skill-list" id="item-list">
-                        ${this.allItems.map(item => this.renderItemOption(item)).join('')}
+                        ${this.getFilteredItems().map(item => this.renderItemOption(item)).join('')}
                     </div>
                 </div>
             </div>
@@ -693,13 +762,7 @@ const ItemSelectionModal = {
     },
 
     filter(searchText) {
-        const search = searchText.toLowerCase();
-        const filtered = this.allItems.filter(item =>
-            item.name.toLowerCase().includes(search) ||
-            (item._cachedDescription && item._cachedDescription.includes(search))
-        );
-        document.getElementById('item-list').innerHTML =
-            filtered.map(item => this.renderItemOption(item)).join('');
+        this.updateItemList(searchText);
     },
 
     select(itemId) {

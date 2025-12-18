@@ -8,13 +8,13 @@ _This roadmap outlines our strategic direction based on player needs and communi
 
 _Expand the Hero Builder with essential game mechanics for complete build theorycrafting._
 
-- [ ] **Advanced Class System**
-  - [ ] **Dynamic Class Progression:** Automatically update the hero's class icon when required skills reach expert level, reflecting advanced class unlocks.
-  - [ ] **Class Tooltips:** Display informative tooltips on class icons explaining the class and its requirements.
+- [X] **Advanced Class System**
+  - [X] **Dynamic Class Progression:** Automatically update the hero's class icon when required skills reach expert level, reflecting advanced class unlocks.
+  - [X] **Class Tooltips:** Display informative tooltips on class icons explaining the class and its requirements.
 
-- [ ] **Equipment System**
-  - [ ] **Full Equipment Selection:** Allow users to equip heroes with all available in-game equipment items.
-  - [ ] **Equipment Upgrades:** Support equipment upgrade levels with clear display of alchemical dust costs at the bottom of the equipment window.
+- [X] **Equipment System**
+  - [X] **Full Equipment Selection:** Allow users to equip heroes with all available in-game equipment items.
+  - [X] **Equipment Upgrades:** Support equipment upgrade levels with clear display of alchemical dust costs at the bottom of the equipment window.
 
 - [ ] **Spell System**
   - [ ] **Spell Selection & Loadout:** Enable users to assign and manage spells as part of their hero build.

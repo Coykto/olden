@@ -40,6 +40,13 @@ uv run python manage.py makemigrations gamedata --name description_of_change
   - `combat_value_extractor.py` - Extracts combat data for calculator
   - `localizations.py` - Loads localized strings from game files
 
+## Data Import Decisions
+
+### Campaign Items (2025-12)
+Campaign-specific items (IDs starting with `campaign_`) are **excluded** during import.
+These are story artifacts not meant for the hero builder (e.g., "Captured Priestesses", "Phoenix Egg").
+If needed in the future, remove the `startswith("campaign_")` check in `_import_items()`.
+
 ## Game Data Location
 
 - Game installation: `/Users/eb/Downloads/gamedata/steamapps/common/Heroes of Might & Magic Olden Era Demo/`

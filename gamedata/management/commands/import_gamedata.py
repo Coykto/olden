@@ -273,6 +273,7 @@ class Command(BaseCommand):
                 start_intelligence=stats.get("intelligence", 0),
                 start_luck=stats.get("luck", 0),
                 start_moral=stats.get("moral", 0),
+                start_view_radius=hero_data.get("viewRadius", 6),
                 raw_data=hero_data
             ))
 
@@ -317,13 +318,24 @@ class Command(BaseCommand):
         self.stdout.write(f"  Created {len(skill_objects)} skills ({extracted_count} with extracted values)")
 
     def _import_items(self, reader: GameDataReader, version: GameVersion):
-        """Import item data."""
+        """Import item data.
+        
+        Note: Campaign items (IDs starting with 'campaign_') are excluded.
+        These are story-specific artifacts not meant for the hero builder.
+        If needed in the future, remove the startswith check below.
+        """
         self.stdout.write("Importing items...")
 
         items_data = reader.get_all_items()
 
         item_objects = []
+        skipped_campaign = 0
         for item_data in items_data:
+            # Skip campaign-specific items (e.g., campaign_M5_friend_item)
+            if item_data["id"].startswith("campaign_"):
+                skipped_campaign += 1
+                continue
+                
             item_objects.append(Item(
                 version=version,
                 id_key=item_data["id"],
@@ -339,7 +351,7 @@ class Command(BaseCommand):
             ))
 
         Item.objects.bulk_create(item_objects)
-        self.stdout.write(f"  Created {len(item_objects)} items")
+        self.stdout.write(f"  Created {len(item_objects)} items (skipped {skipped_campaign} campaign items)")
 
     def _import_advanced_classes(self, reader: GameDataReader, version: GameVersion):
         """Import advanced class data."""
