@@ -1836,7 +1836,6 @@
     font-weight: 500;
     margin-bottom: 4px;
     line-height: 1.2;
-    min-height: 2.4em;
 }
 
 .unit-card-stats {
@@ -1853,10 +1852,6 @@
     padding: 2px 5px;
     border-radius: 3px;
 }
-
-.unit-card-stats .stat-atk { color: #ff8866; }
-.unit-card-stats .stat-def { color: #66aaff; }
-.unit-card-stats .stat-hp { color: #66ff88; }
 
 /* Unit Abilities in Card */
 .unit-card-abilities {
@@ -2008,7 +2003,7 @@
     align-items: center;
     justify-content: center;
     position: relative;
-    padding: 0 28px; /* Space for tier badge */
+    padding: 8px 28px 0; /* Top padding + space for tier badge */
 }
 
 .unit-card-name {

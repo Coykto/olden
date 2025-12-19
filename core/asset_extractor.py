@@ -46,6 +46,11 @@ class AssetExtractor:
         'wip_might_specialization_icon': 'might_icon',
         'wip_mage_specialization_icon': 'magic_icon',
     }
+    # Unit stat icons (40x40)
+    STAT_ICONS = [
+        'unit_attack', 'unit_damage', 'unit_defence', 'unit_health',
+        'unit_init', 'unit_luck', 'unit_moral', 'unit_speed',
+    ]
 
     def extract_all(self, force: bool = False) -> Dict[str, int]:
         """
@@ -82,6 +87,9 @@ class AssetExtractor:
 
         # Extract spell icons
         results['spells'] = self._extract_spell_icons(force)
+
+        # Extract stat icons
+        results['stat_icons'] = self._extract_stat_icons(force)
 
         return results
 
@@ -562,6 +570,44 @@ class AssetExtractor:
                     if name.startswith(('day_', 'night_', 'space_', 'primal_', 'neutral_')) and '_magic_' not in name:
                         continue
 
+                    out_file = output_path / f"{name}.png"
+
+                    if not force and out_file.exists():
+                        continue
+
+                    image = data.image
+                    image.save(str(out_file))
+                    count += 1
+
+            except Exception:
+                pass
+
+        return count
+
+    def _extract_stat_icons(self, force: bool = False) -> int:
+        """Extract unit stat icons (40x40 textures)."""
+        output_path = self.output_dir / "ui"
+        output_path.mkdir(parents=True, exist_ok=True)
+
+        count = 0
+        # Stat icons are in resources.assets
+        resources_path = self.game_data_path / "resources.assets"
+
+        if not resources_path.exists():
+            return 0
+
+        env = UnityPy.load(str(resources_path))
+
+        for obj in env.objects:
+            if obj.type.name != 'Texture2D':
+                continue
+
+            try:
+                data = obj.read()
+                name = data.m_Name
+
+                # Match stat icons by exact name
+                if name in self.STAT_ICONS:
                     out_file = output_path / f"{name}.png"
 
                     if not force and out_file.exists():
