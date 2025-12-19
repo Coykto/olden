@@ -87,6 +87,8 @@ class CombatValueExtractor:
             attack_type = first_attack.get('attackType_', 'melee')
             if attack_type == 'shoot':
                 result['attack_type'] = 'ranged'
+            elif attack_type == 'range':
+                result['attack_type'] = 'long_reach'
             elif attack_type == 'cast':
                 result['attack_type'] = 'magic'
             else:

@@ -60,11 +60,14 @@ def get_ability_display_name(ability_id: str) -> str:
 
 
 def get_ability_info(ability_id: str) -> dict:
-    """Get ability info including name, description template, and args.
+    """Get ability info including name, description template, args, and icon URL.
 
     Uses the same index conversion logic as get_ability_display_name.
-    Returns dict with: name, description_template, description_args
+    Returns dict with: name, description_template, description_args, icon_url
     """
+    import os
+    from django.conf import settings
+
     localizations = get_localizations()
     args_data = get_unit_ability_args()
 
@@ -80,11 +83,13 @@ def get_ability_info(ability_id: str) -> dict:
     description_args = args_data.get(desc_key, [])
 
     # For upgraded units (_upg, _upg_alt), try base unit ability description
+    icon_key = localization_key  # Start with the 1-based key
     if not description_template:
         base_key = re.sub(r'_upg(_alt)?', '', localization_key)
         base_desc_key = f"{base_key}_description"
         description_template = localizations.get(base_desc_key, "")
         description_args = args_data.get(base_desc_key, [])
+        icon_key = base_key  # Use base unit's icon for upgrades
 
     # Try aura suffix directly
     if not description_template and ability_id.endswith('_aura'):
@@ -92,10 +97,16 @@ def get_ability_info(ability_id: str) -> dict:
         description_template = localizations.get(aura_desc_key, "")
         description_args = args_data.get(aura_desc_key, [])
 
+    # Generate icon URL - icons are named {unit}_{passive|ability}_{n}_name.png
+    icon_filename = f"{icon_key}_name.png"
+    icon_path = os.path.join(settings.MEDIA_ROOT, 'gamedata', 'passives', icon_filename)
+    icon_url = f"/media/gamedata/passives/{icon_filename}" if os.path.exists(icon_path) else None
+
     return {
         'name': get_ability_display_name(ability_id),
         'description_template': description_template,
         'description_args': description_args,
+        'icon_url': icon_url,
     }
 
 
@@ -141,8 +152,7 @@ def get_base_passives(unit_raw_data: dict, attack_type: str) -> list:
     attack_type_map = {
         'melee': 'base_passive_melee_attack',
         'ranged': 'base_passive_ranged_attack',
-        'shoot': 'base_passive_ranged_attack',
-        'range': 'base_passive_ranged_attack',
+        'long_reach': 'base_passive_remote_attack',
     }
     attack_key = attack_type_map.get(attack_type, 'base_passive_melee_attack')
     attack_name = localizations.get(f'{attack_key}_name', 'Attack')
@@ -412,11 +422,15 @@ def api_faction_units(request, faction_slug):
         actives = []
         for ability_id in (unit.abilities or []):
             ability_info = get_ability_info(ability_id)
+            # Skip placeholder abilities with no description and no icon
+            if not ability_info['description_template'] and not ability_info.get('icon_url'):
+                continue
             ability_data = {
                 'id': ability_id,
                 'name': ability_info['name'],
                 'description_template': ability_info['description_template'],
                 'description_args': ability_info['description_args'],
+                'icon_url': ability_info.get('icon_url'),
             }
             if '_passive_' in ability_id or ability_id.endswith('_aura'):
                 passives.append(ability_data)
@@ -491,11 +505,15 @@ def api_all_units(request):
             actives = []
             for ability_id in (unit.abilities or []):
                 ability_info = get_ability_info(ability_id)
+                # Skip placeholder abilities with no description and no icon
+                if not ability_info['description_template'] and not ability_info.get('icon_url'):
+                    continue
                 ability_data = {
                     'id': ability_id,
                     'name': ability_info['name'],
                     'description_template': ability_info['description_template'],
                     'description_args': ability_info['description_args'],
+                    'icon_url': ability_info.get('icon_url'),
                 }
                 # Classify by ID pattern: passive_, aura = passive; ability_ = active
                 if '_passive_' in ability_id or ability_id.endswith('_aura'):

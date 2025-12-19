@@ -110,7 +110,7 @@ class Unit(models.Model):
     attack_type = models.CharField(
         max_length=20,
         default="melee",
-        help_text="Attack type: melee, ranged, magic"
+        help_text="Attack type: melee, ranged, long_reach, magic"
     )
     abilities = models.JSONField(
         default=list,

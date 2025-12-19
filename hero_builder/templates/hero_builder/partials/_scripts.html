@@ -3277,6 +3277,7 @@ const ArmyManager = {
     formatUnitType(unit) {
         const types = [];
         if (unit.attack_type === 'ranged') types.push('Ranged');
+        else if (unit.attack_type === 'long_reach') types.push('Long Reach');
         else if (unit.attack_type === 'magic') types.push('Magic');
         else types.push('Melee');
         if (unit.move_type === 'fly') types.push('Flying');
@@ -3648,10 +3649,6 @@ const ArmyManager = {
         const modalHtml = `
             <div class="modal-overlay" onclick="ArmyManager.closeUnitEditor()">
                 <div class="modal-content unit-editor-modal" onclick="event.stopPropagation()">
-                    <div class="modal-header">
-                        <h2>${unit.name}</h2>
-                        <button class="modal-close" onclick="ArmyManager.closeUnitEditor()">×</button>
-                    </div>
                     <div class="modal-body">
                         <div class="unit-editor-content">
                             <div class="unit-editor-header">

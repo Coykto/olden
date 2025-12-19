@@ -157,6 +157,56 @@ class Command(BaseCommand):
         Faction.objects.bulk_create(faction_objects)
         self.stdout.write(f"  Created {len(faction_objects)} factions")
 
+    def _get_unit_displayable_abilities(self, unit_id: str, localizations: dict, has_aura: bool = False) -> list:
+        """
+        Derive displayable ability IDs from localization keys.
+
+        The localization files define which passives/abilities should be displayed.
+        We scan for {unit_id}_{passive|ability}_{n}_name keys (1-based in localization)
+        and generate 0-based ability IDs for storage.
+
+        For upgraded units (_upg, _upg_alt), we also check the base unit's abilities
+        since upgrades often share ability descriptions with their base.
+        """
+        abilities = []
+
+        # Get base unit ID for upgrades (e.g., griffin_upg -> griffin)
+        base_unit_id = re.sub(r'_upg(_alt)?$', '', unit_id)
+
+        # Scan for passives (passive_1, passive_2, etc.)
+        for n in range(1, 10):  # Check up to 9 passives
+            loc_key = f"{unit_id}_passive_{n}_name"
+            base_loc_key = f"{base_unit_id}_passive_{n}_name"
+            if loc_key in localizations or (unit_id != base_unit_id and base_loc_key in localizations):
+                # Store as 0-based ID
+                abilities.append({
+                    'id': f"{unit_id}_passive_{n - 1}",
+                    'type': 'passive',
+                })
+
+        # Scan for abilities (ability_1, ability_2, etc.)
+        for n in range(1, 10):  # Check up to 9 abilities
+            loc_key = f"{unit_id}_ability_{n}_name"
+            base_loc_key = f"{base_unit_id}_ability_{n}_name"
+            if loc_key in localizations or (unit_id != base_unit_id and base_loc_key in localizations):
+                # Store as 0-based ID
+                abilities.append({
+                    'id': f"{unit_id}_ability_{n - 1}",
+                    'type': 'active',
+                })
+
+        # Add aura if present (auras are detected from raw data)
+        if has_aura:
+            aura_loc_key = f"{unit_id}_aura_name"
+            base_aura_key = f"{base_unit_id}_aura_name"
+            if aura_loc_key in localizations or base_aura_key in localizations:
+                abilities.append({
+                    'id': f"{unit_id}_aura",
+                    'type': 'aura',
+                })
+
+        return abilities
+
     def _import_units(self, reader: GameDataReader, version: GameVersion, localizations: dict):
         """Import unit data with combat extraction."""
         self.stdout.write("Importing units...")
@@ -188,10 +238,14 @@ class Command(BaseCommand):
             # Get display name using general localization lookup
             display_name = get_localized_name(unit_id, 'unit')
 
-            # Extract combat data
+            # Extract combat data (for attack_type and damage_modifiers)
             combat_data = combat_extractor.extract_unit_combat_data(unit_data)
             if combat_data['damage_modifiers']['outDmgMods'] or combat_data['damage_modifiers']['inDmgMods']:
                 combat_extracted += 1
+
+            # Derive displayable abilities from localization (not from raw data array indices)
+            has_aura = unit_data.get('aura') is not None
+            displayable_abilities = self._get_unit_displayable_abilities(unit_id, localizations, has_aura)
 
             unit_objects.append(Unit(
                 version=version,
@@ -218,7 +272,7 @@ class Command(BaseCommand):
                 moral=stats.get("moral", 0),
                 move_type=stats.get("moveType", "ground"),
                 attack_type=combat_data['attack_type'],
-                abilities=[a['id'] for a in combat_data['abilities']],
+                abilities=[a['id'] for a in displayable_abilities],
                 damage_modifiers=combat_data['damage_modifiers'],
                 raw_data=unit_data
             ))
