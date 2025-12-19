@@ -1858,18 +1858,6 @@
 .unit-card-stats .stat-def { color: #66aaff; }
 .unit-card-stats .stat-hp { color: #66ff88; }
 
-.unit-card-tier {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    background: #c9a227;
-    color: #000;
-    font-size: 0.65rem;
-    font-weight: bold;
-    padding: 2px 5px;
-    border-radius: 3px;
-}
-
 /* Unit Abilities in Card */
 .unit-card-abilities {
     display: flex;
@@ -2029,20 +2017,6 @@
     font-weight: 600;
     text-align: center;
     text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-}
-
-.unit-card-tier {
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    background: linear-gradient(135deg, #5a90c0 0%, #3a6090 100%);
-    color: #fff;
-    font-size: 0.7rem;
-    font-weight: bold;
-    padding: 3px 8px;
-    border-radius: 4px;
-    border: 1px solid #7ab0e0;
 }
 
 /* Stat Bar - icons with values */
