@@ -123,7 +123,7 @@ class Command(BaseCommand):
         }
 
         faction_objects = []
-        for faction_id in factions_data:
+        for sort_order, faction_id in enumerate(factions_data):
             # Get localized faction name (e.g., "human_name" -> "Temple")
             name_key = f"{faction_id}_name"
             faction_name = localizations.get(name_key, faction_id.capitalize())
@@ -138,7 +138,8 @@ class Command(BaseCommand):
                 slug=slugify(faction_name),
                 name=faction_name,
                 description=faction_desc,
-                faction_skill=faction_skill_map.get(faction_id, "")
+                faction_skill=faction_skill_map.get(faction_id, ""),
+                sort_order=sort_order
             ))
 
         Faction.objects.bulk_create(faction_objects)

@@ -521,10 +521,10 @@
 }
 
 .spell-book-title {
-    font-size: 0.9rem;
-    font-weight: 600;
+    font-size: 0.75rem;
+    color: #8899aa;
     text-transform: uppercase;
-    text-align: center;
+    letter-spacing: 1px;
 }
 
 /* Horizontal layout: spells on left, filters on right */

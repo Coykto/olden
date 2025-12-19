@@ -4,17 +4,13 @@ Views for the Hero Builder application.
 import json
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
-from django.views.decorators.http import require_http_methods, require_GET
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_GET
 from gamedata.models import GameVersion, Hero, Faction, Item, ItemSet, Skill, Unit, Spell, MagicSchool
-from core.damage_calculator import (
-    DamageCalculator, create_unit_stack_from_db, create_hero_build_from_db
-)
 from core.localizations import get_skill_info, get_localizations, get_item_info, get_item_set_info, get_skill_args, get_subskill_configs, get_spell_info, get_spell_descriptions_by_level
 
 
 def index(request):
-    """Faction selection page."""
+    """Combined faction and hero selection page."""
     version = GameVersion.objects.filter(is_active=True).first()
 
     if not version:
@@ -22,15 +18,26 @@ def index(request):
 
     factions = Faction.objects.filter(version=version)
 
+    # Check for faction query param, otherwise default to first faction (Temple)
+    faction_slug = request.GET.get('faction')
+    if faction_slug:
+        selected_faction = factions.filter(slug=faction_slug).first() or factions.first()
+    else:
+        selected_faction = factions.first()
+
+    heroes = Hero.objects.filter(version=version, faction=selected_faction).order_by('sort_order') if selected_faction else []
+
     context = {
         'version': version,
         'factions': factions,
+        'selected_faction': selected_faction,
+        'heroes': heroes,
     }
     return render(request, 'hero_builder/index.html', context)
 
 
 def faction_heroes(request, faction_slug):
-    """Hero selection page for a specific faction."""
+    """Hero selection partial for a specific faction (HTMX endpoint)."""
     version = GameVersion.objects.filter(is_active=True).first()
 
     if not version:
@@ -44,7 +51,8 @@ def faction_heroes(request, faction_slug):
         'faction': faction,
         'heroes': heroes,
     }
-    return render(request, 'hero_builder/heroes.html', context)
+    # Return partial template for HTMX requests
+    return render(request, 'hero_builder/partials/_heroes_grid.html', context)
 
 
 def builder(request, hero_slug):
@@ -138,30 +146,6 @@ def api_hero_data(request, hero_slug):
     }
 
     return JsonResponse(data)
-
-
-# =============================================================================
-# Calculator Views
-# =============================================================================
-
-def calculator(request):
-    """Combat calculator page."""
-    version = GameVersion.objects.filter(is_active=True).first()
-
-    if not version:
-        return render(request, 'hero_builder/no_data.html')
-
-    factions = Faction.objects.filter(version=version)
-    heroes = Hero.objects.filter(version=version).order_by('faction', 'sort_order')
-    units = Unit.objects.filter(version=version).order_by('faction', 'tier', 'id_key')
-
-    context = {
-        'version': version,
-        'factions': factions,
-        'heroes': heroes,
-        'units': units,
-    }
-    return render(request, 'hero_builder/calculator.html', context)
 
 
 def api_units(request):
@@ -334,145 +318,6 @@ def api_heroes(request):
         })
 
     return JsonResponse({'heroes': heroes_data})
-
-
-@csrf_exempt
-@require_http_methods(["POST"])
-def api_calculate_damage(request):
-    """
-    API endpoint to calculate damage between two unit stacks.
-
-    Request body:
-    {
-        "attacker": {
-            "unit_id": "angel",
-            "count": 10
-        },
-        "defender": {
-            "unit_id": "black_dragon",
-            "count": 5
-        },
-        "attacker_hero": {  // Optional
-            "hero_id": "human_hero_1",
-            "level": 10,
-            "skills": [["skill_offence", 2], ["skill_archery", 1]]
-        },
-        "defender_hero": {  // Optional
-            "hero_id": "dungeon_hero_1",
-            "level": 8
-        }
-    }
-    """
-    version = GameVersion.objects.filter(is_active=True).first()
-
-    if not version:
-        return JsonResponse({'error': 'No active game version'}, status=404)
-
-    try:
-        data = json.loads(request.body)
-    except json.JSONDecodeError:
-        return JsonResponse({'error': 'Invalid JSON'}, status=400)
-
-    # Validate required fields
-    if 'attacker' not in data or 'defender' not in data:
-        return JsonResponse({'error': 'Missing attacker or defender'}, status=400)
-
-    attacker_data = data['attacker']
-    defender_data = data['defender']
-
-    # Get units
-    try:
-        attacker_unit = Unit.objects.get(version=version, id_key=attacker_data['unit_id'])
-        defender_unit = Unit.objects.get(version=version, id_key=defender_data['unit_id'])
-    except Unit.DoesNotExist as e:
-        return JsonResponse({'error': f'Unit not found: {e}'}, status=404)
-
-    # Create unit stacks
-    attacker_stack = create_unit_stack_from_db(
-        attacker_unit,
-        attacker_data.get('count', 1)
-    )
-    defender_stack = create_unit_stack_from_db(
-        defender_unit,
-        defender_data.get('count', 1)
-    )
-
-    # Get heroes if provided
-    attacker_hero = None
-    defender_hero = None
-
-    if 'attacker_hero' in data and data['attacker_hero']:
-        hero_data = data['attacker_hero']
-        try:
-            hero = Hero.objects.get(version=version, id_key=hero_data['hero_id'])
-            attacker_hero = create_hero_build_from_db(
-                hero,
-                hero_data.get('level', 1),
-                hero_data.get('skills', [])
-            )
-        except Hero.DoesNotExist:
-            pass
-
-    if 'defender_hero' in data and data['defender_hero']:
-        hero_data = data['defender_hero']
-        try:
-            hero = Hero.objects.get(version=version, id_key=hero_data['hero_id'])
-            defender_hero = create_hero_build_from_db(
-                hero,
-                hero_data.get('level', 1),
-                hero_data.get('skills', [])
-            )
-        except Hero.DoesNotExist:
-            pass
-
-    # Calculate damage
-    calculator = DamageCalculator()
-    result = calculator.calculate_expected_damage(
-        attacker_stack,
-        defender_stack,
-        attacker_hero,
-        defender_hero
-    )
-
-    # Format response
-    response = {
-        'attacker': {
-            'unit_id': attacker_stack.unit_id,
-            'unit_name': attacker_stack.unit_name,
-            'count': attacker_stack.count,
-            'effective_offence': attacker_stack.stats.offence + (attacker_hero.computed_stats.offence if attacker_hero else 0),
-        },
-        'defender': {
-            'unit_id': defender_stack.unit_id,
-            'unit_name': defender_stack.unit_name,
-            'count': defender_stack.count,
-            'effective_defence': defender_stack.stats.defence + (defender_hero.computed_stats.defence if defender_hero else 0),
-            'hp_per_unit': defender_stack.stats.hp,
-        },
-        'base_result': {
-            'min_damage': result.base_result.min_damage,
-            'max_damage': result.base_result.max_damage,
-            'avg_damage': result.base_result.avg_damage,
-            'kills_min': result.base_result.kills_min,
-            'kills_max': result.base_result.kills_max,
-            'kills_avg': result.base_result.kills_avg,
-        },
-        'modifiers': [
-            {
-                'source': m.source,
-                'type': m.modifier_type,
-                'value': m.value,
-                'description': m.description,
-            }
-            for m in result.base_result.modifiers_applied
-        ],
-        'luck_chance': result.luck_trigger_chance,
-        'morale_chance': result.morale_trigger_chance,
-        'expected_avg_damage': result.expected_avg_damage,
-        'expected_avg_kills': result.expected_avg_kills,
-    }
-
-    return JsonResponse(response)
 
 
 def api_available_skills(request):

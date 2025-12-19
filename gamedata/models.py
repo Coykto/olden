@@ -30,9 +30,10 @@ class Faction(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(default="", blank=True)
     faction_skill = models.CharField(max_length=100, default="", blank=True, help_text="Faction-specific skill ID")
+    sort_order = models.IntegerField(default=0, help_text="Display order from availableFractions in data.json")
 
     class Meta:
-        ordering = ['version', 'name']
+        ordering = ['version', 'sort_order', 'name']
         unique_together = [['version', 'id_key'], ['version', 'slug']]
 
     def __str__(self):

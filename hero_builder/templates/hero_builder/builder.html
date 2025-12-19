@@ -10,8 +10,7 @@
 {% block content %}
 <div class="builder-container">
     <div class="builder-header">
-        <h1 class="builder-title">Hero Builder</h1>
-        <a href="{% url 'hero_builder:faction_heroes' hero.faction.slug %}" class="pick-hero-btn">Pick Hero</a>
+        <a href="{% url 'hero_builder:index' %}?faction={{ hero.faction.slug }}" class="pick-hero-btn">Pick another Hero</a>
     </div>
 
     <div class="main-with-sidebar">

@@ -11,7 +11,6 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('faction/<slug:faction_slug>/', views.faction_heroes, name='faction_heroes'),
     path('hero/<slug:hero_slug>/', views.builder, name='builder'),
-    path('calculator/', views.calculator, name='calculator'),
 
     # API endpoints - Heroes
     path('api/hero/<slug:hero_slug>/', views.api_hero_data, name='api_hero_data'),
@@ -30,9 +29,6 @@ urlpatterns = [
     # API endpoints - Advanced Classes
     path('api/advanced-classes/', views.api_advanced_classes, name='api_advanced_classes'),
     path('api/advanced-classes/skill-indicators/', views.api_advanced_class_skill_indicators, name='api_advanced_class_skill_indicators'),
-
-    # API endpoints - Calculator
-    path('api/calculate-damage/', views.api_calculate_damage, name='api_calculate_damage'),
 
     # API endpoints - Items
     path('api/items/available/', views.api_available_items, name='api_available_items'),
