@@ -772,12 +772,17 @@ def api_available_spells(request):
     school_names = {s.id_key: s.display_name for s in schools}
 
     spell_list = []
+    bonus_spell_list = []  # Skill-granted spells (not learnable, but shown when skill acquired)
+
     for spell in spells:
         # Skip masterful variants - they're upgrades, not separate learnable spells
         if spell.id_key.endswith('_special'):
             continue
 
         raw = spell.raw_data or {}
+
+        # Separate bonus spells - these are skill-granted effects, not learnable spells
+        is_bonus_spell = spell.id_key.startswith('bonus_')
 
         # Extract spell type (combat vs global) from raw_data
         # Check usedOnMap field to determine if spell is used on adventure map
@@ -801,7 +806,7 @@ def api_available_spells(request):
         description_keys = raw.get('description', [])
         descriptions_by_level = get_spell_descriptions_by_level(description_keys)
 
-        spell_list.append({
+        spell_data = {
             'id': spell.id_key,
             'id_key': spell.id_key,
             'icon': raw.get('icon', spell.id_key),  # Icon filename (without extension)
@@ -816,11 +821,17 @@ def api_available_spells(request):
             # Keep legacy fields for backwards compatibility (level 1 description)
             'description_template': spell_info['description_template'],
             'description_args': spell_info['description_args'],
-        })
+        }
+
+        if is_bonus_spell:
+            bonus_spell_list.append(spell_data)
+        else:
+            spell_list.append(spell_data)
 
     schools_list = [{'id': s.id_key, 'name': s.display_name} for s in schools]
 
     return JsonResponse({
         'spells': spell_list,
+        'bonus_spells': bonus_spell_list,  # Skill-granted spells
         'schools': schools_list
     })

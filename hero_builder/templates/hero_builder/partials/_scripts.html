@@ -196,6 +196,10 @@ const SkillManager = {
         this.updateUI();
         // Update all descriptions since skill bonuses may affect them
         EquipmentManager.updateAllDescriptions();
+        // Update skill-granted spells
+        if (typeof SpellBookManager !== 'undefined') {
+            SpellBookManager.updateSkillGrantedSpells();
+        }
     },
 
     getSelectedSkillIds() {
@@ -221,6 +225,10 @@ const SkillManager = {
         // Update UI and descriptions (skill level affects bonuses)
         this.updateUI();
         EquipmentManager.updateAllDescriptions();
+        // Update skill-granted spells (higher levels may grant more spells)
+        if (typeof SpellBookManager !== 'undefined') {
+            SpellBookManager.updateSkillGrantedSpells();
+        }
     },
 
     repickSubskill(slotIndex, subskillSlot, subskillId, subskillName, subskillDesc, subskillRawData) {
@@ -236,6 +244,10 @@ const SkillManager = {
         // Update UI and descriptions (subskill bonuses may affect item descriptions)
         this.updateUI();
         EquipmentManager.updateAllDescriptions();
+        // Update subskill-granted spells (changing subskill may add/remove spells)
+        if (typeof SpellBookManager !== 'undefined') {
+            SpellBookManager.updateSkillGrantedSpells();
+        }
     },
 
     removeSkill(slotIndex) {
@@ -253,6 +265,10 @@ const SkillManager = {
         this.updateUI();
         // Update descriptions since skill bonuses are removed
         EquipmentManager.updateAllDescriptions();
+        // Update skill-granted spells (removed skill's spells should disappear)
+        if (typeof SpellBookManager !== 'undefined') {
+            SpellBookManager.updateSkillGrantedSpells();
+        }
     },
 
     updateUI() {
@@ -1849,6 +1865,11 @@ const EquipmentManager = {
         // Update UI
         this.updateUI();
         this.updateDustDisplay();
+
+        // Update item-granted spells (magic scrolls grant spells)
+        if (typeof SpellBookManager !== 'undefined') {
+            SpellBookManager.updateSkillGrantedSpells();
+        }
     },
 
     unequipItem(slotId) {
@@ -1861,6 +1882,11 @@ const EquipmentManager = {
         // Update UI
         this.updateUI();
         this.updateDustDisplay();
+
+        // Update item-granted spells (removed item's spells should disappear)
+        if (typeof SpellBookManager !== 'undefined') {
+            SpellBookManager.updateSkillGrantedSpells();
+        }
     },
 
     updateUI() {
@@ -2148,6 +2174,8 @@ const ItemSetManager = {
 const SpellBookManager = {
     // State
     availableSpells: [],
+    bonusSpells: [],  // Skill-granted spells (not learnable, from API)
+    skillGrantedSpells: [],  // Currently active skill-granted spells
     schools: [],
     equippedSpells: new Array(5).fill(null), // 5 initial slots
     currentSlotIndex: null,
@@ -2164,14 +2192,18 @@ const SpellBookManager = {
             const response = await fetch('/api/spells/available/');
             const data = await response.json();
             this.availableSpells = data.spells || [];
+            this.bonusSpells = data.bonus_spells || [];
             this.schools = data.schools || [];
-            console.log(`[SpellBookManager] Loaded ${this.availableSpells.length} spells`);
+            console.log(`[SpellBookManager] Loaded ${this.availableSpells.length} spells, ${this.bonusSpells.length} bonus spells`);
         } catch (error) {
             console.error('[SpellBookManager] Failed to load spells:', error);
         }
 
         // Load starting spells from hero card data attribute
         this.loadStartingSpells();
+
+        // Check current skills for skill-granted spells
+        this.updateSkillGrantedSpells();
 
         this.renderSchoolTabs();
         this.rebuildSpellGrid();  // Build the initial grid with just the "+" button
@@ -2204,6 +2236,90 @@ const SpellBookManager = {
             });
         } catch (error) {
             console.error('[SpellBookManager] Error loading starting spells:', error);
+        }
+    },
+
+    // Update granted spells based on current hero skills and equipped items
+    updateSkillGrantedSpells() {
+        const newGrantedSpells = [];
+        const addedSpellIds = new Set();
+
+        // Helper to find spell data in both bonus and available spells
+        const findSpellData = (spellId) => {
+            return this.bonusSpells.find(s => s.id === spellId) ||
+                   this.availableSpells.find(s => s.id === spellId);
+        };
+
+        // Helper to add a granted spell (avoiding duplicates)
+        const addGrantedSpell = (spellId, source, sourceId) => {
+            if (addedSpellIds.has(spellId)) return;
+            const spellData = findSpellData(spellId);
+            if (spellData) {
+                addedSpellIds.add(spellId);
+                newGrantedSpells.push({
+                    spell: spellData,
+                    upgradeLevel: 1,
+                    isSkillGrantedSpell: true,
+                    grantingSource: source,  // 'skill' or 'item'
+                    grantingSourceId: sourceId
+                });
+            }
+        };
+
+        // Check skills for heroMagicAddition bonuses
+        heroBuild.skills.forEach(skill => {
+            if (!skill) return;
+
+            // Check main skill bonuses (from parametersPerLevel)
+            if (skill.raw_data) {
+                const rawData = skill.raw_data;
+                const parametersPerLevel = rawData.parametersPerLevel || [];
+
+                // Get bonuses for current skill level (levels are 1-indexed, array is 0-indexed)
+                const levelIndex = (skill.level || 1) - 1;
+                const levelParams = parametersPerLevel[levelIndex];
+                if (levelParams && levelParams.bonuses) {
+                    levelParams.bonuses.forEach(bonus => {
+                        if (bonus.type === 'heroMagicAddition' && bonus.parameters && bonus.parameters[0]) {
+                            addGrantedSpell(bonus.parameters[0], 'skill', skill.skillId);
+                        }
+                    });
+                }
+            }
+
+            // Check subskill bonuses
+            const subskillRawDataArray = skill.subskillRawData || [];
+            subskillRawDataArray.forEach((subskillRaw, idx) => {
+                if (!subskillRaw) return;
+                const bonuses = subskillRaw.bonuses || [];
+                bonuses.forEach(bonus => {
+                    if (bonus.type === 'heroMagicAddition' && bonus.parameters && bonus.parameters[0]) {
+                        addGrantedSpell(bonus.parameters[0], 'subskill', skill.subskills[idx]);
+                    }
+                });
+            });
+        });
+
+        // Check equipped items for heroMagicAddition bonuses
+        Object.values(heroBuild.equipment.slots).forEach(itemData => {
+            if (!itemData || !itemData.raw_data) return;
+
+            const bonuses = itemData.raw_data.bonuses || [];
+            bonuses.forEach(bonus => {
+                if (bonus.type === 'heroMagicAddition' && bonus.parameters && bonus.parameters[0]) {
+                    addGrantedSpell(bonus.parameters[0], 'item', itemData.id);
+                }
+            });
+        });
+
+        // Check if anything changed
+        const oldIds = this.skillGrantedSpells.map(s => s.spell.id).sort().join(',');
+        const newIds = newGrantedSpells.map(s => s.spell.id).sort().join(',');
+
+        if (oldIds !== newIds) {
+            console.log(`[SpellBookManager] Granted spells updated: ${newGrantedSpells.length} spells`);
+            this.skillGrantedSpells = newGrantedSpells;
+            this.rebuildSpellGrid();
         }
     },
 
@@ -2333,9 +2449,10 @@ const SpellBookManager = {
         `;
     },
 
-    // Check if a spell is already equipped
+    // Check if a spell is already equipped (manually or via skill/item)
     isSpellEquipped(spellId) {
-        return this.equippedSpells.some(eq => eq && eq.spell && eq.spell.id === spellId);
+        return this.equippedSpells.some(eq => eq && eq.spell && eq.spell.id === spellId) ||
+               this.skillGrantedSpells.some(eq => eq && eq.spell && eq.spell.id === spellId);
     },
 
     // Render the list of spells
@@ -2534,6 +2651,9 @@ const SpellBookManager = {
             const magicDealers = spell.raw_data?.battleMagic?.magicDealers || [];
             const dealerIndex = Math.min(upgradeLevel - 1, magicDealers.length - 1);
             const magicDealer = magicDealers[Math.max(0, dealerIndex)] || {};
+            // For world magic spells, get usageLimit from worldMagic settings
+            const worldMagicSettings = spell.raw_data?.worldMagic?.magicSettings?.[0] || {};
+
             const ctx = {
                 currentMagic: {
                     id: spell.id_key || spell.id,
@@ -2542,11 +2662,15 @@ const SpellBookManager = {
                     school: spell.school,
                     // Spread magicDealer data so targetMechanics is directly accessible
                     ...magicDealer,
+                    // Include worldMagic settings (for usageLimit, etc.)
+                    ...worldMagicSettings,
                     // Also include the full raw_data for functions that need config
                     config: spell.raw_data || {},
                 },
                 currentHero: {
-                    stats: effectiveStats,
+                    // Use 'heroStat' as the key - this is what transpiled functions expect
+                    heroStat: effectiveStats,
+                    stats: effectiveStats,  // Keep for backwards compatibility
                     getSpellPower: (school) => {
                         // Base spell power + school-specific bonuses
                         return effectiveStats.spellPower || 0;
@@ -2595,6 +2719,7 @@ const SpellBookManager = {
                  onerror="SpellBookManager.handleSpellIconError(this, '${spell.icon || spell.id_key || spell.id}')">
             <button class="spell-slot-remove" onclick="event.stopPropagation(); SpellBookManager.removeSpell(${index})" ${isStarting ? 'disabled' : ''}>×</button>
             ${isStarting ? '<div class="spell-starting-badge">Starting</div>' : ''}
+            <div class="spell-level-badge">${currentLevel}</div>
             <div class="spell-tooltip">
                 <div class="spell-tooltip-name">${spell.name || this.formatSpellName(spell.id_key || spell.id)}</div>
                 <div class="spell-tooltip-school">${spell.school_display}</div>
@@ -2660,6 +2785,7 @@ const SpellBookManager = {
                      onerror="SpellBookManager.handleSpellIconError(this, '${spell.icon || spell.id_key || spell.id}')">
                 <button class="spell-slot-remove" onclick="event.stopPropagation(); SpellBookManager.removeSpell(${index})" ${isStarting ? 'disabled' : ''}>×</button>
                 ${isStarting ? '<div class="spell-starting-badge">Starting</div>' : ''}
+                <div class="spell-level-badge">${currentLevel}</div>
                 <div class="spell-tooltip">
                     <div class="spell-tooltip-name">${spell.name || this.formatSpellName(spell.id_key || spell.id)}</div>
                     <div class="spell-tooltip-school">${spell.school_display}</div>
@@ -2694,8 +2820,9 @@ const SpellBookManager = {
     },
 
     // Upgrade spell to next level
-    upgradeSpell(index) {
-        const equipped = this.equippedSpells[index];
+    upgradeSpell(index, isSkillGranted = false) {
+        const spellArray = isSkillGranted ? this.skillGrantedSpells : this.equippedSpells;
+        const equipped = spellArray[index];
         if (!equipped) return;
 
         const maxLevel = equipped.spell.max_upgrade_level || 3;
@@ -2704,12 +2831,13 @@ const SpellBookManager = {
         equipped.upgradeLevel++;
         console.log(`[SpellBookManager] Upgraded spell to level ${equipped.upgradeLevel}`);
 
-        this.updateSlot(index);
+        this.updateSlotInPlace(index, isSkillGranted);
     },
 
     // Downgrade spell to previous level
-    downgradeSpell(index) {
-        const equipped = this.equippedSpells[index];
+    downgradeSpell(index, isSkillGranted = false) {
+        const spellArray = isSkillGranted ? this.skillGrantedSpells : this.equippedSpells;
+        const equipped = spellArray[index];
         if (!equipped) return;
 
         if (equipped.upgradeLevel <= 1) return;
@@ -2717,7 +2845,41 @@ const SpellBookManager = {
         equipped.upgradeLevel--;
         console.log(`[SpellBookManager] Downgraded spell to level ${equipped.upgradeLevel}`);
 
-        this.updateSlot(index);
+        this.updateSlotInPlace(index, isSkillGranted);
+    },
+
+    // Update a slot in place without rebuilding the grid
+    updateSlotInPlace(index, isSkillGranted = false) {
+        const selector = isSkillGranted
+            ? `.spell-slot.skill-granted[data-slot-index="${index}"]`
+            : `.spell-slot[data-slot-index="${index}"]:not(.skill-granted)`;
+        const slotElement = document.querySelector(selector);
+        if (!slotElement) return;
+
+        const spellArray = isSkillGranted ? this.skillGrantedSpells : this.equippedSpells;
+        const equipped = spellArray[index];
+        const spell = equipped.spell;
+        const description = this.formatSpellDescription(spell, equipped.upgradeLevel);
+        const maxLevel = spell.max_upgrade_level || 4;
+        const currentLevel = equipped.upgradeLevel;
+
+        // Update level badge
+        const levelBadge = slotElement.querySelector('.spell-level-badge');
+        if (levelBadge) levelBadge.textContent = currentLevel;
+
+        // Update tooltip level
+        const tooltipLevel = slotElement.querySelector('.spell-tooltip-level');
+        if (tooltipLevel) tooltipLevel.textContent = `Level ${currentLevel}/${maxLevel}`;
+
+        // Update tooltip description
+        const tooltipDesc = slotElement.querySelector('.spell-tooltip-desc');
+        if (tooltipDesc) tooltipDesc.innerHTML = description;
+
+        // Update button states
+        const upgradeBtn = slotElement.querySelector('.spell-action-btn:first-child');
+        const downgradeBtn = slotElement.querySelector('.spell-action-btn:nth-child(2)');
+        if (upgradeBtn) upgradeBtn.disabled = currentLevel >= maxLevel;
+        if (downgradeBtn) downgradeBtn.disabled = currentLevel <= 1;
     },
 
     // Remove spell from slot
@@ -2782,25 +2944,41 @@ const SpellBookManager = {
         // Remove any null entries (clean up the array)
         this.equippedSpells = this.equippedSpells.filter(e => e !== null);
 
-        // Render all equipped spells
-        this.equippedSpells.forEach((equipped, index) => {
+        // Helper to render a spell slot
+        const renderSpellSlot = (equipped, index, isSkillGranted = false) => {
             const slotDiv = document.createElement('div');
-            slotDiv.className = 'spell-slot equipped';
+            slotDiv.className = 'spell-slot equipped' + (isSkillGranted ? ' skill-granted' : '');
             slotDiv.dataset.slotIndex = index;
+            if (isSkillGranted) {
+                slotDiv.dataset.skillGranted = 'true';
+            }
 
             const spell = equipped.spell;
             const description = this.formatSpellDescription(spell, equipped.upgradeLevel);
             const maxLevel = spell.max_upgrade_level || 4;
             const currentLevel = equipped.upgradeLevel;
             const isStarting = equipped.isStartingSpell;
+            const isLocked = isStarting || isSkillGranted;
+
+            // Badge text based on spell source
+            let badgeHtml = '';
+            if (isStarting) {
+                badgeHtml = '<div class="spell-starting-badge">Starting</div>';
+            } else if (isSkillGranted) {
+                let source = 'Skill';
+                if (equipped.grantingSource === 'item') source = 'Scroll';
+                else if (equipped.grantingSource === 'subskill') source = 'Subskill';
+                badgeHtml = `<div class="spell-skill-badge">${source}</div>`;
+            }
 
             slotDiv.innerHTML = `
                 <img src="/media/gamedata/spells/${spell.icon || spell.id_key || spell.id}.png"
                      alt="${spell.id_key || spell.id}"
                      class="spell-icon"
                      onerror="SpellBookManager.handleSpellIconError(this, '${spell.icon || spell.id_key || spell.id}')">
-                <button class="spell-slot-remove" onclick="event.stopPropagation(); SpellBookManager.removeSpell(${index})" ${isStarting ? 'disabled' : ''}>×</button>
-                ${isStarting ? '<div class="spell-starting-badge">Starting</div>' : ''}
+                ${!isLocked ? `<button class="spell-slot-remove" onclick="event.stopPropagation(); SpellBookManager.removeSpell(${index})">×</button>` : ''}
+                ${badgeHtml}
+                <div class="spell-level-badge">${currentLevel}</div>
                 <div class="spell-tooltip">
                     <div class="spell-tooltip-name">${spell.name || this.formatSpellName(spell.id_key || spell.id)}</div>
                     <div class="spell-tooltip-school">${spell.school_display}</div>
@@ -2810,21 +2988,32 @@ const SpellBookManager = {
                     <div class="spell-tooltip-desc">${description}</div>
                     <div class="spell-tooltip-actions">
                         <button class="spell-action-btn"
-                                onclick="event.stopPropagation(); SpellBookManager.upgradeSpell(${index})"
+                                onclick="event.stopPropagation(); SpellBookManager.upgradeSpell(${index}, ${isSkillGranted})"
                                 ${currentLevel >= maxLevel ? 'disabled' : ''}>Upgrade</button>
                         <button class="spell-action-btn"
-                                onclick="event.stopPropagation(); SpellBookManager.downgradeSpell(${index})"
+                                onclick="event.stopPropagation(); SpellBookManager.downgradeSpell(${index}, ${isSkillGranted})"
                                 ${currentLevel <= 1 ? 'disabled' : ''}>Downgrade</button>
-                        <button class="spell-action-btn spell-remove-btn"
-                                onclick="event.stopPropagation(); SpellBookManager.removeSpell(${index})"
-                                ${isStarting ? 'disabled' : ''}>Remove</button>
+                        ${!isLocked ? `<button class="spell-action-btn spell-remove-btn"
+                                onclick="event.stopPropagation(); SpellBookManager.removeSpell(${index})">Remove</button>` : ''}
                     </div>
                 </div>
             `;
 
-            // Click to replace this spell
-            slotDiv.addEventListener('click', () => this.openSpellPicker(index));
+            // Click to replace this spell (only for non-locked spells)
+            if (!isLocked) {
+                slotDiv.addEventListener('click', () => this.openSpellPicker(index));
+            }
             grid.appendChild(slotDiv);
+        };
+
+        // Render all equipped spells (user-selected)
+        this.equippedSpells.forEach((equipped, index) => {
+            renderSpellSlot(equipped, index, false);
+        });
+
+        // Render skill-granted spells (from skills)
+        this.skillGrantedSpells.forEach((equipped, index) => {
+            renderSpellSlot(equipped, index, true);
         });
 
         // Add the "+" button at the end to add new spells
