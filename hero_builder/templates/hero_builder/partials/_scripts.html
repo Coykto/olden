@@ -113,8 +113,8 @@ const SkillManager = {
 
             if (skillId) {
                 // Extract name from tooltip if present
-                const tooltipName = skillMain.querySelector('.tooltip-name')?.textContent || skillId;
-                const tooltipDescEl = skillMain.querySelector('.tooltip-desc');
+                const tooltipName = skillMain.querySelector('.tooltip-title')?.textContent || skillId;
+                const tooltipDescEl = skillMain.querySelector('.tooltip-text');
 
                 // Extract description pipeline fields from data attributes
                 const descTemplate = tooltipDescEl?.dataset.skillTemplate || '';
@@ -303,13 +303,14 @@ const SkillManager = {
                 const iconSuffix = skill.level > 1 ? `_${skill.level}` : '';
                 const levelPrefix = skill.level === 1 ? 'Basic ' : skill.level === 2 ? 'Advanced ' : 'Expert ';
 
-                skillMain.className = 'skill-main tooltip-wrapper';
+                skillMain.className = 'skill-main has-tooltip';
+                skillMain.dataset.tooltipPlacement = 'bottom';
                 skillMain.innerHTML = `
                     <img src="/media/gamedata/skills/${skill.skillId}${iconSuffix}.png" alt="${skill.name || skill.skillId}">
                     ${typeof AdvancedClassManager !== 'undefined' ? AdvancedClassManager.renderSkillIndicators(skill.skillId) : ''}
-                    <div class="tooltip-content">
-                        <div class="tooltip-name">${levelPrefix}${skill.name || skill.skillId}</div>
-                        ${(() => { const desc = EquipmentManager.formatSkillDescription(skill, skill.level); return desc ? `<div class="tooltip-desc">${desc}</div>` : ''; })()}
+                    <div class="tooltip tooltip-skill">
+                        <div class="tooltip-title">${levelPrefix}${skill.name || skill.skillId}</div>
+                        ${(() => { const desc = EquipmentManager.formatSkillDescription(skill, skill.level); return desc ? `<div class="tooltip-text">${desc}</div>` : ''; })()}
                     </div>
                 `;
                 skillMain.dataset.skillId = skill.skillId;
@@ -341,12 +342,13 @@ const SkillManager = {
                     subskillBtns[0].onclick = () => SubskillSelectionModal.openForRepick(index, 0);
                 } else {
                     // Show selected subskill with tooltip - clickable to repick
-                    subskillBtns[0].className = 'subskill-btn filled tooltip-wrapper';
+                    subskillBtns[0].className = 'subskill-btn filled has-tooltip';
+                    subskillBtns[0].dataset.tooltipPlacement = 'bottom';
                     subskillBtns[0].innerHTML = `
                         <img src="/media/gamedata/skills/${skill.subskills[0]}_icon.png">
-                        <div class="tooltip-content">
-                            <div class="tooltip-name">${skill.subskillNames[0] || skill.subskills[0]}</div>
-                            ${skill.subskillDescs[0] ? `<div class="tooltip-desc">${skill.subskillDescs[0]}</div>` : ''}
+                        <div class="tooltip tooltip-skill">
+                            <div class="tooltip-title">${skill.subskillNames[0] || skill.subskills[0]}</div>
+                            ${skill.subskillDescs[0] ? `<div class="tooltip-text">${skill.subskillDescs[0]}</div>` : ''}
                         </div>
                     `;
                     subskillBtns[0].style.cursor = 'pointer';
@@ -376,12 +378,13 @@ const SkillManager = {
                     subskillBtns[1].onclick = () => SubskillSelectionModal.openForRepick(index, 1);
                 } else if (skill.subskills[1]) {
                     // Show selected subskill with tooltip - clickable to repick
-                    subskillBtns[1].className = 'subskill-btn filled tooltip-wrapper';
+                    subskillBtns[1].className = 'subskill-btn filled has-tooltip';
+                    subskillBtns[1].dataset.tooltipPlacement = 'bottom';
                     subskillBtns[1].innerHTML = `
                         <img src="/media/gamedata/skills/${skill.subskills[1]}_icon.png">
-                        <div class="tooltip-content">
-                            <div class="tooltip-name">${skill.subskillNames[1] || skill.subskills[1]}</div>
-                            ${skill.subskillDescs[1] ? `<div class="tooltip-desc">${skill.subskillDescs[1]}</div>` : ''}
+                        <div class="tooltip tooltip-skill">
+                            <div class="tooltip-title">${skill.subskillNames[1] || skill.subskills[1]}</div>
+                            ${skill.subskillDescs[1] ? `<div class="tooltip-text">${skill.subskillDescs[1]}</div>` : ''}
                         </div>
                     `;
                     subskillBtns[1].style.cursor = 'pointer';
@@ -477,11 +480,11 @@ const SkillSelectionModal = {
                 </div>
                 <div class="subskill-previews">
                     ${(skill.subskill_preview || []).map(sub =>
-                        `<div class="subskill-preview-wrapper tooltip-wrapper">
+                        `<div class="subskill-preview-wrapper has-tooltip" data-tooltip-placement="bottom">
                             <img src="/media/gamedata/skills/${sub.icon}.png" class="subskill-preview-icon" alt="${sub.name}">
-                            <div class="tooltip-content">
-                                <div class="tooltip-name">${sub.name}</div>
-                                <div class="tooltip-desc">${sub.description}</div>
+                            <div class="tooltip tooltip-skill">
+                                <div class="tooltip-title">${sub.name}</div>
+                                <div class="tooltip-text">${sub.description}</div>
                             </div>
                         </div>`
                     ).join('')}
@@ -912,12 +915,12 @@ const AdvancedClassManager = {
         if (!wrapper) return;
 
         // Remove existing tooltip
-        const existing = wrapper.querySelector('.class-tooltip');
+        const existing = wrapper.querySelector('.tooltip');
         if (existing) existing.remove();
 
         // Build tooltip HTML
         const tooltip = document.createElement('div');
-        tooltip.className = 'class-tooltip';
+        tooltip.className = 'tooltip tooltip-class';
         tooltip.innerHTML = this.renderTooltipContent();
         wrapper.appendChild(tooltip);
 
@@ -942,15 +945,15 @@ const AdvancedClassManager = {
         }
 
         let html = `
-            <div class="class-tooltip-header">
-                <div class="class-tooltip-name">${specName}</div>
-                <div class="class-tooltip-desc">${specDesc}</div>
+            <div class="tooltip-header">
+                <div class="tooltip-title tooltip-title--gold">${specName}</div>
+                <div class="tooltip-text">${specDesc}</div>
             </div>
         `;
 
         // Advanced classes
         if (this.advancedClasses.length > 0) {
-            html += '<div class="class-tooltip-divider"></div>';
+            html += '<div class="tooltip-divider"></div>';
 
             for (const advClass of this.advancedClasses) {
                 const progress = this.calculateProgress(advClass);
@@ -1803,9 +1806,15 @@ const EquipmentManager = {
         // Update all descriptions (hero stats and item levels may affect them)
         this.updateAllDescriptions();
 
-        // Update UI to reflect changes
+        // Update UI to reflect changes (updateUI handles hiding active tooltip)
         this.updateUI();
         this.updateDustDisplay();
+
+        // Re-show tooltip for the same slot so user sees updated content immediately
+        const slotElement = document.getElementById(`slot-${slotId}`);
+        if (slotElement && typeof Tooltip !== 'undefined') {
+            Tooltip.show(slotElement);
+        }
     },
 
     init() {
@@ -1893,6 +1902,13 @@ const EquipmentManager = {
     },
 
     updateUI() {
+        // Hide active tooltip before regenerating DOM content
+        // (Tooltip system moves tooltips to document.body; if we regenerate the slot's
+        // innerHTML, the old tooltip stays orphaned in body showing stale content)
+        if (typeof Tooltip !== 'undefined') {
+            Tooltip.hideActive();
+        }
+
         // Update all equipment slots to show equipped items or empty state
         for (const [slotId, itemData] of Object.entries(heroBuild.equipment.slots)) {
             const slotElement = document.getElementById(`slot-${slotId}`);
@@ -1975,11 +1991,13 @@ const EquipmentManager = {
                     }
                 }
 
+                slotElement.classList.add('has-tooltip');
+                slotElement.dataset.tooltipPlacement = 'right';
                 slotElement.innerHTML = `
                     <img src="/media/gamedata/items/${itemData.icon}.png"
                          alt="${itemData.name}"
                          style="opacity: 1; width: 90%; height: 90%;">
-                    <div class="item-tooltip">
+                    <div class="tooltip tooltip-item">
                         <div class="tooltip-header">
                             <span class="item-name" style="color: ${rarityColor}">${itemData.name}</span>
                             <span class="item-rarity">${itemData.rarity}</span>
@@ -2002,6 +2020,8 @@ const EquipmentManager = {
                 }
             } else {
                 // Show empty slot with default icon
+                slotElement.classList.remove('has-tooltip');
+                delete slotElement.dataset.tooltipPlacement;
                 const slotType = slotElement.dataset.slotType;
                 const defaultIcons = {
                     'unique': 'slot_unique.png',
@@ -2722,8 +2742,9 @@ const SpellBookManager = {
         const currentLevel = equipped.upgradeLevel;
 
         const slotDiv = document.createElement('div');
-        slotDiv.className = 'spell-slot equipped';
+        slotDiv.className = 'spell-slot equipped has-tooltip';
         slotDiv.dataset.slotIndex = index;
+        slotDiv.dataset.tooltipPlacement = 'left';
         const isStarting = equipped.isStartingSpell;
         slotDiv.innerHTML = `
             <img src="/media/gamedata/spells/${spell.icon || spell.id_key || spell.id}.png"
@@ -2733,25 +2754,27 @@ const SpellBookManager = {
             <button class="spell-slot-remove" onclick="event.stopPropagation(); SpellBookManager.removeSpell(${index})" ${isStarting ? 'disabled' : ''}>×</button>
             ${isStarting ? '<div class="spell-starting-badge">Starting</div>' : ''}
             <div class="spell-level-badge">${currentLevel}</div>
-            <div class="spell-tooltip">
-                <div class="spell-tooltip-name">${spell.name || this.formatSpellName(spell.id_key || spell.id)}</div>
-                <div class="spell-tooltip-school">${spell.school_display}</div>
-                <div class="spell-tooltip-type">${spell.spell_type === 'global' ? 'Global Map' : 'Combat'} Spell</div>
-                <div class="spell-tooltip-tier">Tier ${spell.level}</div>
-                <div class="spell-tooltip-level">Level ${currentLevel}/${maxLevel}</div>
-                <div class="spell-tooltip-desc">${description}</div>
-                <div class="spell-tooltip-actions">
-                    <button class="spell-action-btn"
+            <div class="tooltip tooltip-spell">
+                <div class="tooltip-title tooltip-title--blue">${spell.name || this.formatSpellName(spell.id_key || spell.id)}</div>
+                <div class="tooltip-subtitle">${spell.school_display}</div>
+                <div class="tooltip-meta">${spell.spell_type === 'global' ? 'Global Map' : 'Combat'} Spell</div>
+                <div class="tooltip-meta">Tier ${spell.level}</div>
+                <div class="tooltip-highlight tooltip-level">Level ${currentLevel}/${maxLevel}</div>
+                <div class="tooltip-section">
+                    <div class="tooltip-text">${description}</div>
+                </div>
+                <div class="tooltip-actions">
+                    <button class="tooltip-action-btn"
                             onclick="event.stopPropagation(); SpellBookManager.upgradeSpell(${index})"
                             ${currentLevel >= maxLevel ? 'disabled' : ''}>
                         Upgrade
                     </button>
-                    <button class="spell-action-btn"
+                    <button class="tooltip-action-btn"
                             onclick="event.stopPropagation(); SpellBookManager.downgradeSpell(${index})"
                             ${currentLevel <= 1 ? 'disabled' : ''}>
                         Downgrade
                     </button>
-                    <button class="spell-action-btn spell-remove-btn"
+                    <button class="tooltip-action-btn tooltip-remove-btn"
                             onclick="event.stopPropagation(); SpellBookManager.removeSpell(${index})"
                             ${isStarting ? 'disabled' : ''}>
                         Remove
@@ -2791,6 +2814,8 @@ const SpellBookManager = {
             const currentLevel = equipped.upgradeLevel;
             const isStarting = equipped.isStartingSpell;
 
+            slotElement.classList.add('has-tooltip');
+            slotElement.dataset.tooltipPlacement = 'left';
             slotElement.innerHTML = `
                 <img src="/media/gamedata/spells/${spell.icon || spell.id_key || spell.id}.png"
                      alt="${spell.id_key || spell.id}"
@@ -2799,25 +2824,27 @@ const SpellBookManager = {
                 <button class="spell-slot-remove" onclick="event.stopPropagation(); SpellBookManager.removeSpell(${index})" ${isStarting ? 'disabled' : ''}>×</button>
                 ${isStarting ? '<div class="spell-starting-badge">Starting</div>' : ''}
                 <div class="spell-level-badge">${currentLevel}</div>
-                <div class="spell-tooltip">
-                    <div class="spell-tooltip-name">${spell.name || this.formatSpellName(spell.id_key || spell.id)}</div>
-                    <div class="spell-tooltip-school">${spell.school_display}</div>
-                    <div class="spell-tooltip-type">${spell.spell_type === 'global' ? 'Global Map' : 'Combat'} Spell</div>
-                    <div class="spell-tooltip-tier">Tier ${spell.level}</div>
-                    <div class="spell-tooltip-level">Level ${currentLevel}/${maxLevel}</div>
-                    <div class="spell-tooltip-desc">${description}</div>
-                    <div class="spell-tooltip-actions">
-                        <button class="spell-action-btn"
+                <div class="tooltip tooltip-spell">
+                    <div class="tooltip-title tooltip-title--blue">${spell.name || this.formatSpellName(spell.id_key || spell.id)}</div>
+                    <div class="tooltip-subtitle">${spell.school_display}</div>
+                    <div class="tooltip-meta">${spell.spell_type === 'global' ? 'Global Map' : 'Combat'} Spell</div>
+                    <div class="tooltip-meta">Tier ${spell.level}</div>
+                    <div class="tooltip-highlight tooltip-level">Level ${currentLevel}/${maxLevel}</div>
+                    <div class="tooltip-section">
+                        <div class="tooltip-text">${description}</div>
+                    </div>
+                    <div class="tooltip-actions">
+                        <button class="tooltip-action-btn"
                                 onclick="event.stopPropagation(); SpellBookManager.upgradeSpell(${index})"
                                 ${currentLevel >= maxLevel ? 'disabled' : ''}>
                             Upgrade
                         </button>
-                        <button class="spell-action-btn"
+                        <button class="tooltip-action-btn"
                                 onclick="event.stopPropagation(); SpellBookManager.downgradeSpell(${index})"
                                 ${currentLevel <= 1 ? 'disabled' : ''}>
                             Downgrade
                         </button>
-                        <button class="spell-action-btn spell-remove-btn"
+                        <button class="tooltip-action-btn tooltip-remove-btn"
                                 onclick="event.stopPropagation(); SpellBookManager.removeSpell(${index})"
                                 ${isStarting ? 'disabled' : ''}>
                             Remove
@@ -2876,21 +2903,35 @@ const SpellBookManager = {
         const maxLevel = spell.max_upgrade_level || 4;
         const currentLevel = equipped.upgradeLevel;
 
-        // Update level badge
+        // Update level badge (always in slot)
         const levelBadge = slotElement.querySelector('.spell-level-badge');
         if (levelBadge) levelBadge.textContent = currentLevel;
 
+        // Helper to find tooltip elements - check slot first, then active tooltip in body
+        // (Tooltip system moves tooltips to document.body when visible)
+        const findTooltipElement = (selector) => {
+            // Try slot first (tooltip not visible or not moved yet)
+            let el = slotElement.querySelector(selector);
+            if (el) return el;
+            // Try active tooltip in document.body (tooltip is visible and was moved)
+            const activeTooltip = document.body.querySelector('.tooltip[style*="display: block"]');
+            if (activeTooltip) {
+                el = activeTooltip.querySelector(selector);
+            }
+            return el;
+        };
+
         // Update tooltip level
-        const tooltipLevel = slotElement.querySelector('.spell-tooltip-level');
+        const tooltipLevel = findTooltipElement('.tooltip-level');
         if (tooltipLevel) tooltipLevel.textContent = `Level ${currentLevel}/${maxLevel}`;
 
         // Update tooltip description
-        const tooltipDesc = slotElement.querySelector('.spell-tooltip-desc');
+        const tooltipDesc = findTooltipElement('.tooltip-text');
         if (tooltipDesc) tooltipDesc.innerHTML = description;
 
         // Update button states
-        const upgradeBtn = slotElement.querySelector('.spell-action-btn:first-child');
-        const downgradeBtn = slotElement.querySelector('.spell-action-btn:nth-child(2)');
+        const upgradeBtn = findTooltipElement('.tooltip-action-btn:first-child');
+        const downgradeBtn = findTooltipElement('.tooltip-action-btn:nth-child(2)');
         if (upgradeBtn) upgradeBtn.disabled = currentLevel >= maxLevel;
         if (downgradeBtn) downgradeBtn.disabled = currentLevel <= 1;
     },
@@ -2960,8 +3001,9 @@ const SpellBookManager = {
         // Helper to render a spell slot
         const renderSpellSlot = (equipped, index, isSkillGranted = false) => {
             const slotDiv = document.createElement('div');
-            slotDiv.className = 'spell-slot equipped' + (isSkillGranted ? ' skill-granted' : '');
+            slotDiv.className = 'spell-slot equipped has-tooltip' + (isSkillGranted ? ' skill-granted' : '');
             slotDiv.dataset.slotIndex = index;
+            slotDiv.dataset.tooltipPlacement = 'left';
             if (isSkillGranted) {
                 slotDiv.dataset.skillGranted = 'true';
             }
@@ -2992,21 +3034,23 @@ const SpellBookManager = {
                 ${!isLocked ? `<button class="spell-slot-remove" onclick="event.stopPropagation(); SpellBookManager.removeSpell(${index})">×</button>` : ''}
                 ${badgeHtml}
                 <div class="spell-level-badge">${currentLevel}</div>
-                <div class="spell-tooltip">
-                    <div class="spell-tooltip-name">${spell.name || this.formatSpellName(spell.id_key || spell.id)}</div>
-                    <div class="spell-tooltip-school">${spell.school_display}</div>
-                    <div class="spell-tooltip-type">${spell.spell_type === 'global' ? 'Global Map' : 'Combat'} Spell</div>
-                    <div class="spell-tooltip-tier">Tier ${spell.level}</div>
-                    <div class="spell-tooltip-level">Level ${currentLevel}/${maxLevel}</div>
-                    <div class="spell-tooltip-desc">${description}</div>
-                    <div class="spell-tooltip-actions">
-                        <button class="spell-action-btn"
+                <div class="tooltip tooltip-spell">
+                    <div class="tooltip-title tooltip-title--blue">${spell.name || this.formatSpellName(spell.id_key || spell.id)}</div>
+                    <div class="tooltip-subtitle">${spell.school_display}</div>
+                    <div class="tooltip-meta">${spell.spell_type === 'global' ? 'Global Map' : 'Combat'} Spell</div>
+                    <div class="tooltip-meta">Tier ${spell.level}</div>
+                    <div class="tooltip-highlight tooltip-level">Level ${currentLevel}/${maxLevel}</div>
+                    <div class="tooltip-section">
+                        <div class="tooltip-text">${description}</div>
+                    </div>
+                    <div class="tooltip-actions">
+                        <button class="tooltip-action-btn"
                                 onclick="event.stopPropagation(); SpellBookManager.upgradeSpell(${index}, ${isSkillGranted})"
                                 ${currentLevel >= maxLevel ? 'disabled' : ''}>Upgrade</button>
-                        <button class="spell-action-btn"
+                        <button class="tooltip-action-btn"
                                 onclick="event.stopPropagation(); SpellBookManager.downgradeSpell(${index}, ${isSkillGranted})"
                                 ${currentLevel <= 1 ? 'disabled' : ''}>Downgrade</button>
-                        ${!isLocked ? `<button class="spell-action-btn spell-remove-btn"
+                        ${!isLocked ? `<button class="tooltip-action-btn tooltip-remove-btn"
                                 onclick="event.stopPropagation(); SpellBookManager.removeSpell(${index})">Remove</button>` : ''}
                     </div>
                 </div>
@@ -3057,6 +3101,8 @@ const SpellBookManager = {
 
 const ArmyManager = {
     currentSlotIndex: null,
+    currentFactionTab: null,  // Currently selected faction in picker
+    allFactions: [],  // All factions data from API
 
     // Initialize the army panel
     async init() {
@@ -3069,8 +3115,11 @@ const ArmyManager = {
             return;
         }
 
-        // Load faction units from API
-        await this.loadFactionUnits(faction);
+        // Load ALL units from all factions
+        await this.loadAllUnits();
+
+        // Set default faction tab to hero's faction
+        this.currentFactionTab = faction;
 
         // Get starting squad from hero card
         const heroCard = document.querySelector('[data-hero-faction]');
@@ -3100,34 +3149,52 @@ const ArmyManager = {
         this.render();
     },
 
-    // Fetch faction units from API
-    async loadFactionUnits(faction) {
+    // Fetch all units from all factions
+    async loadAllUnits() {
         try {
-            const response = await fetch(`/api/factions/${faction}/units/`);
+            const response = await fetch('/api/units/all/');
             const data = await response.json();
-            heroBuild.factionUnits = data.units_by_tier || {};
-            console.log(`[ArmyManager] Loaded units for ${faction}:`, Object.keys(heroBuild.factionUnits));
+            this.allFactions = data.factions || [];
+
+            // Also maintain backwards-compatible factionUnits for hero's faction
+            const heroFaction = this.allFactions.find(f => f.slug === heroBuild.heroFaction);
+            if (heroFaction) {
+                heroBuild.factionUnits = heroFaction.units_by_tier || {};
+            }
+
+            console.log(`[ArmyManager] Loaded ${this.allFactions.length} factions with units`);
         } catch (error) {
-            console.error('[ArmyManager] Failed to load faction units:', error);
+            console.error('[ArmyManager] Failed to load units:', error);
+            this.allFactions = [];
             heroBuild.factionUnits = {};
         }
     },
 
-    // Helper: Find unit by ID across all tiers
+    // Helper: Find unit by ID across ALL factions
     findUnitById(unitId) {
-        for (const tier of Object.keys(heroBuild.factionUnits)) {
-            const units = heroBuild.factionUnits[tier];
-            const unit = units.find(u => u.id === unitId);
-            if (unit) return unit;
+        for (const faction of this.allFactions) {
+            for (const tier of Object.keys(faction.units_by_tier || {})) {
+                const units = faction.units_by_tier[tier];
+                const unit = units.find(u => u.id === unitId);
+                if (unit) return unit;
+            }
         }
         return null;
+    },
+
+    // Helper: Get units for a specific faction
+    getFactionUnits(factionSlug) {
+        const faction = this.allFactions.find(f => f.slug === factionSlug);
+        return faction ? faction.units_by_tier : {};
     },
 
     // Helper: Get all units as flat array
     getAllUnits() {
         const allUnits = [];
-        for (const tier of Object.keys(heroBuild.factionUnits)) {
-            allUnits.push(...heroBuild.factionUnits[tier]);
+        for (const faction of this.allFactions) {
+            for (const tier of Object.keys(faction.units_by_tier || {})) {
+                allUnits.push(...faction.units_by_tier[tier]);
+            }
         }
         return allUnits;
     },
@@ -3173,29 +3240,32 @@ const ArmyManager = {
 
             if (armySlot && armySlot.unitData) {
                 // Filled slot
-                slot.classList.add('filled');
+                slot.classList.add('filled', 'has-tooltip');
+                slot.dataset.tooltipPlacement = 'top';
 
                 const unit = armySlot.unitData;
 
                 slot.innerHTML = `
                     <img src="${unit.icon_url}" alt="${unit.name}" class="unit-icon" onerror="this.src='/media/gamedata/ui/unit_placeholder.png'">
                     <span class="unit-count">${armySlot.count}</span>
-                    <div class="tooltip-content">
-                        <div class="unit-tooltip-name">${unit.name}</div>
-                        <div class="unit-tooltip-tier">Tier ${unit.tier}</div>
-                        <div class="unit-tooltip-stats">
-                            <div>ATK: ${unit.stats.offence}</div>
-                            <div>DEF: ${unit.stats.defence}</div>
-                            <div>HP: ${unit.stats.hp}</div>
-                            <div>DMG: ${unit.stats.damage_min}-${unit.stats.damage_max}</div>
-                            <div>Speed: ${unit.stats.speed}</div>
-                            <div>Value: ${unit.squad_value}</div>
+                    <div class="tooltip tooltip-unit">
+                        <div class="tooltip-title">${unit.name}</div>
+                        <div class="tooltip-tier">Tier ${unit.tier}</div>
+                        <div class="tooltip-stats">
+                            <div class="stat-item"><span class="stat-label">ATK:</span> <span class="stat-value">${unit.stats.offence}</span></div>
+                            <div class="stat-item"><span class="stat-label">DEF:</span> <span class="stat-value">${unit.stats.defence}</span></div>
+                            <div class="stat-item"><span class="stat-label">HP:</span> <span class="stat-value">${unit.stats.hp}</span></div>
+                            <div class="stat-item"><span class="stat-label">DMG:</span> <span class="stat-value">${unit.stats.damage_min}-${unit.stats.damage_max}</span></div>
+                            <div class="stat-item"><span class="stat-label">Speed:</span> <span class="stat-value">${unit.stats.speed}</span></div>
+                            <div class="stat-item"><span class="stat-label">Value:</span> <span class="stat-value">${unit.squad_value}</span></div>
                         </div>
-                        <div class="unit-tooltip-type">${this.formatUnitType(unit)}</div>
+                        <div class="tooltip-type">${this.formatUnitType(unit)}</div>
                     </div>
                 `;
             } else {
                 // Empty slot
+                slot.classList.remove('has-tooltip');
+                delete slot.dataset.tooltipPlacement;
                 slot.innerHTML = '<span class="add-text">+</span>';
             }
         });
@@ -3211,6 +3281,218 @@ const ArmyManager = {
         else types.push('Melee');
         if (unit.move_type === 'fly') types.push('Flying');
         return types.join(', ');
+    },
+
+    // Stat icons SVGs (inline for reliability)
+    statIcons: {
+        hp: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`,
+        damage: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.92 5L5 6.92l2.5 2.5L3.42 13.5 8.5 18.58l4.08-4.08 2.5 2.5L17 15.08l-2.59-2.59L19 8l-3-3-4.59 4.59L6.92 5zM18 4l2 2-3 3-2-2 3-3zm-7.91 9.5l-2 2L6 13.42l2-2 2.09 2.08z"/></svg>`,
+        offence: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.92 5L5 6.92l5.79 5.79L5.5 18l1.5 1.5 5.29-5.29L18 20l2-2-5.79-5.79L19.5 7l-1.5-1.5-5.29 5.29L6.92 5z"/></svg>`,
+        defence: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>`,
+        luck: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.2 14.2L11 13V7h1.5v5.2l4.5 2.7-.8 1.3z"/></svg>`,
+        morale: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6h-5.6z"/></svg>`,
+        speed: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7z"/></svg>`,
+        initiative: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 2v6h.01L6 8.01 10 12l-4 4 .01.01H6V22h12v-5.99h-.01L18 16l-4-4 4-3.99-.01-.01H18V2H6zm10 14.5V20H8v-3.5l4-4 4 4zm-4-5l-4-4V4h8v3.5l-4 4z"/></svg>`,
+    },
+
+    // Get stat icon HTML
+    getStatIcon(stat) {
+        return this.statIcons[stat] || '';
+    },
+
+    // Get stat color
+    getStatColor(stat) {
+        const colors = {
+            hp: '#66ff88',
+            damage: '#ff6666',
+            offence: '#ff8866',
+            defence: '#66aaff',
+            luck: '#ffcc00',
+            morale: '#cc99ff',
+            speed: '#88ddff',
+            initiative: '#ffaa66',
+        };
+        return colors[stat] || '#ffffff';
+    },
+
+    // Build stat bar HTML for unit card
+    buildStatBar(stats) {
+        const statOrder = ['hp', 'damage', 'offence', 'defence', 'luck', 'morale', 'speed', 'initiative'];
+        const statLabels = {
+            hp: 'Health',
+            damage: 'Damage',
+            offence: 'Attack',
+            defence: 'Defence',
+            luck: 'Luck',
+            morale: 'Morale',
+            speed: 'Speed',
+            initiative: 'Initiative',
+        };
+        const statDescriptions = {
+            hp: 'Hit points per creature',
+            damage: 'Base damage dealt per attack',
+            offence: 'Increases damage dealt',
+            defence: 'Reduces damage taken',
+            luck: 'Chance for critical hits',
+            morale: 'Chance for extra actions',
+            speed: 'Movement range in combat',
+            initiative: 'Determines turn order',
+        };
+
+        // Format damage as range
+        const damageValue = stats.damage_min === stats.damage_max
+            ? stats.damage_min
+            : `${stats.damage_min}-${stats.damage_max}`;
+
+        const statValues = {
+            hp: stats.hp,
+            damage: damageValue,
+            offence: stats.offence,
+            defence: stats.defence,
+            luck: stats.luck || 0,
+            morale: stats.morale || 0,
+            speed: stats.speed,
+            initiative: stats.initiative,
+        };
+
+        return statOrder.map(stat => `
+            <div class="unit-stat has-tooltip" data-tooltip-placement="top" style="color: ${this.getStatColor(stat)}">
+                <span class="unit-stat-icon">${this.getStatIcon(stat)}</span>
+                <span class="unit-stat-value">${statValues[stat]}</span>
+                <div class="tooltip">
+                    <div class="tooltip-title">${statLabels[stat]}: ${statValues[stat]}</div>
+                    <div class="tooltip-text">${statDescriptions[stat]}</div>
+                </div>
+            </div>
+        `).join('');
+    },
+
+    // Extract raw ability data from unit's raw_data based on ability ID
+    getRawAbilityData(abilityId, rawData) {
+        if (!rawData || !abilityId) return null;
+
+        // Parse ability ID format: unitId_type_index (e.g., "crossbowman_ability_0", "esquire_passive_0", "unit_aura")
+        const passiveMatch = abilityId.match(/_passive_(\d+)$/);
+        if (passiveMatch) {
+            const index = parseInt(passiveMatch[1], 10);
+            return rawData.passives?.[index] || null;
+        }
+
+        const abilityMatch = abilityId.match(/_ability_(\d+)$/);
+        if (abilityMatch) {
+            const index = parseInt(abilityMatch[1], 10);
+            return rawData.abilities?.[index] || null;
+        }
+
+        if (abilityId.endsWith('_aura')) {
+            return rawData.aura || null;
+        }
+
+        return null;
+    },
+
+    // Check if a description has failed resolutions (contains obvious "0" placeholders)
+    hasFailedResolution(text) {
+        if (!text) return false;
+        // Patterns that indicate failed resolution: +0, -0, 0%, 0–0, etc.
+        const failurePatterns = [
+            /[+\-–]\s*0\s*(?:%|$|\s|,|\.)/,  // +0, -0, +0%, -0%, –0%
+            /\b0[–-]0\b/,                      // 0-0, 0–0 (damage ranges)
+            /\bby\s+0\b/,                      // "by 0", "increases by 0"
+            /:\s*0\s*(?:$|,|\s)/,              // ": 0" (durations, counts)
+        ];
+        return failurePatterns.some(pattern => pattern.test(text));
+    },
+
+    // Format ability description using DescriptionRuntime
+    formatAbilityDescription(ability, unitData) {
+        if (!ability.description_template) {
+            return ability.name || '';
+        }
+
+        if (!ability.description_args || ability.description_args.length === 0) {
+            return ability.description_template;
+        }
+
+        try {
+            const rawData = unitData?.raw_data || {};
+
+            // Get the raw ability data from the unit's raw_data
+            // Description functions expect currentAbility to have the raw structure
+            const rawAbility = this.getRawAbilityData(ability.id, rawData);
+
+            const ctx = {
+                currentUnit: rawData,
+                currentAbility: rawAbility || ability,
+            };
+
+            const resolved = DescriptionRuntime.formatDescription(
+                ability.description_template,
+                ability.description_args,
+                ctx
+            );
+
+            // If resolution produced obvious "0" placeholders, fall back to template
+            // (This happens when base units lack the data structure that upgraded units have)
+            if (this.hasFailedResolution(resolved)) {
+                // Return template with placeholders stripped for cleaner display
+                return ability.description_template.replace(/\{(\d+)\}/g, '?');
+            }
+
+            return resolved;
+        } catch (e) {
+            console.warn('[ArmyManager] Error formatting ability description:', e);
+            return ability.description_template;
+        }
+    },
+
+    // Build side abilities HTML for new card layout (vertical column)
+    buildSideAbilitiesHtml(abilities, type, unitData) {
+        const self = this;
+        if (!abilities || abilities.length === 0) return '';
+
+        return abilities.map(ability => `
+            <div class="ability-icon ${type} has-tooltip" data-tooltip-placement="${type === 'passive' ? 'left' : 'right'}">
+                <div class="tooltip">
+                    <div class="tooltip-title">${ability.name}</div>
+                    <div class="tooltip-text">${self.formatAbilityDescription(ability, unitData) || (type === 'passive' ? 'Passive ability' : 'Active ability')}</div>
+                </div>
+            </div>
+        `).join('');
+    },
+
+    // Build abilities HTML for unit card (legacy row layout for editor modal)
+    buildAbilitiesHtml(passives, actives, unitData) {
+        const self = this;
+        const passiveHtml = passives && passives.length > 0
+            ? `<div class="unit-abilities-column passives">
+                ${passives.map(p => `
+                    <div class="ability-icon passive has-tooltip" data-tooltip-placement="top">
+                        <div class="tooltip">
+                            <div class="tooltip-title">${p.name}</div>
+                            <div class="tooltip-text">${self.formatAbilityDescription(p, unitData) || 'Passive ability'}</div>
+                        </div>
+                    </div>
+                `).join('')}
+               </div>`
+            : '';
+
+        const activeHtml = actives && actives.length > 0
+            ? `<div class="unit-abilities-column actives">
+                ${actives.map(a => `
+                    <div class="ability-icon active has-tooltip" data-tooltip-placement="top">
+                        <div class="tooltip">
+                            <div class="tooltip-title">${a.name}</div>
+                            <div class="tooltip-text">${self.formatAbilityDescription(a, unitData) || 'Active ability'}</div>
+                        </div>
+                    </div>
+                `).join('')}
+               </div>`
+            : '';
+
+        if (!passiveHtml && !activeHtml) return '';
+
+        return `<div class="unit-abilities-row">${passiveHtml}${activeHtml}</div>`;
     },
 
     // Calculate and display total army value
@@ -3232,48 +3514,88 @@ const ArmyManager = {
         }, 0);
     },
 
-    // Open unit picker modal
+    // Open unit picker modal with faction tabs
     openUnitPicker(slotIndex) {
         this.currentSlotIndex = slotIndex;
 
-        const unitsByTier = heroBuild.factionUnits;
-        if (!unitsByTier || Object.keys(unitsByTier).length === 0) {
-            console.error('[ArmyManager] No faction units available');
+        if (!this.allFactions || this.allFactions.length === 0) {
+            console.error('[ArmyManager] No factions available');
             return;
         }
 
-        // Build modal HTML - units already grouped by tier
+        // Default to hero's faction tab
+        if (!this.currentFactionTab) {
+            this.currentFactionTab = heroBuild.heroFaction;
+        }
+
+        this.renderUnitPickerModal();
+    },
+
+    // Render the unit picker modal
+    renderUnitPickerModal() {
+        const unitsByTier = this.getFactionUnits(this.currentFactionTab);
+
+        // Build faction tabs HTML
+        const factionTabsHtml = this.allFactions.map(faction => `
+            <button class="faction-tab ${faction.slug === this.currentFactionTab ? 'active' : ''}"
+                    onclick="ArmyManager.switchFactionTab('${faction.slug}')"
+                    title="${faction.name}">
+                <img src="${faction.icon_url}" alt="${faction.name}" class="faction-tab-icon"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='inline'">
+                <span class="faction-tab-name" style="display:none">${faction.name}</span>
+            </button>
+        `).join('');
+
+        // Build units grid HTML with game-style card layout
+        const unitsGridHtml = Object.keys(unitsByTier).sort((a, b) => a - b).map(tier => `
+            <div class="unit-tier-group">
+                <h3 class="unit-tier-header">Tier ${tier}</h3>
+                <div class="unit-picker-grid">
+                    ${unitsByTier[tier].map(unit => {
+                        const statBarHtml = this.buildStatBar(unit.stats);
+                        const passivesHtml = this.buildSideAbilitiesHtml(unit.passives, 'passive', unit);
+                        const activesHtml = this.buildSideAbilitiesHtml(unit.actives, 'active', unit);
+
+                        return `
+                        <div class="unit-card" onclick="ArmyManager.selectUnit('${unit.id}')">
+                            <div class="unit-card-header">
+                                <div class="unit-card-name">${unit.name}</div>
+                                <div class="unit-card-tier">T${unit.tier}</div>
+                            </div>
+                            <div class="unit-stat-bar">${statBarHtml}</div>
+                            <div class="unit-card-portrait-section">
+                                <div class="unit-abilities-side left">${passivesHtml}</div>
+                                <img src="${unit.icon_url}" alt="${unit.name}" class="unit-card-portrait"
+                                     onerror="this.src='/media/gamedata/ui/unit_placeholder.png'">
+                                <div class="unit-abilities-side right">${activesHtml}</div>
+                            </div>
+                            <div class="unit-card-footer">${unit.squad_value} gold</div>
+                        </div>
+                    `}).join('')}
+                </div>
+            </div>
+        `).join('');
+
         const modalHtml = `
             <div class="modal-overlay" onclick="ArmyManager.closeUnitPicker()">
                 <div class="skill-modal unit-picker-modal" onclick="event.stopPropagation()">
-                    <div class="modal-header">
-                        <h2>Select Unit</h2>
+                    <div class="faction-tabs">
+                        ${factionTabsHtml}
                     </div>
-                    <div class="skill-list">
-                        ${Object.keys(unitsByTier).sort((a, b) => a - b).map(tier => `
-                            <div class="unit-tier-group">
-                                <h3 class="unit-tier-header">Tier ${tier}</h3>
-                                <div class="unit-picker-grid">
-                                    ${unitsByTier[tier].map(unit => `
-                                        <div class="unit-card" onclick="ArmyManager.selectUnit('${unit.id}')">
-                                            <img src="${unit.icon_url}" alt="${unit.name}" class="unit-card-icon" onerror="this.src='/media/gamedata/ui/unit_placeholder.png'">
-                                            <div class="unit-card-name">${unit.name}</div>
-                                            <div class="unit-card-stats">
-                                                <span>ATK ${unit.stats.offence}</span>
-                                                <span>DEF ${unit.stats.defence}</span>
-                                                <span>HP ${unit.stats.hp}</span>
-                                            </div>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        `).join('')}
+                    <div class="skill-list unit-list">
+                        ${unitsGridHtml}
                     </div>
                 </div>
             </div>
         `;
 
         document.getElementById('skill-modal-container').innerHTML = modalHtml;
+    },
+
+    // Switch faction tab in unit picker
+    switchFactionTab(factionSlug) {
+        this.currentFactionTab = factionSlug;
+        this.renderUnitPickerModal();
     },
 
     // Select a unit from picker
@@ -3305,6 +3627,22 @@ const ArmyManager = {
         const unit = armySlot.unitData;
         const canRemove = !armySlot.isStartingUnit;
 
+        // Build stats object from unit data (handle both old and new property names)
+        const stats = unit.stats || {
+            hp: unit.health || unit.hp,
+            offence: unit.attack || unit.offence,
+            defence: unit.defence,
+            damage_min: unit.damage_min,
+            damage_max: unit.damage_max,
+            initiative: unit.initiative,
+            speed: unit.speed,
+            luck: unit.luck || 0,
+            morale: unit.morale || unit.moral || 0,
+        };
+
+        const statBarHtml = this.buildStatBar(stats);
+        const abilitiesHtml = this.buildAbilitiesHtml(unit.passives, unit.actives, unit);
+
         const modalHtml = `
             <div class="modal-overlay" onclick="ArmyManager.closeUnitEditor()">
                 <div class="modal-content unit-editor-modal" onclick="event.stopPropagation()">
@@ -3314,17 +3652,22 @@ const ArmyManager = {
                     </div>
                     <div class="modal-body">
                         <div class="unit-editor-content">
-                            <img src="/media/gamedata/units/${unit.icon}.png" alt="${unit.name}" class="unit-editor-icon">
-                            <div class="unit-editor-stats">
-                                <div>Tier ${unit.level}</div>
-                                <div>ATK: ${unit.attack} | DEF: ${unit.defence}</div>
-                                <div>HP: ${unit.health} | DMG: ${unit.damage_min}-${unit.damage_max}</div>
-                                <div>Speed: ${unit.speed} | Value: ${unit.squad_value}</div>
-                                ${this.formatUnitType(unit) !== 'Ground' ? `<div>${this.formatUnitType(unit)}</div>` : ''}
+                            <div class="unit-editor-header">
+                                <img src="${unit.icon_url || '/media/gamedata/units/' + (unit.icon || unit.id) + '.png'}"
+                                     alt="${unit.name}" class="unit-editor-icon"
+                                     onerror="this.src='/media/gamedata/ui/unit_placeholder.png'">
+                                <div class="unit-editor-info">
+                                    <span class="unit-editor-tier">Tier ${unit.tier || unit.level}</span>
+                                    <span class="unit-editor-type">${this.formatUnitType(unit)}</span>
+                                </div>
                             </div>
+                            <div class="unit-stat-bar editor-stat-bar">${statBarHtml}</div>
+                            ${abilitiesHtml}
+                            <div class="unit-editor-value">${unit.squad_value} gold per unit</div>
                             <div class="unit-count-control">
-                                <label>Count:</label>
+                                <label>Stack Size:</label>
                                 <input type="number" id="unit-count-input" value="${armySlot.count}" min="1" max="9999">
+                                <span class="unit-stack-value">= ${armySlot.count * unit.squad_value} gold</span>
                             </div>
                             <div class="unit-editor-actions">
                                 <button class="btn btn-primary" onclick="ArmyManager.updateUnitCount()">Update</button>
@@ -3338,12 +3681,19 @@ const ArmyManager = {
 
         document.getElementById('skill-modal-container').innerHTML = modalHtml;
 
-        // Focus the input
+        // Focus the input and update stack value on change
         setTimeout(() => {
             const input = document.getElementById('unit-count-input');
             if (input) {
                 input.focus();
                 input.select();
+                input.addEventListener('input', () => {
+                    const stackValueEl = document.querySelector('.unit-stack-value');
+                    if (stackValueEl) {
+                        const count = parseInt(input.value) || 0;
+                        stackValueEl.textContent = `= ${count * unit.squad_value} gold`;
+                    }
+                });
             }
         }, 50);
     },

@@ -1,0 +1,494 @@
+/**
+ * Unified Tooltip Styles
+ *
+ * All tooltips use the same base styling with CSS variables for customization.
+ * Content-specific styles (item bonuses, spell schools, etc.) are layered on top.
+ */
+
+/* ==========================================================================
+   CSS Variables
+   ========================================================================== */
+:root {
+    /* Tooltip container */
+    --tooltip-bg: linear-gradient(180deg, #1a2030 0%, #141820 100%);
+    --tooltip-border: #3a4555;
+    --tooltip-border-radius: 8px;
+    --tooltip-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    --tooltip-padding: 12px 14px;
+    --tooltip-min-width: 200px;
+    --tooltip-max-width: 300px;
+    --tooltip-z-index: 9999;
+
+    /* Text colors */
+    --tooltip-title-color: #fff;
+    --tooltip-title-gold: #c9a227;
+    --tooltip-title-blue: #7ec8e3;
+    --tooltip-text-color: #aabbcc;
+    --tooltip-text-muted: #8899aa;
+    --tooltip-text-highlight: #7ec8e3;
+
+    /* Dividers */
+    --tooltip-divider-color: #3a4555;
+}
+
+/* ==========================================================================
+   Base Tooltip Styles
+   ========================================================================== */
+
+/* Trigger element */
+.has-tooltip {
+    position: relative;
+}
+
+/* Tooltip container */
+.tooltip {
+    display: none;
+    position: fixed;
+    background: var(--tooltip-bg);
+    border: 2px solid var(--tooltip-border);
+    border-radius: var(--tooltip-border-radius);
+    box-shadow: var(--tooltip-shadow);
+    padding: var(--tooltip-padding);
+    min-width: var(--tooltip-min-width);
+    max-width: var(--tooltip-max-width);
+    z-index: var(--tooltip-z-index);
+    text-align: left;
+    white-space: normal;
+    pointer-events: auto;
+}
+
+/* Wide variant for tooltips with more content */
+.tooltip--wide {
+    min-width: 280px;
+    max-width: 340px;
+}
+
+/* ==========================================================================
+   Tooltip Content Elements
+   ========================================================================== */
+
+/* Title/Name */
+.tooltip-title {
+    color: var(--tooltip-title-color);
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.tooltip-title--gold {
+    color: var(--tooltip-title-gold);
+}
+
+.tooltip-title--blue {
+    color: var(--tooltip-title-blue);
+}
+
+/* Subtitle (e.g., rarity, school) */
+.tooltip-subtitle {
+    color: var(--tooltip-title-gold);
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+}
+
+/* Meta info (type, tier, etc.) */
+.tooltip-meta {
+    color: var(--tooltip-text-muted);
+    font-size: 0.8rem;
+    margin-bottom: 4px;
+}
+
+/* Main description text */
+.tooltip-text {
+    color: var(--tooltip-text-color);
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+/* Highlighted/special text */
+.tooltip-highlight {
+    color: var(--tooltip-text-highlight);
+}
+
+/* Muted text */
+.tooltip-muted {
+    color: var(--tooltip-text-muted);
+}
+
+/* Italic narrative text */
+.tooltip-narrative {
+    color: var(--tooltip-text-muted);
+    font-size: 0.8rem;
+    line-height: 1.4;
+    font-style: italic;
+}
+
+/* Divider line */
+.tooltip-divider {
+    height: 1px;
+    background: var(--tooltip-divider-color);
+    margin: 10px 0;
+}
+
+/* Section with top border (for separating content areas) */
+.tooltip-section {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--tooltip-divider-color);
+}
+
+/* ==========================================================================
+   Skill Tooltip
+   ========================================================================== */
+.tooltip-skill .tooltip-title {
+    margin-bottom: 8px;
+}
+
+/* ==========================================================================
+   Spell Tooltip
+   ========================================================================== */
+.tooltip-spell .tooltip-title {
+    color: var(--tooltip-title-blue);
+}
+
+.tooltip-spell .tooltip-level {
+    color: var(--tooltip-title-blue);
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+/* ==========================================================================
+   Item Tooltip
+   ========================================================================== */
+.tooltip-item {
+    min-width: 280px;
+    max-width: 320px;
+}
+
+.tooltip-item .item-name {
+    font-size: 1.1rem;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.tooltip-item .item-rarity {
+    color: var(--tooltip-text-muted);
+    font-size: 0.85rem;
+    text-transform: capitalize;
+}
+
+.tooltip-item .tooltip-bonuses {
+    margin-top: 10px;
+}
+
+.tooltip-item .bonus-line {
+    color: var(--tooltip-text-highlight);
+    font-size: 0.9rem;
+    line-height: 1.4;
+    margin: 4px 0;
+}
+
+.tooltip-item .item-description {
+    color: var(--tooltip-text-muted);
+    font-size: 0.85rem;
+    line-height: 1.4;
+    margin-top: 10px;
+    font-style: italic;
+}
+
+/* Item level and upgrade controls */
+.tooltip-item .tooltip-level {
+    font-size: 0.9rem;
+    color: var(--tooltip-text-highlight);
+    margin-top: 8px;
+}
+
+.tooltip-item .tooltip-upgrade-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.tooltip-item .tooltip-upgrade-btn {
+    flex: 1;
+    padding: 6px 10px;
+    background: #252d38;
+    border: 1px solid var(--tooltip-border);
+    border-radius: 4px;
+    color: var(--tooltip-text-muted);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tooltip-item .tooltip-upgrade-btn:hover:not(.disabled) {
+    background: #2a3545;
+    border-color: var(--tooltip-text-highlight);
+    color: var(--tooltip-text-highlight);
+}
+
+.tooltip-item .tooltip-upgrade-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.tooltip-item .tooltip-remove-btn {
+    width: 100%;
+    margin-top: 8px;
+    padding: 8px;
+    background: rgba(180, 80, 80, 0.2);
+    border: 1px solid #804040;
+    border-radius: 4px;
+    color: #cc8080;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tooltip-item .tooltip-remove-btn:hover {
+    background: rgba(180, 80, 80, 0.3);
+    border-color: #a05050;
+    color: #ffaaaa;
+}
+
+/* ==========================================================================
+   Item Set Styles
+   ========================================================================== */
+.tooltip-set-section {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid #2a3545;
+}
+
+.set-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.set-header .set-name {
+    color: #4fc3f7;
+    font-weight: 500;
+    font-size: 0.85rem;
+}
+
+.set-header .set-progress {
+    color: var(--tooltip-text-muted);
+    font-size: 0.8rem;
+}
+
+.set-bonus-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.set-bonus-item {
+    display: flex;
+    gap: 6px;
+    font-size: 0.8rem;
+    line-height: 1.3;
+}
+
+.set-bonus-req {
+    color: var(--tooltip-title-gold);
+    font-weight: 500;
+    min-width: 24px;
+}
+
+.set-bonus-desc {
+    color: #ccc;
+}
+
+.set-bonus-active .set-bonus-desc {
+    color: #4fc3f7;
+}
+
+.set-bonus-inactive {
+    opacity: 0.5;
+}
+
+.set-bonus-inactive .set-bonus-desc {
+    color: #888;
+}
+
+/* ==========================================================================
+   Class/Specialization Tooltip
+   ========================================================================== */
+.tooltip-class {
+    min-width: 280px;
+    max-width: 320px;
+}
+
+.tooltip-class .tooltip-header {
+    margin-bottom: 10px;
+}
+
+.tooltip-class .tooltip-title {
+    color: var(--tooltip-title-gold);
+    font-size: 1.1rem;
+    text-transform: uppercase;
+}
+
+.tooltip-class .tooltip-text {
+    margin-top: 5px;
+}
+
+/* Advanced class sections */
+.advanced-class-section {
+    margin-bottom: 12px;
+}
+
+.advanced-class-section:last-child {
+    margin-bottom: 0;
+}
+
+.advanced-class-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.advanced-class-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+}
+
+.advanced-class-name {
+    color: var(--tooltip-title-gold);
+    font-weight: bold;
+    flex: 1;
+}
+
+.advanced-class-progress {
+    color: var(--tooltip-text-highlight);
+    font-size: 0.9rem;
+}
+
+.advanced-class-progress-bar {
+    height: 6px;
+    background: #252d38;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #c9a227 0%, #e0b830 100%);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.advanced-class-desc {
+    color: var(--tooltip-text-muted);
+    font-size: 0.8rem;
+    line-height: 1.3;
+}
+
+/* ==========================================================================
+   Unit Tooltip
+   ========================================================================== */
+.tooltip-unit .tooltip-title {
+    margin-bottom: 4px;
+}
+
+.tooltip-unit .tooltip-tier {
+    color: var(--tooltip-text-muted);
+    font-size: 0.85rem;
+    margin-bottom: 6px;
+}
+
+.tooltip-unit .tooltip-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px 12px;
+    margin-bottom: 8px;
+}
+
+.tooltip-unit .stat-item {
+    display: flex;
+    gap: 4px;
+    font-size: 0.85rem;
+}
+
+.tooltip-unit .stat-label {
+    color: var(--tooltip-text-muted);
+}
+
+.tooltip-unit .stat-value {
+    color: var(--tooltip-title-color);
+    font-weight: 500;
+}
+
+.tooltip-unit .tooltip-type {
+    color: var(--tooltip-text-muted);
+    font-size: 0.8rem;
+    font-style: italic;
+}
+
+/* ==========================================================================
+   Spell Action Buttons
+   ========================================================================== */
+
+/* Wider tooltip when it has action buttons */
+.tooltip:has(.tooltip-actions) {
+    min-width: 260px;
+}
+
+.tooltip-actions {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 6px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--tooltip-divider-color);
+}
+
+.tooltip-action-btn {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 6px 10px;
+    background: #252d38;
+    border: 1px solid var(--tooltip-border);
+    border-radius: 4px;
+    color: var(--tooltip-text-muted);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tooltip-action-btn:hover:not(:disabled) {
+    background: #2a3545;
+    border-color: var(--tooltip-text-highlight);
+    color: var(--tooltip-text-highlight);
+}
+
+.tooltip-action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Red remove button - reset properties that builder.css overrides */
+.tooltip-action-btn.tooltip-remove-btn {
+    /* Reset layout properties from builder.css .tooltip-remove-btn */
+    display: inline-block;
+    width: auto;
+    margin-top: 0;
+    padding: 6px 10px;
+    font-size: 0.75rem;
+    /* Color styling */
+    background: rgba(180, 80, 80, 0.15);
+    border-color: #5a3535;
+    color: #cc8080;
+}
+
+.tooltip-action-btn.tooltip-remove-btn:hover:not(:disabled) {
+    background: rgba(180, 80, 80, 0.3);
+    border-color: #804040;
+    color: #ffaaaa;
+}

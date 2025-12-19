@@ -90,7 +90,6 @@
         border-color: #d4af37;
     }
 
-    /* Faction skill tooltip */
     .faction-skill-wrapper {
         position: relative;
         display: inline-block;
@@ -166,17 +165,6 @@
         height: 38px;
     }
 
-    /* Override tooltip position for hero cards - appears to the left */
-    .hero-card .class-tooltip {
-        left: auto;
-        right: 100%;
-        top: 50%;
-        transform: translateY(-50%);
-        margin-left: 0;
-        margin-right: 15px;
-        text-align: left;
-    }
-
     .skill-icon {
         position: absolute;
         bottom: -1px;
@@ -193,18 +181,10 @@
         border-color: #666;
     }
 
-    /* Skill wrapper positioning */
     .skill-wrapper {
         position: absolute;
         bottom: -1px;
         right: -12px;
-    }
-
-    /* Override tooltip position for hero cards - appears to the right */
-    .skill-wrapper .tooltip-content {
-        top: 0;
-        left: 100%;
-        margin-top: -10px;
     }
 
     .hero-name {
@@ -284,13 +264,13 @@
         <div class="faction-name">{{ faction.name }}</div>
         {% if faction.skill_icon_url %}
         <div class="faction-skill">
-            <div class="faction-skill-wrapper tooltip-wrapper">
+            <div class="faction-skill-wrapper has-tooltip" data-tooltip-placement="top">
                 <img src="{{ faction.skill_icon_url }}" alt="Faction Skill" class="faction-skill-icon">
                 {% with faction.skill_info as skill %}
                 {% if skill %}
-                <div class="tooltip-content tooltip-above">
-                    <div class="tooltip-name">{{ skill.name }}</div>
-                    <div class="tooltip-desc"
+                <div class="tooltip tooltip-skill">
+                    <div class="tooltip-title">{{ skill.name }}</div>
+                    <div class="tooltip-text"
                          data-skill-template="{{ skill.description_template|escapejs }}"
                          data-skill-args='{{ skill.description_args|to_json }}'
                          data-skill-raw='{{ skill.raw_data|to_json }}'

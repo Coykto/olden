@@ -97,8 +97,6 @@
         display: block;
     }
 
-    /* Faction skill tooltip - uses tooltip-above from components.css */
-
     .portrait-container {
         position: relative;
         display: inline-block;
@@ -143,17 +141,6 @@
         height: 38px;
     }
 
-    /* Override tooltip position for hero cards - appears to the left */
-    .hero-card .class-tooltip {
-        left: auto;
-        right: 100%;
-        top: 50%;
-        transform: translateY(-50%);
-        margin-left: 0;
-        margin-right: 15px;
-        text-align: left;
-    }
-
     .skill-icon {
         position: absolute;
         bottom: -1px;
@@ -170,18 +157,10 @@
         border-color: #666;
     }
 
-    /* Skill wrapper positioning - tooltip styles from components.css */
     .skill-wrapper {
         position: absolute;
         bottom: -1px;
         right: -12px;
-    }
-
-    /* Override tooltip position for hero cards - appears to the right */
-    .skill-wrapper .tooltip-content {
-        top: 0;
-        left: 100%;
-        margin-top: -10px;
     }
 
     .hero-name {
@@ -255,13 +234,13 @@
         <div class="faction-name">{{ faction.name }}</div>
         {% if faction.skill_icon_url %}
         <div class="faction-skill">
-            <div class="faction-skill-wrapper tooltip-wrapper">
+            <div class="faction-skill-wrapper has-tooltip" data-tooltip-placement="top">
                 <img src="{{ faction.skill_icon_url }}" alt="Faction Skill" class="faction-skill-icon">
                 {% with faction.skill_info as skill %}
                 {% if skill %}
-                <div class="tooltip-content tooltip-above">
-                    <div class="tooltip-name">{{ skill.name }}</div>
-                    <div class="tooltip-desc"
+                <div class="tooltip tooltip-skill">
+                    <div class="tooltip-title">{{ skill.name }}</div>
+                    <div class="tooltip-text"
                          data-skill-template="{{ skill.description_template|escapejs }}"
                          data-skill-args='{{ skill.description_args|to_json }}'
                          data-skill-raw='{{ skill.raw_data|to_json }}'
@@ -284,18 +263,18 @@
             <div class="hero-portrait" style="background: #333;"></div>
             {% endif %}
 
-            <div class="class-badge-wrapper">
+            <div class="class-badge-wrapper has-tooltip" data-tooltip-placement="left">
                 <img src="{{ hero.class_icon_url }}" alt="{{ hero.class_type }}" class="class-icon">
                 {% include "hero_builder/partials/_class_tooltip.html" with hero=hero %}
             </div>
 
             {% with hero.hero_card_skill as skill %}
             {% if skill %}
-            <div class="skill-wrapper tooltip-wrapper">
+            <div class="skill-wrapper has-tooltip" data-tooltip-placement="right">
                 <img src="/media/gamedata/skills/{{ skill.id }}{{ skill.icon_suffix }}.png" alt="{{ skill.name }}" class="skill-icon">
-                <div class="tooltip-content">
-                    <div class="tooltip-name">{{ skill.level_prefix }}{{ skill.name }}</div>
-                    <div class="tooltip-desc"
+                <div class="tooltip tooltip-skill">
+                    <div class="tooltip-title">{{ skill.level_prefix }}{{ skill.name }}</div>
+                    <div class="tooltip-text"
                          data-skill-template="{{ skill.description_template|escapejs }}"
                          data-skill-args='{{ skill.description_args|to_json }}'
                          data-skill-raw='{{ skill.raw_data|to_json }}'

@@ -1,0 +1,45 @@
+{% load static json_filters %}
+<!-- Heroes Grid Partial - for HTMX swapping -->
+<!-- Faction emblem in first slot -->
+<div class="faction-emblem-slot">
+    <img src="{{ faction.icon_url }}" alt="{{ faction.name }}" class="faction-emblem">
+</div>
+
+{% for hero in heroes %}
+<a href="{% url 'hero_builder:builder' hero.slug %}" class="hero-card no-border">
+    <div class="portrait-container">
+        {% if hero.portrait_url %}
+        <img src="{{ hero.portrait_url }}" alt="{{ hero.display_name }}" class="hero-portrait">
+        {% else %}
+        <div class="hero-portrait" style="background: #333;"></div>
+        {% endif %}
+
+        <div class="class-badge-wrapper has-tooltip" data-tooltip-placement="left">
+            <img src="{{ hero.class_icon_url }}" alt="{{ hero.class_type }}" class="class-icon">
+            {% include "hero_builder/partials/_class_tooltip.html" with hero=hero %}
+        </div>
+
+        {% with hero.hero_card_skill as skill %}
+        {% if skill %}
+        <div class="skill-wrapper has-tooltip" data-tooltip-placement="right">
+            <img src="/media/gamedata/skills/{{ skill.id }}{{ skill.icon_suffix }}.png" alt="{{ skill.name }}" class="skill-icon">
+            <div class="tooltip tooltip-skill">
+                <div class="tooltip-title">{{ skill.level_prefix }}{{ skill.name }}</div>
+                <div class="tooltip-text"
+                     data-skill-template="{{ skill.description_template|escapejs }}"
+                     data-skill-args='{{ skill.description_args|to_json }}'
+                     data-skill-raw='{{ skill.raw_data|to_json }}'
+                     data-skill-level="{{ skill.level }}">
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% endwith %}
+    </div>
+
+    <div class="hero-name">{{ hero.display_name }}</div>
+    <div class="hero-specialty">{{ hero.specialization_name }}</div>
+</a>
+{% empty %}
+<p style="color: #666; grid-column: 1/-1; text-align: center;">No heroes available for this faction.</p>
+{% endfor %}

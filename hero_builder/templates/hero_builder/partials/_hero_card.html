@@ -11,7 +11,8 @@
                 <div class="hero-portrait" style="background: linear-gradient(180deg, #333 0%, #222 100%);"></div>
                 {% endif %}
             </div>
-            <div class="class-badge-wrapper"
+            <div class="class-badge-wrapper has-tooltip"
+                 data-tooltip-placement="right"
                  data-spec-name="{{ hero.specialization_name }}"
                  data-spec-template="{{ hero.specialization_info.description_template|escapejs }}"
                  data-spec-args='{{ hero.specialization_info.description_args|to_json }}'
@@ -66,11 +67,11 @@
                     {% for skill in hero.starting_skills_with_levels %}
                     <!-- Skill with 2 stacked subskill slots -->
                     <div class="skill-with-subs">
-                        <div class="skill-main tooltip-wrapper" id="skill-{{ forloop.counter }}" data-skill-id="{{ skill.id }}" data-skill-level="{{ skill.level }}">
+                        <div class="skill-main has-tooltip" id="skill-{{ forloop.counter }}" data-skill-id="{{ skill.id }}" data-skill-level="{{ skill.level }}" data-tooltip-placement="bottom">
                             <img src="/media/gamedata/skills/{{ skill.id }}{{ skill.icon_suffix }}.png" alt="{{ skill.level_prefix }}{{ skill.name }}">
-                            <div class="tooltip-content">
-                                <div class="tooltip-name">{{ skill.level_prefix }}{{ skill.name }}</div>
-                                <div class="tooltip-desc"
+                            <div class="tooltip tooltip-skill">
+                                <div class="tooltip-title">{{ skill.level_prefix }}{{ skill.name }}</div>
+                                <div class="tooltip-text"
                                      data-skill-template="{{ skill.description_template|escapejs }}"
                                      data-skill-args='{{ skill.description_args|to_json }}'
                                      data-skill-raw='{{ skill.raw_data|to_json }}'

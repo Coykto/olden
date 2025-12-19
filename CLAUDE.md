@@ -24,6 +24,10 @@ When you encounter an issue, ask: "What is the underlying system or pattern that
    - BAD: Manually handle specific items that use fallbacks
    - GOOD: Fix the runtime parser to correctly split and try each function in the fallback chain for ALL items.
 
+5. **Item tooltip not updating when clicking upgrade button**
+   - BAD: Add `Tooltip.hideActive()` to `setItemLevel()`, `maxAllUpgrades()`, `resetAllUpgrades()`
+   - GOOD: Understand WHY tooltips go stale (tooltip system moves them to `document.body`), then fix it in ONE place (`updateUI()`) so ALL callers automatically work. See "Tooltip System Architecture" section below.
+
 ## Project Overview
 Olden Forge is a hero builder web application for Heroes of Might & Magic: Olden Era.
 
@@ -176,3 +180,48 @@ Google for game screenshots: `"Heroes of Might and Magic Olden Era" [feature]`
 | `/hero_builder/views.py` | API endpoints |
 | `/hero_builder/templates/hero_builder/builder.html` | Main frontend |
 | `/gamedata/management/commands/import_gamedata.py` | Data import |
+
+## Tooltip System Architecture
+
+**CRITICAL:** The tooltip system (`/static/js/tooltip.js`) moves tooltip elements to `document.body` when displaying them. This has important implications:
+
+### The Problem
+When a tooltip is visible:
+1. The tooltip DOM element is moved from its parent (e.g., equipment slot) to `document.body`
+2. If code regenerates the parent's innerHTML, a NEW tooltip is created inside the parent
+3. But the OLD tooltip is still in `document.body` being displayed
+4. User sees stale content
+
+### The Solution Pattern
+When updating UI that contains tooltips:
+
+**For full DOM regeneration (like `EquipmentManager.updateUI()`):**
+```javascript
+// Hide active tooltip BEFORE regenerating DOM
+if (typeof Tooltip !== 'undefined') {
+    Tooltip.hideActive();
+}
+// Now safe to regenerate innerHTML
+this.updateUI();
+// Optionally re-show tooltip for same element
+Tooltip.show(element);
+```
+
+**For in-place updates (like `SpellBookManager.updateSlotInPlace()`):**
+```javascript
+// Query both the slot AND the active tooltip in body
+const findTooltipElement = (selector) => {
+    let el = slotElement.querySelector(selector);
+    if (el) return el;
+    // Tooltip may have been moved to body
+    const activeTooltip = document.body.querySelector('.tooltip[style*="display: block"]');
+    if (activeTooltip) {
+        el = activeTooltip.querySelector(selector);
+    }
+    return el;
+};
+```
+
+### Key Files
+- `/static/js/tooltip.js` - Tooltip system (moves tooltips to body on show)
+- `/hero_builder/templates/hero_builder/partials/_scripts.html` - EquipmentManager, SpellBookManager

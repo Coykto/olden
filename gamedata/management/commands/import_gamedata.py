@@ -142,6 +142,18 @@ class Command(BaseCommand):
                 sort_order=sort_order
             ))
 
+        # Add neutral faction for neutral units (after playable factions)
+        neutral_sort_order = len(factions_data)
+        faction_objects.append(Faction(
+            version=version,
+            id_key='neutral',
+            slug='neutral',
+            name='Neutral',
+            description='Neutral creatures that can be found throughout the world.',
+            faction_skill='',
+            sort_order=neutral_sort_order
+        ))
+
         Faction.objects.bulk_create(faction_objects)
         self.stdout.write(f"  Created {len(faction_objects)} factions")
 
@@ -162,7 +174,8 @@ class Command(BaseCommand):
         for unit_data in units_data:
             faction_id = unit_data.get("fraction")
             if faction_id not in faction_map:
-                continue  # Skip neutral/invalid factions for now
+                self.stdout.write(f"  Warning: Skipping unit with unknown faction '{faction_id}'")
+                continue
 
             # Extract costs
             costs = unit_data.get("unitCost", {}).get("costResArray", [])

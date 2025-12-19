@@ -6,7 +6,97 @@ from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
 from gamedata.models import GameVersion, Hero, Faction, Item, ItemSet, Skill, Unit, Spell, MagicSchool
-from core.localizations import get_skill_info, get_localizations, get_item_info, get_item_set_info, get_skill_args, get_subskill_configs, get_spell_info, get_spell_descriptions_by_level
+from core.localizations import get_skill_info, get_localizations, get_item_info, get_item_set_info, get_skill_args, get_subskill_configs, get_spell_info, get_spell_descriptions_by_level, get_unit_ability_args
+import re
+
+
+def get_ability_display_name(ability_id: str) -> str:
+    """Convert ability ID to display name using localizations.
+
+    Ability IDs use 0-based indexing (e.g., fairy_dragon_ability_0)
+    but localizations use 1-based indexing (e.g., fairy_dragon_ability_1_name).
+    """
+    localizations = get_localizations()
+
+    # Convert 0-based to 1-based index: ability_0 -> ability_1, passive_0 -> passive_1
+    def increment_index(match):
+        return f"{match.group(1)}{int(match.group(2)) + 1}"
+
+    localization_key = re.sub(r'(ability_|passive_)(\d+)', increment_index, ability_id)
+    name_key = f"{localization_key}_name"
+
+    if name_key in localizations:
+        return localizations[name_key]
+
+    # Try without _name suffix
+    if localization_key in localizations:
+        return localizations[localization_key]
+
+    # For upgraded units (_upg, _upg_alt), try base unit ability name
+    # e.g., esquire_upg_passive_1 -> esquire_passive_1
+    base_key = re.sub(r'_upg(_alt)?', '', localization_key)
+    base_name_key = f"{base_key}_name"
+    if base_name_key in localizations:
+        return localizations[base_name_key]
+
+    # Try aura suffix directly
+    if ability_id.endswith('_aura'):
+        aura_name_key = f"{ability_id}_name"
+        if aura_name_key in localizations:
+            return localizations[aura_name_key]
+
+    # Fallback: prettify the ability_id
+    # Remove unit prefix and clean up
+    pretty = ability_id
+    # Remove common suffixes
+    pretty = re.sub(r'_passive_\d+$', '', pretty)
+    pretty = re.sub(r'_ability_\d+$', '', pretty)
+    pretty = re.sub(r'_aura$', ' Aura', pretty)
+    # Remove _upg variants
+    pretty = re.sub(r'_upg(_alt)?', '', pretty)
+    # Convert to title case
+    pretty = pretty.replace('_', ' ').title()
+    return pretty
+
+
+def get_ability_info(ability_id: str) -> dict:
+    """Get ability info including name, description template, and args.
+
+    Uses the same index conversion logic as get_ability_display_name.
+    Returns dict with: name, description_template, description_args
+    """
+    localizations = get_localizations()
+    args_data = get_unit_ability_args()
+
+    # Convert 0-based to 1-based index: ability_0 -> ability_1, passive_0 -> passive_1
+    def increment_index(match):
+        return f"{match.group(1)}{int(match.group(2)) + 1}"
+
+    localization_key = re.sub(r'(ability_|passive_)(\d+)', increment_index, ability_id)
+    desc_key = f"{localization_key}_description"
+
+    # Try main description key
+    description_template = localizations.get(desc_key, "")
+    description_args = args_data.get(desc_key, [])
+
+    # For upgraded units (_upg, _upg_alt), try base unit ability description
+    if not description_template:
+        base_key = re.sub(r'_upg(_alt)?', '', localization_key)
+        base_desc_key = f"{base_key}_description"
+        description_template = localizations.get(base_desc_key, "")
+        description_args = args_data.get(base_desc_key, [])
+
+    # Try aura suffix directly
+    if not description_template and ability_id.endswith('_aura'):
+        aura_desc_key = f"{ability_id}_description"
+        description_template = localizations.get(aura_desc_key, "")
+        description_args = args_data.get(aura_desc_key, [])
+
+    return {
+        'name': get_ability_display_name(ability_id),
+        'description_template': description_template,
+        'description_args': description_args,
+    }
 
 
 def index(request):
@@ -253,6 +343,22 @@ def api_faction_units(request, faction_slug):
         if tier not in units_by_tier:
             units_by_tier[tier] = []
 
+        # Convert ability IDs to full ability info, separated by type
+        passives = []
+        actives = []
+        for ability_id in (unit.abilities or []):
+            ability_info = get_ability_info(ability_id)
+            ability_data = {
+                'id': ability_id,
+                'name': ability_info['name'],
+                'description_template': ability_info['description_template'],
+                'description_args': ability_info['description_args'],
+            }
+            if '_passive_' in ability_id or ability_id.endswith('_aura'):
+                passives.append(ability_data)
+            else:
+                actives.append(ability_data)
+
         units_by_tier[tier].append({
             'id': unit.id_key,
             'name': unit.display_name,
@@ -266,16 +372,104 @@ def api_faction_units(request, faction_slug):
                 'damage_max': unit.damage_max,
                 'initiative': unit.initiative,
                 'speed': unit.speed,
+                'luck': unit.luck,
+                'morale': unit.moral,
             },
             'attack_type': unit.attack_type,
             'move_type': unit.move_type,
             'squad_value': unit.squad_value,
+            'passives': passives,
+            'actives': actives,
             'is_upgrade': '_upg' in unit.id_key,
+            'raw_data': unit.raw_data,
         })
 
     return JsonResponse({
         'faction': faction.name,
         'units_by_tier': units_by_tier,
+    })
+
+
+@require_GET
+def api_all_units(request):
+    """Get all units from all factions, grouped by faction and tier.
+
+    Used by the unit picker modal to allow selecting units from any faction.
+    """
+    version = GameVersion.objects.filter(is_active=True).first()
+
+    if not version:
+        return JsonResponse({'error': 'No active game version'}, status=404)
+
+    # Get all factions ordered by sort_order
+    factions = Faction.objects.filter(version=version).order_by('sort_order')
+
+    # Get all units
+    units = Unit.objects.filter(version=version).select_related('faction').order_by('faction__sort_order', 'tier', 'id_key')
+
+    # Group units by faction, then by tier
+    factions_data = []
+    for faction in factions:
+        faction_units = [u for u in units if u.faction_id == faction.id]
+
+        units_by_tier = {}
+        for unit in faction_units:
+            tier = str(unit.tier)
+            if tier not in units_by_tier:
+                units_by_tier[tier] = []
+
+            # Convert ability IDs to full ability info, separated by type
+            passives = []
+            actives = []
+            for ability_id in (unit.abilities or []):
+                ability_info = get_ability_info(ability_id)
+                ability_data = {
+                    'id': ability_id,
+                    'name': ability_info['name'],
+                    'description_template': ability_info['description_template'],
+                    'description_args': ability_info['description_args'],
+                }
+                # Classify by ID pattern: passive_, aura = passive; ability_ = active
+                if '_passive_' in ability_id or ability_id.endswith('_aura'):
+                    passives.append(ability_data)
+                else:
+                    actives.append(ability_data)
+
+            units_by_tier[tier].append({
+                'id': unit.id_key,
+                'name': unit.display_name,
+                'tier': unit.tier,
+                'icon_url': unit.icon_url,
+                'stats': {
+                    'hp': unit.hp,
+                    'offence': unit.offence,
+                    'defence': unit.defence,
+                    'damage_min': unit.damage_min,
+                    'damage_max': unit.damage_max,
+                    'initiative': unit.initiative,
+                    'speed': unit.speed,
+                    'luck': unit.luck,
+                    'morale': unit.moral,
+                },
+                'attack_type': unit.attack_type,
+                'move_type': unit.move_type,
+                'squad_value': unit.squad_value,
+                'passives': passives,
+                'actives': actives,
+                'is_upgrade': '_upg' in unit.id_key,
+                'raw_data': unit.raw_data,
+            })
+
+        factions_data.append({
+            'id': faction.id_key,
+            'slug': faction.slug,
+            'name': faction.name,
+            'icon_url': faction.icon_url,
+            'units_by_tier': units_by_tier,
+        })
+
+    return JsonResponse({
+        'factions': factions_data,
     })
 
 

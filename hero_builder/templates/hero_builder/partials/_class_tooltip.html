@@ -4,10 +4,10 @@
 
 {% with hero.specialization_info as spec %}
 {% with hero.advanced_classes_info as adv_info %}
-<div class="class-tooltip">
-    <div class="class-tooltip-header">
-        <div class="class-tooltip-name">{{ hero.specialization_name }}</div>
-        <div class="class-tooltip-desc"
+<div class="tooltip tooltip-class">
+    <div class="tooltip-header">
+        <div class="tooltip-title tooltip-title--gold">{{ hero.specialization_name }}</div>
+        <div class="tooltip-text"
              data-spec-template="{{ spec.description_template|escapejs }}"
              data-spec-args='{{ spec.description_args|to_json }}'
              data-spec-raw='{{ spec.raw_data|to_json }}'>
@@ -15,7 +15,7 @@
     </div>
 
     {% if adv_info.advanced_classes %}
-    <div class="class-tooltip-divider"></div>
+    <div class="tooltip-divider"></div>
 
     {% for adv_class in adv_info.advanced_classes %}
     <div class="advanced-class-section">

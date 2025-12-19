@@ -718,6 +718,26 @@ def get_spell_args(lang: str = "english") -> dict:
         return {}
 
 
+@lru_cache(maxsize=1)
+def get_unit_ability_args(lang: str = "english") -> dict:
+    """
+    Load unit ability description args from game files.
+    Returns a dict mapping sid -> list of function names.
+    """
+    args_file = settings.GAME_DATA_PATH / "StreamingAssets" / "Lang" / "args" / "unitsAbility.json"
+
+    if not args_file.exists():
+        return {}
+
+    try:
+        with open(args_file, 'r', encoding='utf-8-sig') as f:
+            data = json.load(f)
+            tokens_args = data.get("tokensArgs", [])
+            return {item["sid"]: item.get("args", []) for item in tokens_args}
+    except Exception:
+        return {}
+
+
 def get_spell_info(spell_id: str, raw_data: dict | None = None) -> dict:
     """
     Get display info for a spell including name and description template/args.

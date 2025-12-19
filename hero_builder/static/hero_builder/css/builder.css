@@ -107,50 +107,6 @@
     border: 2px solid #c9a227;
 }
 
-/* Class Badge Tooltip */
-.class-tooltip {
-    position: absolute;
-    left: 80%;
-    top: 50%;
-    transform: translateY(-50%);
-    margin-left: 15px;
-    min-width: 280px;
-    max-width: 320px;
-    background: linear-gradient(180deg, #1a2030 0%, #141820 100%);
-    border: 2px solid #3a4555;
-    border-radius: 8px;
-    padding: 15px;
-    z-index: 100;
-    display: none;
-}
-
-.class-badge-wrapper:hover .class-tooltip {
-    display: block;
-}
-
-.class-tooltip-header {
-    margin-bottom: 10px;
-}
-
-.class-tooltip-name {
-    color: #c9a227;
-    font-size: 1.1rem;
-    font-weight: bold;
-    text-transform: uppercase;
-}
-
-.class-tooltip-desc {
-    color: #8899aa;
-    font-size: 0.85rem;
-    margin-top: 5px;
-}
-
-.class-tooltip-divider {
-    height: 1px;
-    background: #3a4555;
-    margin: 12px 0;
-}
-
 .advanced-class-section {
     margin-bottom: 12px;
 }
@@ -317,8 +273,6 @@
     border-radius: 6px;
 }
 
-/* Skill tooltip - uses shared .tooltip-content from components.css */
-
 .skill-add-text {
     color: #5a6575;
     font-size: 1.5rem;
@@ -362,16 +316,6 @@
 
 .subskill-btn.filled {
     cursor: pointer;
-}
-
-.subskill-btn.filled .tooltip-content {
-    left: 100%;
-    top: 50%;
-    transform: translateY(-50%);
-    margin-left: 10px;
-    min-width: 200px;
-    max-width: 280px;
-    white-space: normal;
 }
 
 .subskill-btn .add-text {
@@ -693,103 +637,6 @@
     object-fit: cover;
 }
 
-/* Spell tooltip - positioned to the right of slot with hover bridge */
-.spell-tooltip {
-    display: none;
-    position: absolute;
-    right: calc(100% - 10px);  /* Overlap slightly with slot */
-    min-width: 220px;
-    background: linear-gradient(180deg, #1a2030 0%, #141820 100%);
-    border: 2px solid #3a4555;
-    border-radius: 8px;
-    padding: 12px;
-    padding-left: 22px;  /* Extra padding to create hover bridge area */
-    z-index: 1000;
-    white-space: nowrap;
-    text-align: left;
-    /* pointer-events enabled so buttons work and tooltip stays visible */
-}
-
-.spell-slot:hover .spell-tooltip {
-    display: block;
-}
-
-.spell-tooltip-name {
-    font-size: 1rem;
-    font-weight: bold;
-    color: #7ec8e3;
-    margin-bottom: 6px;
-}
-
-.spell-tooltip-school {
-    font-size: 0.85rem;
-    color: #c9a227;
-    margin-bottom: 4px;
-}
-
-.spell-tooltip-type {
-    font-size: 0.8rem;
-    color: #8899aa;
-    margin-bottom: 4px;
-}
-
-.spell-tooltip-tier {
-    font-size: 0.8rem;
-    color: #8899aa;
-}
-
-.spell-tooltip-level {
-    font-size: 0.85rem;
-    color: #7ec8e3;
-    font-weight: 600;
-    margin-top: 4px;
-}
-
-.spell-tooltip-desc {
-    margin-top: 8px;
-    padding-top: 8px;
-    border-top: 1px solid #3a4555;
-    font-size: 0.85rem;
-    color: #aabbcc;
-    line-height: 1.4;
-    white-space: normal;
-    max-width: 250px;
-}
-
-.spell-tooltip-actions {
-    display: flex;
-    gap: 6px;
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid #3a4555;
-    pointer-events: auto;
-}
-
-.spell-action-btn {
-    flex: 1;
-    padding: 6px 10px;
-    background: #252d38;
-    border: 1px solid #3a4555;
-    border-radius: 4px;
-    color: #8899aa;
-    font-size: 0.75rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    pointer-events: auto;
-}
-
-.spell-action-btn:hover:not(:disabled) {
-    background: #2a3545;
-    border-color: #7ec8e3;
-    color: #7ec8e3;
-}
-
-.spell-action-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-/* Tooltip now positioned above, no need for left/right flipping */
 
 .spell-book-controls {
     display: flex;
@@ -881,41 +728,6 @@
     text-align: center;
 }
 
-/* Unit tooltip */
-.unit-slot .tooltip-content {
-    bottom: calc(100% + 10px);
-    left: 50%;
-    transform: translateX(-50%);
-    min-width: 200px;
-}
-
-.unit-tooltip-name {
-    font-size: 1rem;
-    font-weight: bold;
-    color: #c9a227;
-    margin-bottom: 4px;
-}
-
-.unit-tooltip-tier {
-    font-size: 0.8rem;
-    color: #7ec8e3;
-    margin-bottom: 8px;
-}
-
-.unit-tooltip-stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4px;
-    font-size: 0.85rem;
-    color: #aabbcc;
-}
-
-.unit-tooltip-type {
-    font-size: 0.8rem;
-    color: #8899aa;
-    margin-top: 8px;
-}
-
 /* Army value display */
 .units-section-header {
     display: flex;
@@ -966,7 +778,6 @@
     background: #252d38;
     border: 1px solid #3a4555;
     border-radius: 8px;
-    padding: 10px;
     cursor: pointer;
     transition: all 0.2s;
     text-align: center;
@@ -1081,30 +892,7 @@
     background: #b06060;
 }
 
-/* Item Tooltip */
-.item-tooltip {
-    display: none;
-    position: absolute;
-    transform: translateY(-50%);
-    min-width: 280px;
-    max-width: 320px;
-    background: linear-gradient(180deg, #1a2030 0%, #141820 100%);
-    border: 2px solid #3a4555;
-    border-radius: 8px;
-    padding: 15px;
-    z-index: 100;
-    white-space: normal;
-    text-align: left;
-}
-
-.equip-slot:hover .item-tooltip {
-    display: block;
-}
-
-.tooltip-header {
-    margin-bottom: 12px;
-}
-
+/* Item Content Styles (used inside tooltips) */
 .item-name {
     font-size: 1.1rem;
     font-weight: bold;
@@ -1546,17 +1334,6 @@
     position: relative;
 }
 
-.subskill-preview-wrapper .tooltip-content {
-    left: auto;
-    right: 100%;
-    top: 50%;
-    transform: translateY(-50%);
-    margin-right: 10px;
-    min-width: 200px;
-    max-width: 280px;
-    white-space: normal;
-    z-index: 1001;
-}
 
 .subskill-preview-icon {
     width: 24px;
@@ -1955,47 +1732,59 @@
     text-align: center;
 }
 
-/* Unit tooltip */
-.unit-slot .tooltip-content {
-    bottom: calc(100% + 10px);
-    left: 50%;
-    transform: translateX(-50%);
-    min-width: 160px;
-    text-align: left;
-}
-
-.unit-tooltip-name {
-    font-size: 1rem;
-    font-weight: bold;
-    color: #c9a227;
-    margin-bottom: 2px;
-}
-
-.unit-tooltip-tier {
-    font-size: 0.8rem;
-    color: #7ec8e3;
-    margin-bottom: 6px;
-}
-
-.unit-tooltip-stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2px 8px;
-    font-size: 0.8rem;
-    color: #aabbcc;
-}
-
-.unit-tooltip-type {
-    font-size: 0.75rem;
-    color: #8899aa;
-    margin-top: 6px;
-    font-style: italic;
-}
-
 /* ===== Unit Picker Modal ===== */
 
 .unit-picker-modal {
-    max-width: 600px;
+    max-width: 750px;
+}
+
+/* Faction Tabs */
+.faction-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 8px 16px;
+    background: #1a1f28;
+    border-bottom: 1px solid #3a4555;
+    overflow-x: auto;
+}
+
+.faction-tab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    background: #252d38;
+    border: 2px solid #3a4555;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 50px;
+}
+
+.faction-tab:hover {
+    background: #2a3545;
+    border-color: #5a6575;
+}
+
+.faction-tab.active {
+    background: #3a4555;
+    border-color: #c9a227;
+}
+
+.faction-tab-icon {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+}
+
+.faction-tab-name {
+    color: #ccc;
+    font-size: 0.8rem;
+}
+
+.unit-list {
+    max-height: 65vh;
+    overflow-y: auto;
 }
 
 .unit-tier-group {
@@ -2017,10 +1806,10 @@
 }
 
 .unit-card {
+    position: relative;
     background: #1e2530;
     border: 2px solid #2a3545;
     border-radius: 8px;
-    padding: 10px;
     cursor: pointer;
     transition: all 0.2s;
     text-align: center;
@@ -2029,36 +1818,87 @@
 .unit-card:hover {
     border-color: #5a7090;
     background: #252d38;
+    transform: translateY(-2px);
 }
 
 .unit-card-icon {
-    width: 48px;
-    height: 48px;
+    width: 56px;
+    height: 56px;
     border-radius: 6px;
     margin-bottom: 6px;
     object-fit: contain;
+    border: 1px solid #3a4555;
 }
 
 .unit-card-name {
     color: #fff;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 500;
     margin-bottom: 4px;
+    line-height: 1.2;
+    min-height: 2.4em;
 }
 
 .unit-card-stats {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 4px;
-    font-size: 0.7rem;
+    gap: 3px;
+    font-size: 0.65rem;
     color: #8899aa;
 }
 
 .unit-card-stats span {
     background: #252d38;
-    padding: 2px 6px;
+    padding: 2px 5px;
     border-radius: 3px;
+}
+
+.unit-card-stats .stat-atk { color: #ff8866; }
+.unit-card-stats .stat-def { color: #66aaff; }
+.unit-card-stats .stat-hp { color: #66ff88; }
+
+.unit-card-tier {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: #c9a227;
+    color: #000;
+    font-size: 0.65rem;
+    font-weight: bold;
+    padding: 2px 5px;
+    border-radius: 3px;
+}
+
+/* Unit Abilities in Card */
+.unit-card-abilities {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2px;
+    margin-top: 4px;
+    max-height: 40px;
+    overflow: hidden;
+}
+
+.ability-tag {
+    background: #2a3545;
+    color: #aabbcc;
+    font-size: 0.55rem;
+    padding: 2px 4px;
+    border-radius: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.ability-more {
+    background: #3a4555;
+    color: #8899aa;
+    font-size: 0.55rem;
+    padding: 2px 4px;
+    border-radius: 2px;
 }
 
 /* Unit Editor Modal */
@@ -2149,5 +1989,324 @@
 .unit-editor-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+/* ============================================
+   New Unit Card Layout (game-like design)
+   ============================================ */
+
+/* Unit Card - Game-style design with large portrait */
+.unit-card {
+    position: relative;
+    background: linear-gradient(180deg, #1a2233 0%, #0d1520 100%);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.unit-card:hover {
+    border-color: #4a6090;
+    background: linear-gradient(180deg, #1e2840 0%, #101825 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+
+/* Card Header - name and tier badge */
+.unit-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 0 28px; /* Space for tier badge */
+}
+
+.unit-card-name {
+    color: #e8dcc8;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: center;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.unit-card-tier {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: linear-gradient(135deg, #5a90c0 0%, #3a6090 100%);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid #7ab0e0;
+}
+
+/* Stat Bar - icons with values */
+.unit-stat-bar {
+    display: flex;
+    gap: 0 10px;
+    justify-content: center;
+    margin: 0 5px;
+}
+
+.unit-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.unit-stat-icon {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.unit-stat-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.unit-stat-value {
+    font-size: 0.65rem;
+    font-weight: 600;
+    margin-top: 2px;
+    width: 400%;
+}
+
+/* Portrait Section - main image with abilities on sides */
+.unit-card-portrait-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    position: relative;
+}
+
+.unit-card-portrait {
+    width: 120px;
+    height: 120px;
+    border-radius: 6px;
+    object-fit: cover;
+    border: 2px solid #3a5070;
+    background: linear-gradient(135deg, #1a2535 0%, #0d1520 100%);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+/* Abilities on sides of portrait */
+.unit-abilities-side {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 28px;
+}
+
+.unit-abilities-side.left {
+    align-items: flex-end;
+}
+
+.unit-abilities-side.right {
+    align-items: flex-start;
+}
+
+/* Larger stat bar for editor modal */
+.editor-stat-bar {
+    padding: 8px;
+    gap: 4px;
+}
+
+.editor-stat-bar .unit-stat {
+    min-width: 32px;
+    padding: 4px 6px;
+}
+
+.editor-stat-bar .unit-stat-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.editor-stat-bar .unit-stat-value {
+    font-size: 0.75rem;
+}
+
+/* Abilities Row - legacy layout (still used in editor modal) */
+.unit-abilities-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 4px 0;
+}
+
+.unit-abilities-column {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.unit-abilities-column.passives {
+    justify-content: flex-start;
+}
+
+.unit-abilities-column.actives {
+    justify-content: flex-end;
+}
+
+/* Ability Icons - circular for passives */
+.ability-icon {
+    width: 24px;
+    height: 24px;
+    cursor: help;
+    position: relative;
+    transition: transform 0.15s;
+}
+
+.ability-icon:hover {
+    transform: scale(1.2);
+    z-index: 10;
+}
+
+.ability-icon.passive {
+    background: linear-gradient(135deg, #4a6080 0%, #2a3a50 100%);
+    border: 2px solid #6a8ab0;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+/* Pentagon shape for actives */
+.ability-icon.active {
+    background: linear-gradient(135deg, #8a6050 0%, #5a4030 100%);
+    border: 2px solid #a08070;
+    clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+/* Unit card footer - gold cost */
+.unit-card-footer {
+    text-align: center;
+    font-size: 0.75rem;
+    color: #d4af37;
+    padding-top: 6px;
+    margin-top: 4px;
+    border-top: 1px solid rgba(100, 140, 180, 0.3);
+    font-weight: 500;
+}
+
+/* Legacy value display */
+.unit-card-value {
+    text-align: center;
+    font-size: 0.6rem;
+    color: #d4af37;
+    padding-top: 2px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Unit Editor Modal - updated styles */
+.unit-editor-modal {
+    max-width: 400px;
+}
+
+.unit-editor-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.unit-editor-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 8px;
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.unit-editor-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 8px;
+    border: 2px solid #3a4555;
+}
+
+.unit-editor-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.unit-editor-tier {
+    color: #d4af37;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.unit-editor-type {
+    color: #7ec8e3;
+    font-size: 0.8rem;
+}
+
+.unit-editor-value {
+    text-align: center;
+    color: #d4af37;
+    font-size: 0.85rem;
+    padding: 8px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 4px;
+}
+
+.unit-count-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 4px;
+}
+
+.unit-count-control label {
+    color: #8899aa;
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+.unit-count-control input {
+    width: 80px;
+    padding: 6px 10px;
+    background: #252d38;
+    border: 1px solid #3a4555;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.unit-stack-value {
+    color: #d4af37;
+    font-size: 0.85rem;
+    flex: 1;
+    text-align: right;
+}
+
+.unit-editor-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+/* Wider unit picker grid for new layout */
+.unit-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+@media (min-width: 900px) {
+    .unit-picker-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
