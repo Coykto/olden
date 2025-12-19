@@ -876,7 +876,8 @@ def api_available_spells(request):
         rank = raw.get('rank', spell.level)
 
         # Get localized spell info with description template and args
-        spell_info = get_spell_info(spell.id_key)
+        # Pass raw_data so custom name keys (like skill_summoner_name_1) can be resolved
+        spell_info = get_spell_info(spell.id_key, raw_data=raw)
 
         # Get descriptions for each upgrade level (spells can have different descriptions per level)
         description_keys = raw.get('description', [])
@@ -885,6 +886,7 @@ def api_available_spells(request):
         spell_data = {
             'id': spell.id_key,
             'id_key': spell.id_key,
+            'name': spell_info['name'],  # Localized spell name
             'icon': raw.get('icon', spell.id_key),  # Icon filename (without extension)
             'school': spell.school,
             'school_display': school_names.get(spell.school, spell.school.title() + ' Magic'),

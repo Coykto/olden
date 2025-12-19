@@ -718,12 +718,14 @@ def get_spell_args(lang: str = "english") -> dict:
         return {}
 
 
-def get_spell_info(spell_id: str) -> dict:
+def get_spell_info(spell_id: str, raw_data: dict | None = None) -> dict:
     """
     Get display info for a spell including name and description template/args.
 
     Args:
         spell_id: The spell's id_key (e.g., 'day_10_magic_second_song')
+        raw_data: Optional raw spell data containing a 'name' field with
+                  a custom localization key (e.g., 'skill_summoner_name_1')
 
     Returns:
         dict with name, description_template, description_args
@@ -731,11 +733,25 @@ def get_spell_info(spell_id: str) -> dict:
     localizations = get_localizations()
     args_data = get_spell_args()
 
-    # Spell localization keys follow pattern: {spell_id}_{field}
-    name_key = f"{spell_id}_name"
-    desc_key = f"{spell_id}_description"
+    # Check if raw_data has a custom name localization key
+    # This is used by bonus spells like Summon Avatar which have names like
+    # "Basic Summon Avatar", "Advanced Summon Avatar", etc.
+    if raw_data and "name" in raw_data:
+        custom_name_key = raw_data["name"]
+        name = localizations.get(custom_name_key)
+        if name:
+            # Found custom name, use it
+            pass
+        else:
+            # Fallback to default pattern
+            name_key = f"{spell_id}_name"
+            name = localizations.get(name_key, spell_id.replace("_", " ").title())
+    else:
+        # Spell localization keys follow pattern: {spell_id}_{field}
+        name_key = f"{spell_id}_name"
+        name = localizations.get(name_key, spell_id.replace("_", " ").title())
 
-    name = localizations.get(name_key, spell_id.replace("_", " ").title())
+    desc_key = f"{spell_id}_description"
     description_template = localizations.get(desc_key, "")
 
     # Get args for description
