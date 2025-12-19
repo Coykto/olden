@@ -3436,14 +3436,21 @@ const ArmyManager = {
         const self = this;
         if (!abilities || abilities.length === 0) return '';
 
-        return abilities.map(ability => `
-            <div class="ability-icon ${type} has-tooltip" data-tooltip-placement="${type === 'passive' ? 'left' : 'right'}">
+        return abilities.map(ability => {
+            const iconContent = ability.icon_url
+                ? `<img src="${ability.icon_url}" alt="${ability.name}" class="ability-icon-img">`
+                : '';
+            const basePassiveClass = ability.is_base_passive ? ' base-passive' : '';
+
+            return `
+            <div class="ability-icon ${type}${basePassiveClass} has-tooltip" data-tooltip-placement="${type === 'passive' ? 'left' : 'right'}">
+                ${iconContent}
                 <div class="tooltip">
                     <div class="tooltip-title">${ability.name}</div>
                     <div class="tooltip-text">${self.formatAbilityDescription(ability, unitData) || (type === 'passive' ? 'Passive ability' : 'Active ability')}</div>
                 </div>
             </div>
-        `).join('');
+        `}).join('');
     },
 
     // Build abilities HTML for unit card (legacy row layout for editor modal)
@@ -3451,27 +3458,38 @@ const ArmyManager = {
         const self = this;
         const passiveHtml = passives && passives.length > 0
             ? `<div class="unit-abilities-column passives">
-                ${passives.map(p => `
-                    <div class="ability-icon passive has-tooltip" data-tooltip-placement="top">
+                ${passives.map(p => {
+                    const iconContent = p.icon_url
+                        ? `<img src="${p.icon_url}" alt="${p.name}" class="ability-icon-img">`
+                        : '';
+                    const basePassiveClass = p.is_base_passive ? ' base-passive' : '';
+                    return `
+                    <div class="ability-icon passive${basePassiveClass} has-tooltip" data-tooltip-placement="top">
+                        ${iconContent}
                         <div class="tooltip">
                             <div class="tooltip-title">${p.name}</div>
                             <div class="tooltip-text">${self.formatAbilityDescription(p, unitData) || 'Passive ability'}</div>
                         </div>
                     </div>
-                `).join('')}
+                `}).join('')}
                </div>`
             : '';
 
         const activeHtml = actives && actives.length > 0
             ? `<div class="unit-abilities-column actives">
-                ${actives.map(a => `
+                ${actives.map(a => {
+                    const iconContent = a.icon_url
+                        ? `<img src="${a.icon_url}" alt="${a.name}" class="ability-icon-img">`
+                        : '';
+                    return `
                     <div class="ability-icon active has-tooltip" data-tooltip-placement="top">
+                        ${iconContent}
                         <div class="tooltip">
                             <div class="tooltip-title">${a.name}</div>
                             <div class="tooltip-text">${self.formatAbilityDescription(a, unitData) || 'Active ability'}</div>
                         </div>
                     </div>
-                `).join('')}
+                `}).join('')}
                </div>`
             : '';
 

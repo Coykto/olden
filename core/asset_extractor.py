@@ -91,6 +91,9 @@ class AssetExtractor:
         # Extract stat icons
         results['stat_icons'] = self._extract_stat_icons(force)
 
+        # Extract passive/ability icons (creature types, attack types, unit abilities)
+        results['passives'] = self._extract_passive_icons(force)
+
         return results
 
     def _extract_hero_portraits(self, force: bool = False) -> int:
@@ -608,6 +611,64 @@ class AssetExtractor:
 
                 # Match stat icons by exact name
                 if name in self.STAT_ICONS:
+                    out_file = output_path / f"{name}.png"
+
+                    if not force and out_file.exists():
+                        continue
+
+                    image = data.image
+                    image.save(str(out_file))
+                    count += 1
+
+            except Exception:
+                pass
+
+        return count
+
+    def _extract_passive_icons(self, force: bool = False) -> int:
+        """Extract passive/ability icons (creature types, attack types, unit abilities).
+
+        These are 200x200 circular icons used for unit passives and abilities.
+        Includes:
+        - base_class_* (creature types: living, undead, dragon, etc.)
+        - base_passive_* (attack types: melee_attack, ranged_attack, etc.)
+        - {unit}_passive_*_name and {unit}_ability_*_name (unit-specific abilities)
+        """
+        output_path = self.output_dir / "passives"
+        output_path.mkdir(parents=True, exist_ok=True)
+
+        count = 0
+        # Passive icons are in resources.assets
+        resources_path = self.game_data_path / "resources.assets"
+
+        if not resources_path.exists():
+            return 0
+
+        env = UnityPy.load(str(resources_path))
+
+        for obj in env.objects:
+            if obj.type.name != 'Texture2D':
+                continue
+
+            try:
+                data = obj.read()
+                name = data.m_Name
+
+                # Match passive/ability icons:
+                # - base_class_* (creature type icons, 200x200)
+                # - base_passive_* (base passive icons like attack types)
+                # - *_passive_*_name (unit-specific passive icons)
+                # - *_ability_*_name (unit-specific ability icons)
+                is_passive_icon = (
+                    name.startswith('base_class_') or
+                    name.startswith('base_passive_') or
+                    name.startswith('base_demon_') or
+                    name.startswith('base_magical_') or
+                    ('_passive_' in name and name.endswith('_name')) or
+                    ('_ability_' in name and name.endswith('_name'))
+                )
+
+                if is_passive_icon:
                     out_file = output_path / f"{name}.png"
 
                     if not force and out_file.exists():

@@ -99,6 +99,67 @@ def get_ability_info(ability_id: str) -> dict:
     }
 
 
+def get_creature_type(unit_raw_data: dict) -> str:
+    """Extract creature type from unit's raw_data based on immunity tags.
+
+    Returns one of: living, undead, dragon, magic_creature, construct, embodiment, demon
+    """
+    passives = unit_raw_data.get('passives', [])
+    for p in passives:
+        if 'data' in p and 'immunities' in p['data']:
+            for imm in p['data']['immunities']:
+                for tag in imm.get('tags', []):
+                    if tag.endswith('_immunities'):
+                        return tag.replace('_immunities', '')
+    return 'living'  # Default fallback
+
+
+def get_base_passives(unit_raw_data: dict, attack_type: str) -> list:
+    """Generate base passive info (creature type and attack type) for a unit.
+
+    Returns list of passive dicts with id, name, description, icon_url.
+    """
+    localizations = get_localizations()
+    base_passives = []
+
+    # Get creature type passive
+    creature_type = get_creature_type(unit_raw_data)
+    creature_key = f'base_class_{creature_type}'
+    creature_name = localizations.get(creature_key, creature_type.replace('_', ' ').title())
+    creature_desc = localizations.get(f'{creature_key}_description', '')
+
+    base_passives.append({
+        'id': creature_key,
+        'name': creature_name,
+        'description_template': creature_desc,
+        'description_args': [],
+        'icon_url': f'/media/gamedata/passives/{creature_key}.png',
+        'is_base_passive': True,
+    })
+
+    # Get attack type passive
+    attack_type_map = {
+        'melee': 'base_passive_melee_attack',
+        'ranged': 'base_passive_ranged_attack',
+        'shoot': 'base_passive_ranged_attack',
+        'range': 'base_passive_ranged_attack',
+    }
+    attack_key = attack_type_map.get(attack_type, 'base_passive_melee_attack')
+    attack_name = localizations.get(f'{attack_key}_name', 'Attack')
+    attack_desc = localizations.get(f'{attack_key}_description', '')
+
+    base_passives.append({
+        'id': attack_key,
+        'name': attack_name,
+        'description_template': attack_desc,
+        'description_args': [],
+        'icon_url': f'/media/gamedata/passives/{attack_key}_name.png',
+        'is_base_passive': True,
+    })
+
+    return base_passives
+
+
 def index(request):
     """Combined faction and hero selection page."""
     version = GameVersion.objects.filter(is_active=True).first()
@@ -343,8 +404,11 @@ def api_faction_units(request, faction_slug):
         if tier not in units_by_tier:
             units_by_tier[tier] = []
 
+        # Get base passives (creature type and attack type)
+        base_passives = get_base_passives(unit.raw_data, unit.attack_type)
+
         # Convert ability IDs to full ability info, separated by type
-        passives = []
+        passives = list(base_passives)  # Start with base passives
         actives = []
         for ability_id in (unit.abilities or []):
             ability_info = get_ability_info(ability_id)
@@ -378,6 +442,7 @@ def api_faction_units(request, faction_slug):
             'attack_type': unit.attack_type,
             'move_type': unit.move_type,
             'squad_value': unit.squad_value,
+            'creature_type': get_creature_type(unit.raw_data),
             'passives': passives,
             'actives': actives,
             'is_upgrade': '_upg' in unit.id_key,
@@ -418,8 +483,11 @@ def api_all_units(request):
             if tier not in units_by_tier:
                 units_by_tier[tier] = []
 
+            # Get base passives (creature type and attack type)
+            base_passives = get_base_passives(unit.raw_data, unit.attack_type)
+
             # Convert ability IDs to full ability info, separated by type
-            passives = []
+            passives = list(base_passives)  # Start with base passives
             actives = []
             for ability_id in (unit.abilities or []):
                 ability_info = get_ability_info(ability_id)
@@ -454,6 +522,7 @@ def api_all_units(request):
                 'attack_type': unit.attack_type,
                 'move_type': unit.move_type,
                 'squad_value': unit.squad_value,
+                'creature_type': get_creature_type(unit.raw_data),
                 'passives': passives,
                 'actives': actives,
                 'is_upgrade': '_upg' in unit.id_key,
