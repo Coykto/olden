@@ -439,8 +439,8 @@
 
 .equip-slot {
     position: relative;
-    width: 3rem;
-    height: 3rem;
+    width: 4.5rem;
+    height: 4.6rem;
     background: #252d38;
     border: 1px solid #3a4555;
     border-radius: 0.5rem;
@@ -481,13 +481,20 @@
     pointer-events: none;
 }
 
+/* Spell Book + Army Wrapper */
+.spell-army-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
 /* Spell Book Section */
 .spell-book-section {
     background: #1a1f28;
     border: 1px solid #2a3545;
     border-radius: 12px;
     padding: 10px;
-    flex: 1;
     overflow: visible;  /* Allow tooltip to overflow */
 }
 
@@ -609,7 +616,7 @@
 
 .spell-grid {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 6px;
     min-height: 50px;  /* At least one row height */
     overflow: visible;  /* Allow tooltip to overflow */
@@ -812,17 +819,18 @@
     border: 1px solid #2a3545;
     border-radius: 12px;
     padding: 10px;
+    margin-top: auto;  /* Push to bottom of spell-army-section */
 }
 
 .units-grid {
     display: flex;
-    gap: 8px;
-    justify-content: center;
+    gap: 10px;
+    justify-content: space-evenly;
 }
 
 .unit-slot {
-    width: 60px;
-    height: 60px;
+    width: 4.3rem;
+    height: 4.3rem;
     background: #252d38;
     border: 1px solid #3a4555;
     border-radius: 8px;
@@ -1109,12 +1117,12 @@
 
 .bulk-upgrade-btn {
     padding: 6px 12px;
-    background: #3a4555;
-    border: 1px solid #4a5565;
+    background: #252d38;
+    border: 1px solid #3a4555;
     border-radius: 4px;
-    color: #c4b998;
+    color: #8899aa;
+    font-size: 0.75rem;
     cursor: pointer;
-    font-size: 0.85rem;
     transition: all 0.2s;
 }
 
