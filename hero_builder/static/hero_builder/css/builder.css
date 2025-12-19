@@ -6,7 +6,7 @@
 .builder-container {
     max-width: 1000px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 12px 20px;
 }
 
 .builder-header {
@@ -14,7 +14,7 @@
     justify-content: center;
     align-items: center;
     gap: 20px;
-    margin-bottom: 30px;
+    margin-bottom: 12px;
 }
 
 .builder-title {
@@ -61,18 +61,18 @@
 
 /* Portrait Column */
 .portrait-column {
-    padding: 20px;
+    padding: 12px 60px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 6px;
 }
 
 .hero-portrait-wrapper {
     position: relative;
-    width: 150px;
-    height: 150px;
-    top: 20%;
+    width: 100px;
+    height: 100px;
+    top: 35%;
 }
 
 .hero-portrait {
@@ -91,16 +91,18 @@
     left: -50%;
     border-radius: 50%;
     object-fit: cover;
+    border: 1px solid #2a3545;
 }
 
 .class-badge-wrapper {
     position: relative;
     cursor: pointer;
+    top: 20%;
 }
 
 .class-badge {
-    width: 80px;
-    height: 80px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     border: 2px solid #c9a227;
 }
@@ -213,8 +215,8 @@
 .name-row {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 15px 20px;
+    gap: 10px;
+    padding: 10px 15px;
     border-bottom: 1px solid #2a3545;
 }
 
@@ -247,15 +249,15 @@
 /* Stats + Skills Row */
 .stats-skills-row {
     display: flex;
-    padding: 15px 20px;
-    gap: 30px;
+    padding: 10px 15px;
+    gap: 20px;
 }
 
 /* Stats Grid */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px 24px;
+    gap: 8px 20px;
     align-content: center;
 }
 
@@ -280,7 +282,7 @@
 .skills-grid {
     display: grid;
     grid-template-columns: repeat(4, auto);
-    gap: 10px;
+    gap: 6px;
     flex: 1;
 }
 
@@ -292,8 +294,8 @@
 
 .skill-main {
     position: relative;
-    width: 60px;
-    height: 60px;
+    width: 64px;
+    height: 64px;
     background: #252d38;
     border: 1px solid #3a4555;
     border-radius: 8px;
@@ -310,8 +312,8 @@
 }
 
 .skill-main img {
-    width: 52px;
-    height: 52px;
+    width: 60px;
+    height: 60px;
     border-radius: 6px;
 }
 
@@ -390,7 +392,7 @@
 /* Equipment + Backpack Row */
 .equip-spells-row {
     display: flex;
-    gap: 15px;
+    gap: 12px;
 }
 
 /* Equipment Section - flexbox rows around hero silhouette */
@@ -398,13 +400,13 @@
     background: #1a1f28;
     border: 1px solid #2a3545;
     border-radius: 12px;
-    padding: 1rem;
+    padding: 0.75rem;
 }
 
 .equipment-silhouette {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.25rem;
 }
 
 /* Each row: 3 columns with space-between */
@@ -427,7 +429,7 @@
 
 /* Center offset - pushes center item down slightly */
 .offset-down {
-    margin-top: 2rem;
+    margin-top: 1rem;
 }
 
 /* Empty placeholder for rows without center item */
@@ -437,8 +439,8 @@
 
 .equip-slot {
     position: relative;
-    width: 3.5rem;
-    height: 3.5rem;
+    width: 3rem;
+    height: 3rem;
     background: #252d38;
     border: 1px solid #3a4555;
     border-radius: 0.5rem;
@@ -447,7 +449,7 @@
     justify-content: center;
     cursor: pointer;
     transition: all 0.15s;
-    margin: 0.5rem;
+    margin: 0.25rem;
 }
 
 .equip-slot:hover {
@@ -484,40 +486,76 @@
     background: #1a1f28;
     border: 1px solid #2a3545;
     border-radius: 12px;
-    padding: 15px;
-    padding-top: 25px;  /* Extra padding for tooltip above */
+    padding: 10px;
     flex: 1;
     overflow: visible;  /* Allow tooltip to overflow */
 }
 
 .spell-book-header {
-    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.spell-book-header::before,
+.spell-book-header::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #7ec8e3 20%, #7ec8e3 80%, transparent);
+}
+
+.spell-book-header::before {
+    margin-right: 12px;
+}
+
+.spell-book-header::after {
+    margin-left: 12px;
 }
 
 .spell-book-title {
-    color: #7ec8e3;
     font-size: 0.9rem;
     font-weight: 600;
     text-transform: uppercase;
+    text-align: center;
 }
 
-/* Spell book school filter tabs */
+/* Horizontal layout: spells on left, filters on right */
+.spell-book-content {
+    display: flex;
+    gap: 12px;
+}
+
+.spell-book-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.spell-book-right {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 80px;
+}
+
+/* Spell book school filter tabs - vertical stack */
 .spell-school-tabs {
     display: flex;
-    gap: 4px;
-    margin-bottom: 10px;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 3px;
 }
 
 .spell-school-tab {
-    padding: 5px 10px;
+    padding: 4px 8px;
     background: #252d38;
     border: 1px solid #3a4555;
     border-radius: 4px;
     cursor: pointer;
     color: #8899aa;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     transition: all 0.2s;
+    text-align: left;
 }
 
 .spell-school-tab:hover {
@@ -531,15 +569,24 @@
     color: #7ec8e3;
 }
 
-/* Spell type filters */
+/* Spell book footer - controls on left, type filters on right */
+.spell-book-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #2a3545;
+}
+
+/* Spell type filters - horizontal in footer */
 .spell-type-filters {
     display: flex;
     gap: 4px;
-    margin-bottom: 10px;
 }
 
 .spell-type-btn {
-    padding: 4px 8px;
+    padding: 4px 10px;
     background: #252d38;
     border: 1px solid #3a4555;
     border-radius: 4px;
@@ -562,9 +609,9 @@
 
 .spell-grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
-    min-height: 70px;  /* At least one row height */
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    min-height: 50px;  /* At least one row height */
     overflow: visible;  /* Allow tooltip to overflow */
     padding-right: 4px;
 }
@@ -590,8 +637,8 @@
 
 .spell-slot {
     position: relative;
-    width: 55px;
-    height: 55px;
+    width: 80px;
+    height: 80px;
     background: #252d38;
     border: 2px solid #3a4555;
     border-radius: 50%;
@@ -615,10 +662,6 @@
 
 .spell-slot:hover .add-text {
     color: #8899aa;
-}
-
-.spell-slot.equipped {
-    border-color: #7ec8e3;
 }
 
 /* Add spell button - flows after the last spell in the grid */
@@ -743,15 +786,7 @@
 
 .spell-book-controls {
     display: flex;
-    gap: 8px;
-    margin-top: 10px;
-    align-items: center;
-}
-
-.spell-upgrade-controls {
-    display: flex;
     gap: 4px;
-    margin-left: auto;
 }
 
 .spell-control-btn {
@@ -776,18 +811,18 @@
     background: #1a1f28;
     border: 1px solid #2a3545;
     border-radius: 12px;
-    padding: 15px;
+    padding: 10px;
 }
 
 .units-grid {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     justify-content: center;
 }
 
 .unit-slot {
-    width: 75px;
-    height: 75px;
+    width: 60px;
+    height: 60px;
     background: #252d38;
     border: 1px solid #3a4555;
     border-radius: 8px;
@@ -1037,8 +1072,8 @@
 
 /* Equipment Dust Summary */
 .equipment-dust-summary {
-    margin-top: 15px;
-    padding: 12px 15px;
+    margin-top: 8px;
+    padding: 8px 12px;
     background: #252d38;
     border: 1px solid #3a4555;
     border-radius: 8px;
@@ -1050,7 +1085,7 @@
     justify-content: center;
     gap: 8px;
     font-weight: 500;
-    margin-bottom: 10px;
+    margin-bottom: 6px;
     color: #c9a227;
     font-size: 0.8rem;
 }
@@ -1098,7 +1133,7 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 10px;
 }
 
 /* Responsive */

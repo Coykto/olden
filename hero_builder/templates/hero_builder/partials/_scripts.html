@@ -647,11 +647,15 @@ const ItemSelectionModal = {
             const response = await fetch(`/api/items/available/?slot=${apiSlotType}`);
             if (!response.ok) throw new Error('Failed to fetch items');
             const data = await response.json();
-            // Cache descriptions for search (computed once for performance)
-            this.allItems = (data.items || []).map(item => ({
-                ...item,
-                _cachedDescription: (EquipmentManager.formatItemDescription(item) || '').toLowerCase()
-            }));
+            // Cache descriptions and set names for search (computed once for performance)
+            this.allItems = (data.items || []).map(item => {
+                const setData = item.item_set ? ItemSetManager.getSetForItem(item.id) : null;
+                return {
+                    ...item,
+                    _cachedDescription: (EquipmentManager.formatItemDescription(item) || '').toLowerCase(),
+                    _cachedSetName: setData ? setData.name.toLowerCase() : ''
+                };
+            });
             this.render();
         } catch (error) {
             console.error('Error fetching items:', error);
@@ -692,10 +696,11 @@ const ItemSelectionModal = {
             if (this.currentSlotType === 'accessory' && !this.showScrolls && this.isScroll(item)) {
                 return false;
             }
-            // Filter by search text
+            // Filter by search text (name, description, or set name)
             if (search) {
                 return item.name.toLowerCase().includes(search) ||
-                       (item._cachedDescription && item._cachedDescription.includes(search));
+                       (item._cachedDescription && item._cachedDescription.includes(search)) ||
+                       (item._cachedSetName && item._cachedSetName.includes(search));
             }
             return true;
         });
@@ -2148,8 +2153,8 @@ const SpellBookManager = {
     currentSlotIndex: null,
     currentSchoolFilter: 'all',  // Filter for picker modal (school)
     currentModalTypeFilter: 'all',  // Filter for picker modal (combat/global)
-    currentBookFilter: 'all',  // Filter for the spell book view (school)
-    currentTypeFilter: 'all',  // Filter for the spell book view (combat/global)
+    currentBookFilter: null,  // Filter for the spell book view (school) - null means all
+    currentTypeFilter: null,  // Filter for the spell book view (combat/global) - null means all
     showEquippedInPicker: false,  // Toggle for showing equipped spells in picker modal
     isAddingNewSlot: false,
 
@@ -2202,63 +2207,61 @@ const SpellBookManager = {
         }
     },
 
-    // Render school tabs for filtering the spell book
+    // Render school tabs for filtering the spell book (no "All" - toggle to deselect)
     renderSchoolTabs() {
         const container = document.getElementById('spell-school-tabs');
         if (!container) return;
 
-        container.innerHTML = `
-            <button class="spell-school-tab active" data-school="all" onclick="SpellBookManager.filterBookBySchool('all')">All</button>
-            ${this.schools.map(school => `
-                <button class="spell-school-tab" data-school="${school.id}" onclick="SpellBookManager.filterBookBySchool('${school.id}')">
-                    ${school.name.replace(' Magic', '')}
-                </button>
-            `).join('')}
-        `;
+        container.innerHTML = this.schools.map(school => `
+            <button class="spell-school-tab" data-school="${school.id}" onclick="SpellBookManager.toggleBookSchoolFilter('${school.id}')">
+                ${school.name.replace(' Magic', '')}
+            </button>
+        `).join('');
     },
 
-    // Filter the spell book view by school
-    filterBookBySchool(schoolId) {
-        this.currentBookFilter = schoolId;
+    // Toggle the spell book school filter (clicking active one turns it off)
+    toggleBookSchoolFilter(schoolId) {
+        // Toggle: if already active, clear filter; otherwise set it
+        this.currentBookFilter = (this.currentBookFilter === schoolId) ? null : schoolId;
 
         // Update active tab
         document.querySelectorAll('#spell-school-tabs .spell-school-tab').forEach(tab => {
-            tab.classList.toggle('active', tab.dataset.school === schoolId);
+            tab.classList.toggle('active', tab.dataset.school === this.currentBookFilter);
         });
 
         // Apply all filters
         this.applyAllFilters();
     },
 
-    // Filter the spell book view by type
-    filterBookByType(type) {
-        this.currentTypeFilter = type;
+    // Toggle the spell book type filter (clicking active one turns it off)
+    toggleBookTypeFilter(type) {
+        // Toggle: if already active, clear filter; otherwise set it
+        this.currentTypeFilter = (this.currentTypeFilter === type) ? null : type;
 
         // Update active button
-        document.querySelectorAll('.spell-type-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.type === type);
+        document.querySelectorAll('.spell-type-filters .spell-type-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.type === this.currentTypeFilter);
         });
 
         // Apply all filters
         this.applyAllFilters();
     },
 
-    // Apply both school and type filters
+    // Apply both school and type filters (null means show all)
     applyAllFilters() {
         document.querySelectorAll('.spell-slot').forEach((slot, index) => {
             const equipped = this.equippedSpells[index];
 
             if (!equipped || !equipped.spell) {
-                // Empty slots: hide unless both filters are 'all'
-                const showEmpty = this.currentBookFilter === 'all' && this.currentTypeFilter === 'all';
-                slot.classList.toggle('filtered-out', !showEmpty);
+                // Empty slots (+ button): always show
+                slot.classList.remove('filtered-out');
             } else {
-                // Check school filter
-                const matchesSchool = this.currentBookFilter === 'all' ||
+                // Check school filter (null means all)
+                const matchesSchool = this.currentBookFilter === null ||
                                       equipped.spell.school === this.currentBookFilter;
 
-                // Check type filter
-                const matchesType = this.currentTypeFilter === 'all' ||
+                // Check type filter (null means all)
+                const matchesType = this.currentTypeFilter === null ||
                                    equipped.spell.spell_type === this.currentTypeFilter;
 
                 // Must match BOTH filters
@@ -2285,9 +2288,9 @@ const SpellBookManager = {
     renderSpellPicker() {
         const container = document.getElementById('skill-modal-container');
 
-        // Sync modal filters from spell book filters
-        this.currentSchoolFilter = this.currentBookFilter;
-        this.currentModalTypeFilter = this.currentTypeFilter;
+        // Sync modal filters from spell book filters (convert null to 'all' for modal)
+        this.currentSchoolFilter = this.currentBookFilter || 'all';
+        this.currentModalTypeFilter = this.currentTypeFilter || 'all';
 
         container.innerHTML = `
             <div class="modal-overlay" onclick="SpellBookManager.closeSpellPicker()">
