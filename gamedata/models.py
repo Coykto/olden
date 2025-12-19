@@ -132,6 +132,19 @@ class Unit(models.Model):
     def __str__(self):
         return f"{self.id_key} (T{self.tier}, v{self.version.build_id})"
 
+    @property
+    def icon_url(self):
+        """Get the URL to this unit's icon."""
+        import os
+        from django.conf import settings
+
+        icon_path = f"/media/gamedata/units/{self.id_key}.png"
+        full_path = os.path.join(settings.MEDIA_ROOT, 'gamedata', 'units', f'{self.id_key}.png')
+
+        if os.path.exists(full_path):
+            return icon_path
+        return "/media/gamedata/ui/unit_placeholder.png"
+
 
 class Hero(models.Model):
     """Represents a hero in the game."""

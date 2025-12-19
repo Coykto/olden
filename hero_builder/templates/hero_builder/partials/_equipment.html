@@ -142,10 +142,14 @@
         </div>
 
         <!-- Army Units -->
-        <div class="units-section">
+        <div class="units-section" id="army-panel">
+            <div class="units-section-header">
+                <span class="army-title">Army</span>
+                <span class="army-value" id="army-value">Value: 0</span>
+            </div>
             <div class="units-grid">
                 {% for i in "1234567"|make_list %}
-                <div class="unit-slot">
+                <div class="unit-slot tooltip-wrapper" data-slot-index="{{ forloop.counter0 }}">
                     <span class="add-text">+</span>
                 </div>
                 {% endfor %}

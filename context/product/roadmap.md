@@ -16,9 +16,9 @@ _Expand the Hero Builder with essential game mechanics for complete build theory
   - [X] **Full Equipment Selection:** Allow users to equip heroes with all available in-game equipment items.
   - [X] **Equipment Upgrades:** Support equipment upgrade levels with clear display of alchemical dust costs at the bottom of the equipment window.
 
-- [ ] **Spell System**
-  - [ ] **Spell Selection & Loadout:** Enable users to assign and manage spells as part of their hero build.
-  - [ ] **Spell Upgrades:** Support spell upgrade levels (without dust cost display, as spells can upgrade without dust).
+- [X] **Spell System**
+  - [X] **Spell Selection & Loadout:** Enable users to assign and manage spells as part of their hero build.
+  - [X] **Spell Upgrades:** Support spell upgrade levels (without dust cost display, as spells can upgrade without dust).
 
 - [ ] **Army Building**
   - [ ] **Unit/Army Selection:** Allow users to select and configure their army composition as part of the build.

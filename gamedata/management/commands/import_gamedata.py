@@ -13,6 +13,7 @@ from gamedata.models import GameVersion, Faction, Unit, Hero, Skill, Item, ItemS
 from core.data_reader import GameDataReader
 from core.asset_extractor import AssetExtractor
 from core.skill_value_extractor import SkillValueExtractor
+from core.localizations import get_localized_name
 from core.combat_value_extractor import CombatValueExtractor
 
 
@@ -64,6 +65,7 @@ class Command(BaseCommand):
             version.heroes.all().delete()
             version.skills.all().delete()
             version.items.all().delete()
+            version.item_sets.all().delete()
             version.spells.all().delete()
             version.magic_schools.all().delete()
             version.advanced_classes.all().delete()
@@ -169,8 +171,8 @@ class Command(BaseCommand):
             stats = unit_data.get("stats", {})
             unit_id = unit_data["id"]
 
-            # Get display name from localizations
-            display_name = localizations.get(unit_id, unit_id.replace("_", " ").title())
+            # Get display name using general localization lookup
+            display_name = get_localized_name(unit_id, 'unit')
 
             # Extract combat data
             combat_data = combat_extractor.extract_unit_combat_data(unit_data)

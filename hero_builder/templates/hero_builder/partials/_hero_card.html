@@ -1,6 +1,6 @@
 {% load json_filters %}
 <!-- Hero Card -->
-<div class="hero-card" data-hero-faction="{{ hero.faction.slug }}" data-hero-class-type="{{ hero.class_type }}" data-hero-id="{{ hero.game_id }}" data-hero-view-radius="{{ hero.start_view_radius }}" data-hero-level="{{ hero.start_level }}" data-hero-spec='{{ hero.specialization_info.raw_data|to_json }}' data-hero-starting-spells='{{ hero.starting_spells_info|to_json }}'>
+<div class="hero-card" data-hero-faction="{{ hero.faction.slug }}" data-hero-class-type="{{ hero.class_type }}" data-hero-id="{{ hero.game_id }}" data-hero-view-radius="{{ hero.start_view_radius }}" data-hero-level="{{ hero.start_level }}" data-hero-spec='{{ hero.specialization_info.raw_data|to_json }}' data-hero-starting-spells='{{ hero.starting_spells_info|to_json }}' data-hero-start-squad='{{ hero.raw_data.startSquad|to_json }}'>
     <div class="hero-header">
         <!-- Portrait Column -->
         <div class="portrait-column">

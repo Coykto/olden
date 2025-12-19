@@ -58,7 +58,10 @@ const heroBuild = {
             'accessory-4': null
         },
         backpack: new Array(24).fill(null)  // 4x6 grid
-    }
+    },
+    // Army state
+    army: Array(7).fill(null),  // Array of 7 slots: {unitId, count, unitData} or null
+    factionUnits: null  // Cached faction units from API
 };
 
 /**
@@ -2365,11 +2368,21 @@ const SpellBookManager = {
 
     // Apply both school and type filters (null means show all)
     applyAllFilters() {
-        document.querySelectorAll('.spell-slot').forEach((slot, index) => {
-            const equipped = this.equippedSpells[index];
+        document.querySelectorAll('.spell-slot').forEach((slot) => {
+            // Skip the add button
+            if (slot.classList.contains('spell-slot-add')) {
+                slot.classList.remove('filtered-out');
+                return;
+            }
+
+            // Get the correct spell array and index based on slot type
+            const slotIndex = parseInt(slot.dataset.slotIndex, 10);
+            const isSkillGranted = slot.classList.contains('skill-granted');
+            const spellArray = isSkillGranted ? this.skillGrantedSpells : this.equippedSpells;
+            const equipped = spellArray[slotIndex];
 
             if (!equipped || !equipped.spell) {
-                // Empty slots (+ button): always show
+                // Empty slots: always show
                 slot.classList.remove('filtered-out');
             } else {
                 // Check school filter (null means all)
@@ -3042,6 +3055,333 @@ const SpellBookManager = {
     }
 };
 
+const ArmyManager = {
+    currentSlotIndex: null,
+
+    // Initialize the army panel
+    async init() {
+        console.log('[ArmyManager] Initializing...');
+
+        // Get hero faction from heroBuild (already set by SkillManager)
+        const faction = heroBuild.heroFaction;
+        if (!faction) {
+            console.error('[ArmyManager] No faction found');
+            return;
+        }
+
+        // Load faction units from API
+        await this.loadFactionUnits(faction);
+
+        // Get starting squad from hero card
+        const heroCard = document.querySelector('[data-hero-faction]');
+        const startSquadData = heroCard?.dataset.heroStartSquad;
+
+        if (startSquadData) {
+            try {
+                const startSquad = JSON.parse(startSquadData);
+                this.populateStartingArmy(startSquad);
+            } catch (error) {
+                console.error('[ArmyManager] Error parsing start squad:', error);
+            }
+        }
+
+        // Bind click events on unit slots
+        document.querySelectorAll('.unit-slot').forEach(slot => {
+            slot.addEventListener('click', () => {
+                const slotIndex = parseInt(slot.dataset.slotIndex, 10);
+                if (heroBuild.army[slotIndex]) {
+                    this.openUnitEditor(slotIndex);
+                } else {
+                    this.openUnitPicker(slotIndex);
+                }
+            });
+        });
+
+        this.render();
+    },
+
+    // Fetch faction units from API
+    async loadFactionUnits(faction) {
+        try {
+            const response = await fetch(`/api/factions/${faction}/units/`);
+            const data = await response.json();
+            heroBuild.factionUnits = data.units_by_tier || {};
+            console.log(`[ArmyManager] Loaded units for ${faction}:`, Object.keys(heroBuild.factionUnits));
+        } catch (error) {
+            console.error('[ArmyManager] Failed to load faction units:', error);
+            heroBuild.factionUnits = {};
+        }
+    },
+
+    // Helper: Find unit by ID across all tiers
+    findUnitById(unitId) {
+        for (const tier of Object.keys(heroBuild.factionUnits)) {
+            const units = heroBuild.factionUnits[tier];
+            const unit = units.find(u => u.id === unitId);
+            if (unit) return unit;
+        }
+        return null;
+    },
+
+    // Helper: Get all units as flat array
+    getAllUnits() {
+        const allUnits = [];
+        for (const tier of Object.keys(heroBuild.factionUnits)) {
+            allUnits.push(...heroBuild.factionUnits[tier]);
+        }
+        return allUnits;
+    },
+
+    // Populate starting army from startSquad data
+    populateStartingArmy(startSquad) {
+        console.log('[ArmyManager] Populating starting army:', startSquad);
+
+        startSquad.forEach((entry, index) => {
+            if (index >= 7) return; // Only 7 slots
+
+            const unitId = entry.sid;
+            const minCount = entry.min || 0;
+            const maxCount = entry.max || minCount;
+            const count = Math.floor((minCount + maxCount) / 2); // Use average
+
+            // Find unit data
+            const unitData = this.findUnitById(unitId);
+            if (unitData) {
+                heroBuild.army[index] = {
+                    unitId: unitId,
+                    count: count,
+                    unitData: unitData,
+                    isStartingUnit: true
+                };
+                console.log(`[ArmyManager] Added starting unit: ${unitData.name} x${count}`);
+            }
+        });
+
+        this.render();
+    },
+
+    // Render the army slots
+    render() {
+        const slots = document.querySelectorAll('.unit-slot');
+
+        slots.forEach((slot, index) => {
+            const armySlot = heroBuild.army[index];
+
+            // Clear previous content
+            slot.innerHTML = '';
+            slot.classList.remove('filled');
+
+            if (armySlot && armySlot.unitData) {
+                // Filled slot
+                slot.classList.add('filled');
+
+                const unit = armySlot.unitData;
+
+                slot.innerHTML = `
+                    <img src="${unit.icon_url}" alt="${unit.name}" class="unit-icon" onerror="this.src='/media/gamedata/ui/unit_placeholder.png'">
+                    <span class="unit-count">${armySlot.count}</span>
+                    <div class="tooltip-content">
+                        <div class="unit-tooltip-name">${unit.name}</div>
+                        <div class="unit-tooltip-tier">Tier ${unit.tier}</div>
+                        <div class="unit-tooltip-stats">
+                            <div>ATK: ${unit.stats.offence}</div>
+                            <div>DEF: ${unit.stats.defence}</div>
+                            <div>HP: ${unit.stats.hp}</div>
+                            <div>DMG: ${unit.stats.damage_min}-${unit.stats.damage_max}</div>
+                            <div>Speed: ${unit.stats.speed}</div>
+                            <div>Value: ${unit.squad_value}</div>
+                        </div>
+                        <div class="unit-tooltip-type">${this.formatUnitType(unit)}</div>
+                    </div>
+                `;
+            } else {
+                // Empty slot
+                slot.innerHTML = '<span class="add-text">+</span>';
+            }
+        });
+
+        this.updateArmyValue();
+    },
+
+    // Format unit type display
+    formatUnitType(unit) {
+        const types = [];
+        if (unit.attack_type === 'ranged') types.push('Ranged');
+        else if (unit.attack_type === 'magic') types.push('Magic');
+        else types.push('Melee');
+        if (unit.move_type === 'fly') types.push('Flying');
+        return types.join(', ');
+    },
+
+    // Calculate and display total army value
+    updateArmyValue() {
+        const totalValue = this.getTotalArmyValue();
+        const valueElement = document.getElementById('army-value');
+        if (valueElement) {
+            valueElement.textContent = `Value: ${totalValue}`;
+        }
+    },
+
+    // Get total army value
+    getTotalArmyValue() {
+        return heroBuild.army.reduce((total, slot) => {
+            if (slot && slot.unitData && slot.count) {
+                return total + (slot.unitData.squad_value * slot.count);
+            }
+            return total;
+        }, 0);
+    },
+
+    // Open unit picker modal
+    openUnitPicker(slotIndex) {
+        this.currentSlotIndex = slotIndex;
+
+        const unitsByTier = heroBuild.factionUnits;
+        if (!unitsByTier || Object.keys(unitsByTier).length === 0) {
+            console.error('[ArmyManager] No faction units available');
+            return;
+        }
+
+        // Build modal HTML - units already grouped by tier
+        const modalHtml = `
+            <div class="modal-overlay" onclick="ArmyManager.closeUnitPicker()">
+                <div class="skill-modal unit-picker-modal" onclick="event.stopPropagation()">
+                    <div class="modal-header">
+                        <h2>Select Unit</h2>
+                    </div>
+                    <div class="skill-list">
+                        ${Object.keys(unitsByTier).sort((a, b) => a - b).map(tier => `
+                            <div class="unit-tier-group">
+                                <h3 class="unit-tier-header">Tier ${tier}</h3>
+                                <div class="unit-picker-grid">
+                                    ${unitsByTier[tier].map(unit => `
+                                        <div class="unit-card" onclick="ArmyManager.selectUnit('${unit.id}')">
+                                            <img src="${unit.icon_url}" alt="${unit.name}" class="unit-card-icon" onerror="this.src='/media/gamedata/ui/unit_placeholder.png'">
+                                            <div class="unit-card-name">${unit.name}</div>
+                                            <div class="unit-card-stats">
+                                                <span>ATK ${unit.stats.offence}</span>
+                                                <span>DEF ${unit.stats.defence}</span>
+                                                <span>HP ${unit.stats.hp}</span>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('skill-modal-container').innerHTML = modalHtml;
+    },
+
+    // Select a unit from picker
+    selectUnit(unitId) {
+        const unitData = this.findUnitById(unitId);
+        if (!unitData) return;
+
+        // Default count based on tier (higher tier = fewer units)
+        const defaultCount = Math.max(1, Math.floor(20 / (unitData.tier || 1)));
+
+        heroBuild.army[this.currentSlotIndex] = {
+            unitId: unitId,
+            count: defaultCount,
+            unitData: unitData,
+            isStartingUnit: false
+        };
+
+        this.render();
+        this.closeUnitPicker();
+    },
+
+    // Open unit editor for existing unit
+    openUnitEditor(slotIndex) {
+        this.currentSlotIndex = slotIndex;
+        const armySlot = heroBuild.army[slotIndex];
+
+        if (!armySlot || !armySlot.unitData) return;
+
+        const unit = armySlot.unitData;
+        const canRemove = !armySlot.isStartingUnit;
+
+        const modalHtml = `
+            <div class="modal-overlay" onclick="ArmyManager.closeUnitEditor()">
+                <div class="modal-content unit-editor-modal" onclick="event.stopPropagation()">
+                    <div class="modal-header">
+                        <h2>${unit.name}</h2>
+                        <button class="modal-close" onclick="ArmyManager.closeUnitEditor()">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="unit-editor-content">
+                            <img src="/media/gamedata/units/${unit.icon}.png" alt="${unit.name}" class="unit-editor-icon">
+                            <div class="unit-editor-stats">
+                                <div>Tier ${unit.level}</div>
+                                <div>ATK: ${unit.attack} | DEF: ${unit.defence}</div>
+                                <div>HP: ${unit.health} | DMG: ${unit.damage_min}-${unit.damage_max}</div>
+                                <div>Speed: ${unit.speed} | Value: ${unit.squad_value}</div>
+                                ${this.formatUnitType(unit) !== 'Ground' ? `<div>${this.formatUnitType(unit)}</div>` : ''}
+                            </div>
+                            <div class="unit-count-control">
+                                <label>Count:</label>
+                                <input type="number" id="unit-count-input" value="${armySlot.count}" min="1" max="9999">
+                            </div>
+                            <div class="unit-editor-actions">
+                                <button class="btn btn-primary" onclick="ArmyManager.updateUnitCount()">Update</button>
+                                ${canRemove ? '<button class="btn btn-danger" onclick="ArmyManager.removeUnit()">Remove</button>' : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('skill-modal-container').innerHTML = modalHtml;
+
+        // Focus the input
+        setTimeout(() => {
+            const input = document.getElementById('unit-count-input');
+            if (input) {
+                input.focus();
+                input.select();
+            }
+        }, 50);
+    },
+
+    // Update unit count
+    updateUnitCount() {
+        const input = document.getElementById('unit-count-input');
+        const newCount = parseInt(input?.value || '1', 10);
+
+        if (newCount > 0 && heroBuild.army[this.currentSlotIndex]) {
+            heroBuild.army[this.currentSlotIndex].count = newCount;
+            this.render();
+            this.closeUnitEditor();
+        }
+    },
+
+    // Remove unit from slot
+    removeUnit() {
+        if (this.currentSlotIndex !== null) {
+            heroBuild.army[this.currentSlotIndex] = null;
+            this.render();
+            this.closeUnitEditor();
+        }
+    },
+
+    // Close unit picker
+    closeUnitPicker() {
+        this.currentSlotIndex = null;
+        document.getElementById('skill-modal-container').innerHTML = '';
+    },
+
+    // Close unit editor
+    closeUnitEditor() {
+        this.currentSlotIndex = null;
+        document.getElementById('skill-modal-container').innerHTML = '';
+    }
+};
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     SkillManager.init();
@@ -3049,6 +3389,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ItemSetManager.init();  // Load item sets before equipment
     EquipmentManager.init();
     SpellBookManager.init();
+    ArmyManager.init();
 
     // Close modal on Escape key
     document.addEventListener('keydown', function(event) {

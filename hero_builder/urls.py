@@ -20,6 +20,7 @@ urlpatterns = [
     # API endpoints - Units
     path('api/units/', views.api_units, name='api_units'),
     path('api/units/<str:unit_id>/', views.api_unit_detail, name='api_unit_detail'),
+    path('api/factions/<slug:faction_slug>/units/', views.api_faction_units, name='api_faction_units'),
 
     # API endpoints - Skills
     path('api/skills/', views.api_skills_combat, name='api_skills'),

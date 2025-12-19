@@ -235,6 +235,54 @@ def get_localizations(lang: str = "english") -> dict:
     return localizations
 
 
+def get_localized_name(entity_id: str, entity_type: str, fallback: str = None) -> str:
+    """
+    Get localized display name for any game entity.
+    
+    This is the GENERAL solution for looking up entity names - each entity type
+    has a specific localization key pattern in the game files.
+    
+    Args:
+        entity_id: The entity's id_key (e.g., 'trogl', 'angel_sword_artifact')
+        entity_type: One of 'unit', 'hero', 'item', 'spell', 'skill'
+        fallback: Optional fallback if not found (defaults to titlecased id)
+    
+    Returns:
+        Localized display name
+    
+    Localization key patterns by entity type:
+        - unit: {id}_name (e.g., trogl_name -> "Troglodyte")
+        - hero: {id}_name (e.g., human_hero_1_name -> "Roland")
+        - item: {id}_artifact_name (e.g., angel_sword_artifact_name -> "Angel Sword")
+        - spell: {id}_name (e.g., fireball_name -> "Fireball")
+        - skill: {id}_name (e.g., archery_name -> "Archery")
+    """
+    localizations = get_localizations()
+    
+    # Define the localization key pattern for each entity type
+    key_patterns = {
+        'unit': f"{entity_id}_name",
+        'hero': f"{entity_id}_name",
+        'item': f"{entity_id}_artifact_name",
+        'spell': f"{entity_id}_name",
+        'skill': f"{entity_id}_name",
+    }
+    
+    key = key_patterns.get(entity_type, f"{entity_id}_name")
+    
+    if key in localizations:
+        return localizations[key]
+    
+    # Fallback: try without suffix pattern (some entities use raw id)
+    if entity_id in localizations:
+        return localizations[entity_id]
+    
+    # Final fallback: generate from id
+    if fallback:
+        return fallback
+    return entity_id.replace("_", " ").title()
+
+
 def _get_nested_value(data: dict, path: str):
     """
     Get a value from nested dict/list using path like 'bonuses[1].parameters[3]'.

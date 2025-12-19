@@ -91,6 +91,35 @@ def api_hero_data(request, hero_slug):
 
     hero = get_object_or_404(Hero, version=version, slug=hero_slug)
 
+    # Get starting squad units
+    start_squad = []
+    raw_squad = hero.raw_data.get('startSquad', [])
+    for squad_entry in raw_squad:
+        unit_id = squad_entry.get('sid', '')
+        count = squad_entry.get('count', 0)
+
+        # Look up the unit
+        unit = Unit.objects.filter(version=version, id_key=unit_id).first()
+        if unit:
+            start_squad.append({
+                'id': unit.id_key,
+                'name': unit.display_name,
+                'count': count,
+                'tier': unit.tier,
+                'icon_url': unit.icon_url,
+                'stats': {
+                    'hp': unit.hp,
+                    'offence': unit.offence,
+                    'defence': unit.defence,
+                    'damage_min': unit.damage_min,
+                    'damage_max': unit.damage_max,
+                    'initiative': unit.initiative,
+                    'speed': unit.speed,
+                },
+                'attack_type': unit.attack_type,
+                'move_type': unit.move_type,
+            })
+
     data = {
         'id': hero.id_key,
         'faction': hero.faction.name,
@@ -104,6 +133,7 @@ def api_hero_data(request, hero_slug):
             'luck': hero.start_luck,
             'moral': hero.start_moral,
         },
+        'start_squad': start_squad,
         'raw_data': hero.raw_data,
     }
 
@@ -217,6 +247,52 @@ def api_unit_detail(request, unit_id):
     }
 
     return JsonResponse(data)
+
+
+@require_GET
+def api_faction_units(request, faction_slug):
+    """Get all units for a faction, grouped by tier."""
+    version = GameVersion.objects.filter(is_active=True).first()
+
+    if not version:
+        return JsonResponse({'error': 'No active game version'}, status=404)
+
+    faction = get_object_or_404(Faction, version=version, slug=faction_slug)
+
+    # Get all units for this faction
+    units = Unit.objects.filter(version=version, faction=faction).order_by('tier', 'id_key')
+
+    # Group units by tier
+    units_by_tier = {}
+    for unit in units:
+        tier = str(unit.tier)
+        if tier not in units_by_tier:
+            units_by_tier[tier] = []
+
+        units_by_tier[tier].append({
+            'id': unit.id_key,
+            'name': unit.display_name,
+            'tier': unit.tier,
+            'icon_url': unit.icon_url,
+            'stats': {
+                'hp': unit.hp,
+                'offence': unit.offence,
+                'defence': unit.defence,
+                'damage_min': unit.damage_min,
+                'damage_max': unit.damage_max,
+                'initiative': unit.initiative,
+                'speed': unit.speed,
+            },
+            'attack_type': unit.attack_type,
+            'move_type': unit.move_type,
+            'squad_value': unit.squad_value,
+            'is_upgrade': '_upg' in unit.id_key,
+        })
+
+    return JsonResponse({
+        'faction': faction.name,
+        'units_by_tier': units_by_tier,
+    })
 
 
 def api_heroes(request):

@@ -139,14 +139,79 @@ class AssetExtractor:
 
         return count
 
+    # Only map full names that differ from id_keys (e.g., troglodyte -> trogl)
+    # Most units use their id_key directly as asset name, so we only need exceptions
+    UNIT_FULL_NAME_TO_ID = {
+        'troglodyte': 'trogl',
+        'minotaur': 'minos',
+        'bonedragon': 'bone_dragon',
+        'blackdragon': 'black_dragon',
+        'iceguard': 'ice_guard',
+        'frostgiant': 'frost_giant',
+    }
+
+    def _get_all_unit_ids(self) -> set:
+        """
+        GENERAL SOLUTION: Dynamically get all unit IDs from game data.
+        This ensures we match any unit without hardcoding the full list.
+        """
+        import json
+        import zipfile
+
+        unit_ids = set()
+        core_zip = self.game_data_path / "StreamingAssets" / "Core.zip"
+
+        if not core_zip.exists():
+            return unit_ids
+
+        try:
+            with zipfile.ZipFile(core_zip, 'r') as zf:
+                # Find all unit logic files
+                for name in zf.namelist():
+                    if name.startswith('DB/units/units_logics/') and name.endswith('_l.json'):
+                        try:
+                            content = zf.read(name).decode('utf-8-sig')
+                            data = json.loads(content)
+                            for unit in data.get('array', []):
+                                unit_id = unit.get('id')
+                                if unit_id:
+                                    unit_ids.add(unit_id)
+                        except:
+                            pass
+        except Exception as e:
+            print(f"Warning: Could not read unit IDs from Core.zip: {e}")
+
+        return unit_ids
+
     def _extract_units(self, force: bool = False) -> int:
-        """Extract unit-related textures."""
+        """
+        Extract unit icon textures.
+
+        GENERAL SOLUTION: Dynamically discovers all unit IDs from game data,
+        then matches textures to those IDs. No hardcoded unit list needed.
+        """
         output_path = self.output_dir / "units"
         output_path.mkdir(parents=True, exist_ok=True)
 
         count = 0
+        extracted_ids = set()
 
-        # Units can be in multiple asset files
+        # Get all unit IDs from game data (GENERAL - not hardcoded)
+        all_unit_ids = self._get_all_unit_ids()
+
+        # Build name-to-id mapping: includes id_keys directly + full name exceptions
+        name_to_id = {}
+        for unit_id in all_unit_ids:
+            name_to_id[unit_id.lower()] = unit_id
+        for full_name, unit_id in self.UNIT_FULL_NAME_TO_ID.items():
+            name_to_id[full_name.lower()] = unit_id
+
+        # Patterns to skip (not unit icons)
+        skip_patterns = ['diffuse', 'emissive', 'normal', 'mask', 'vfx',
+                        'gradient', 'particle', 'glow', 'throne', 'ability',
+                        'passive', 'debuff', 'buff', 'projectile']
+
+        # Extract from all asset files
         for asset_file in self.game_data_path.glob("*.assets"):
             try:
                 env = UnityPy.load(str(asset_file))
@@ -158,29 +223,42 @@ class AssetExtractor:
                     try:
                         data = obj.read()
                         name = data.m_Name
-
-                        # Look for unit-related textures
-                        # Common unit names from the game
-                        unit_keywords = [
-                            'esquire', 'crossbowman', 'griffin', 'knight', 'angel',
-                            'skeleton', 'zombie', 'vampire', 'lich', 'ghost',
-                            'troglodyte', 'medusa', 'assassin', 'hydra',
-                            'pixie', 'ent', 'druid', 'phoenix',
-                        ]
-
                         name_lower = name.lower()
-                        if any(kw in name_lower for kw in unit_keywords):
-                            # Skip non-icon textures (diffuse maps, etc.)
-                            if 'diffuse' in name_lower or 'emissive' in name_lower:
-                                continue
 
-                            out_file = output_path / f"{name}.png"
+                        # Skip non-icon textures
+                        if any(p in name_lower for p in skip_patterns):
+                            continue
+
+                        # Try to match to a unit id_key
+                        matched_id = None
+
+                        # Check for exact match (most common case)
+                        if name_lower in name_to_id:
+                            matched_id = name_to_id[name_lower]
+                        else:
+                            # Check for upgrade variants (e.g., medusa_upg)
+                            for asset_name, unit_id in name_to_id.items():
+                                if name_lower.startswith(asset_name):
+                                    # Determine the full id (base, _upg, or _upg_alt)
+                                    suffix = name_lower[len(asset_name):]
+                                    if suffix == '' or suffix.startswith('_upg'):
+                                        matched_id = unit_id
+                                        if '_upg_alt' in name_lower:
+                                            matched_id = f"{unit_id}_upg_alt"
+                                        elif '_upg' in name_lower:
+                                            matched_id = f"{unit_id}_upg"
+                                        break
+
+                        if matched_id and matched_id not in extracted_ids:
+                            out_file = output_path / f"{matched_id}.png"
 
                             if not force and out_file.exists():
+                                extracted_ids.add(matched_id)
                                 continue
 
                             image = data.image
                             image.save(str(out_file))
+                            extracted_ids.add(matched_id)
                             count += 1
 
                     except Exception:
