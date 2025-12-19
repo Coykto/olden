@@ -206,7 +206,7 @@ const DescriptionRuntime = {
       // All functions failed
       const triedFuncs = funcNames.map(f => `"${f.trim()}"`).join(', ');
       console.error(`[DescriptionRuntime] Placeholder ${placeholder}: All functions failed. Tried: ${triedFuncs}. Context keys: ${ctx ? Object.keys(ctx).join(', ') : 'null'}`);
-      return fullMatch;
+      return placeholder;
     });
 
     return convertNewlines(result);

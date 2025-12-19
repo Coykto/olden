@@ -4,13 +4,13 @@ Views for the Hero Builder application.
 import json
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_http_methods, require_GET
 from django.views.decorators.csrf import csrf_exempt
-from gamedata.models import GameVersion, Hero, Faction, Item, Skill, Unit
+from gamedata.models import GameVersion, Hero, Faction, Item, ItemSet, Skill, Unit, Spell, MagicSchool
 from core.damage_calculator import (
     DamageCalculator, create_unit_stack_from_db, create_hero_build_from_db
 )
-from core.localizations import get_skill_info, get_localizations, get_item_info, get_skill_args, get_subskill_configs
+from core.localizations import get_skill_info, get_localizations, get_item_info, get_item_set_info, get_skill_args, get_subskill_configs, get_spell_info, get_spell_descriptions_by_level
 
 
 def index(request):
@@ -722,3 +722,105 @@ def api_available_items(request):
         })
 
     return JsonResponse({'items': items_data})
+
+
+@require_GET
+def api_item_sets(request):
+    """
+    API endpoint to get all item sets with their metadata.
+    Returns: {item_sets: [{id, name, items, bonuses}, ...]}
+    """
+    version = GameVersion.objects.filter(is_active=True).first()
+    if not version:
+        return JsonResponse({'error': 'No active game version'}, status=404)
+
+    item_sets = ItemSet.objects.filter(version=version)
+
+    sets_data = []
+    for item_set in item_sets:
+        raw = item_set.raw_data or {}
+        bonuses = raw.get("bonuses", [])
+
+        # Get localized info
+        set_info = get_item_set_info(item_set.id_key, bonuses)
+
+        sets_data.append({
+            'id': item_set.id_key,
+            'name': set_info['name'],
+            'items': raw.get('itemsInSet', []),
+            'bonuses': set_info['bonuses'],
+            'raw_data': raw,
+        })
+
+    return JsonResponse({'item_sets': sets_data})
+
+
+@require_GET
+def api_available_spells(request):
+    """
+    API endpoint to get available spells with their metadata.
+    Returns all spells grouped by school with full spell configuration.
+    """
+    version = GameVersion.objects.filter(is_active=True).first()
+    if not version:
+        return JsonResponse({'error': 'No game version found'}, status=404)
+
+    spells = Spell.objects.filter(version=version).select_related('version')
+    schools = MagicSchool.objects.filter(version=version)
+
+    # Build school lookup
+    school_names = {s.id_key: s.display_name for s in schools}
+
+    spell_list = []
+    for spell in spells:
+        # Skip masterful variants - they're upgrades, not separate learnable spells
+        if spell.id_key.endswith('_special'):
+            continue
+
+        raw = spell.raw_data or {}
+
+        # Extract spell type (combat vs global) from raw_data
+        # Check usedOnMap field to determine if spell is used on adventure map
+        spell_type = 'global' if raw.get('usedOnMap') else 'combat'
+
+        # Extract max upgrade level from upgradeCost or manaCost arrays
+        # upgradeCost has [cost_for_level_2, cost_for_level_3, cost_for_level_4] (3 entries = 4 levels)
+        # manaCost has [level_1, level_2, level_3, level_4] (4 entries = 4 levels)
+        # Max level = number of upgrades + 1 (starting level)
+        upgrade_cost = raw.get('upgradeCost', [])
+        mana_cost = raw.get('manaCost', [])
+        max_upgrade_level = (len(upgrade_cost) + 1) if upgrade_cost else (len(mana_cost) if mana_cost else 1)
+
+        # Get spell rank/tier from raw_data
+        rank = raw.get('rank', spell.level)
+
+        # Get localized spell info with description template and args
+        spell_info = get_spell_info(spell.id_key)
+
+        # Get descriptions for each upgrade level (spells can have different descriptions per level)
+        description_keys = raw.get('description', [])
+        descriptions_by_level = get_spell_descriptions_by_level(description_keys)
+
+        spell_list.append({
+            'id': spell.id_key,
+            'id_key': spell.id_key,
+            'icon': raw.get('icon', spell.id_key),  # Icon filename (without extension)
+            'school': spell.school,
+            'school_display': school_names.get(spell.school, spell.school.title() + ' Magic'),
+            'level': rank,  # Use rank instead of database level field
+            'spell_type': spell_type,
+            'max_upgrade_level': max_upgrade_level,
+            'raw_data': raw,
+            # Descriptions per upgrade level (index 0 = level 1, etc.)
+            'descriptions': descriptions_by_level,
+            # Keep legacy fields for backwards compatibility (level 1 description)
+            'description_template': spell_info['description_template'],
+            'description_args': spell_info['description_args'],
+        })
+
+    schools_list = [{'id': s.id_key, 'name': s.display_name} for s in schools]
+
+    return JsonResponse({
+        'spells': spell_list,
+        'schools': schools_list
+    })

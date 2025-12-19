@@ -35,4 +35,8 @@ urlpatterns = [
 
     # API endpoints - Items
     path('api/items/available/', views.api_available_items, name='api_available_items'),
+    path('api/item-sets/', views.api_item_sets, name='api_item_sets'),
+
+    # API endpoints - Spells
+    path('api/spells/available/', views.api_available_spells, name='api_available_spells'),
 ]

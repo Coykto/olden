@@ -80,6 +80,9 @@ class AssetExtractor:
         # Extract UI icons (factions, classes)
         results['ui_icons'] = self._extract_ui_icons(force)
 
+        # Extract spell icons
+        results['spells'] = self._extract_spell_icons(force)
+
         return results
 
     def _extract_hero_portraits(self, force: bool = False) -> int:
@@ -437,6 +440,58 @@ class AssetExtractor:
 
                     except Exception:
                         pass
+
+            except Exception:
+                pass
+
+        return count
+
+    def _extract_spell_icons(self, force: bool = False) -> int:
+        """Extract spell icons (256x256 magic spell textures)."""
+        output_path = self.output_dir / "spells"
+        output_path.mkdir(parents=True, exist_ok=True)
+
+        count = 0
+        # Spell icons are in resources.assets
+        resources_path = self.game_data_path / "resources.assets"
+
+        if not resources_path.exists():
+            return 0
+
+        env = UnityPy.load(str(resources_path))
+
+        # Spell icon naming patterns:
+        # - day_01_magic_blessing, day_02_magic_*, etc.
+        # - night_01_magic_*, night_02_magic_*, etc.
+        # - space_01_magic_*, space_02_magic_*, etc.
+        # - primal_01_magic_*, primal_02_magic_*, etc.
+        # - neutral_01_magic_*, neutral_02_magic_*, etc.
+        # - bonus_magic_* (special abilities)
+        # - kara_* (hero-specific spells)
+        spell_prefixes = ('day_', 'night_', 'space_', 'primal_', 'neutral_', 'bonus_magic_', 'kara_')
+
+        for obj in env.objects:
+            if obj.type.name != 'Texture2D':
+                continue
+
+            try:
+                data = obj.read()
+                name = data.m_Name
+
+                # Match spell icons by prefix and ensure they're 256x256
+                if name.startswith(spell_prefixes) and data.m_Width == 256:
+                    # Skip non-magic textures (make sure it contains 'magic' for school prefixes)
+                    if name.startswith(('day_', 'night_', 'space_', 'primal_', 'neutral_')) and '_magic_' not in name:
+                        continue
+
+                    out_file = output_path / f"{name}.png"
+
+                    if not force and out_file.exists():
+                        continue
+
+                    image = data.image
+                    image.save(str(out_file))
+                    count += 1
 
             except Exception:
                 pass

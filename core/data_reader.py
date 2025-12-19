@@ -125,6 +125,11 @@ class GameDataReader:
 
         return items
 
+    def get_all_item_sets(self) -> List[Dict[str, Any]]:
+        """Get all item set data from item_sets directory."""
+        data = self.read_json("items/item_sets/item_sets.json")
+        return data.get("array", [])
+
     def get_all_skills(self) -> List[Dict[str, Any]]:
         """Get all skill data from heroes_skills directory."""
         data = self.read_json("heroes_skills/skills/skills.json")

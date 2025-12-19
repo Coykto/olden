@@ -63,26 +63,105 @@ cd transpiler && npx ts-node src/index.ts <core_zip_path> <output_dir>
 ## Development Workflow
 See serena memory: `development-workflow`
 
+## Subagent Usage
+
+**Use subagents as much as possible.** They provide specialized expertise and allow parallel work.
+
+### python-expert
+**Always use for Python work:**
+- Django views, models, forms, serializers
+- Management commands
+- Any backend logic
+- Class design and refactoring
+
+### react-expert
+**Always use for JavaScript/TypeScript work:**
+- Frontend JS in `/static/js/`
+- Transpiler code in `/transpiler/`
+- Any TypeScript modifications
+
+### tester (custom)
+**Always use for testing. NEVER write or execute unit tests.**
+
+Spawn a general-purpose subagent with these instructions:
+- Use Playwright MCP tools exclusively for E2E testing
+- Test against the running dev server at `http://127.0.0.1:8000`
+- When testing a specific issue (e.g., a spell description), also check 3-5 similar items to catch patterns
+- Take screenshots of failures
+- Check browser console for JS errors
+
+Example prompt for tester:
+```
+Test that spell descriptions render correctly. Focus on [specific spell], but also verify 3-4 other spells from different schools. Use Playwright MCP to navigate, check text content, and capture any console errors.
+```
+
+### Testing Rules
+
+1. **NEVER write unit tests. NEVER run pytest or Django tests.**
+2. **All testing happens via Playwright E2E through the tester subagent.**
+3. When delegating to tester, provide:
+   - What specific behavior to verify
+   - Context on what might be broken
+   - Examples of similar past issues (if any)
+   - URLs/paths to test
+
+## Game Data
+
+### Source of Truth
+**Game files are the ultimate source of truth.** Never assume something exists or doesn't exist in game data - always check.
+
+### Raw Game Data Location
+```
+/Users/eb/Downloads/gamedata/steamapps/common/Heroes of Might Magic Olden Era Demo/HeroesOE_Data/StreamingAssets/
+```
+
+Key files:
+- `Core.zip` - Contains all `.script` files with game logic
+- `Lang/english/` - Localization JSON files
+
+### Re-importing Game Data
+Feel free to re-import whenever needed:
+```bash
+python manage.py import_gamedata --force
+```
+This also runs the transpiler automatically.
+
+### Decompiling Game Code
+The game is built with Unity (C#). To decompile:
+```bash
+# Install ILSpy CLI if needed
+dotnet tool install -g ilspycmd
+
+# Decompile a DLL
+ilspycmd /path/to/Assembly-CSharp.dll -o ./decompiled/
+```
+
+Game assemblies are typically in:
+```
+HeroesOE_Data/Managed/
+```
+
+### Verification Principle
+**NEVER assume. ALWAYS verify.**
+- Don't assume a field exists in game data - grep for it
+- Don't assume a function works a certain way - read the .script file
+- Don't assume game behavior - check the wiki or screenshots
+
+## Research Resources
+
+### When Unsure About Game Visuals
+Google for game screenshots: `"Heroes of Might and Magic Olden Era" [feature]`
+
+### Game Wikis
+- https://wiki.hoodedhorse.com/Heroes_of_Might_and_Magic_Olden_Era/Main_Page
+- https://mightandmagic.fandom.com/wiki/Category:Olden_Era
+
 ## Tech Stack
 - Django 6.0 backend
 - Vanilla JavaScript frontend with transpiled description functions
 - Node.js TypeScript transpiler
 - SQLite database
 - Game data imported from Unity asset bundles
-
-## Testing
-
-### E2E Tests (Playwright)
-```bash
-# Requires server running at http://127.0.0.1:8000
-pytest tests/e2e/test_descriptions.py -v
-```
-
-Tests verify:
-- Hero builder loads without JS errors
-- Item descriptions render with correct values
-- Descriptions update when equipment changes
-- Cross-item stat dependencies work correctly
 
 ## Key Files
 

@@ -223,12 +223,25 @@ export class CodeGenerator {
     // Function wrapper with memoization
     lines.push(`DescriptionFunctions["${func.name}"] = DescriptionRuntime.memoize(function(ctx) {`);
 
+    // Track if we've already generated an explicit return statement
+    let hasExplicitReturn = false;
+
     // Generate operation code
     for (const op of func.operations) {
       const opCode = this.generateOperation(op, func.returnType, declaredVars);
       if (opCode) {
         lines.push(`  ${opCode}`);
+        // Check if this operation was an explicit return (Text with resultVar 'return')
+        if (opCode.startsWith('return ')) {
+          hasExplicitReturn = true;
+        }
       }
+    }
+
+    // If no explicit return was generated but _return was declared, add return statement
+    if (!hasExplicitReturn && declaredVars.has('_return')) {
+      const formatter = RETURN_TYPE_FORMATTERS[func.returnType] || 'formatString';
+      lines.push(`  return DescriptionRuntime.${formatter}(_return);`);
     }
 
     lines.push(`}, ${this.options.memoizeSize});`);
@@ -282,6 +295,12 @@ export class CodeGenerator {
         if (name === 'CurrentBuffSumMaxDmg') {
           return declareOrAssign(safeVar, `${config.contextPath}.getSumMaxDmg?.() ?? 0`);
         }
+      }
+
+      // Special case: CurrentMagicLevel returns upgrade level (1-indexed)
+      // The game script uses CurrentMagicLevel(level) to get the spell's current upgrade level
+      if (name === 'CurrentMagicLevel') {
+        return declareOrAssign(safeVar, `(${config.contextPath}.upgradeLevel ?? 0) + 1`);
       }
 
       // Path-based accessor

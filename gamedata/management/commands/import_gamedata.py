@@ -9,7 +9,7 @@ import re
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils.text import slugify
-from gamedata.models import GameVersion, Faction, Unit, Hero, Skill, Item, Spell, UnitAbility, CombatModifier, AdvancedClass
+from gamedata.models import GameVersion, Faction, Unit, Hero, Skill, Item, ItemSet, Spell, MagicSchool, UnitAbility, CombatModifier, AdvancedClass
 from core.data_reader import GameDataReader
 from core.asset_extractor import AssetExtractor
 from core.skill_value_extractor import SkillValueExtractor
@@ -65,6 +65,8 @@ class Command(BaseCommand):
             version.skills.all().delete()
             version.items.all().delete()
             version.spells.all().delete()
+            version.magic_schools.all().delete()
+            version.advanced_classes.all().delete()
 
         # Extract game data
         self.stdout.write("Extracting Core.zip...")
@@ -84,6 +86,8 @@ class Command(BaseCommand):
                 self._import_skills(reader, version)
                 self._import_advanced_classes(reader, version)
                 self._import_items(reader, version)
+                self._import_item_sets(reader, version)
+                self._import_magic_schools(reader, version, localizations)
                 self._import_spells(reader, version)
 
             self.stdout.write(self.style.SUCCESS(
@@ -252,6 +256,9 @@ class Command(BaseCommand):
             # Get starting skills
             starting_skills = [s['sid'] for s in hero_data.get('startSkills', [])]
 
+            # Get starting spells (from startMagics)
+            starting_spells = hero_data.get('startMagics', [])
+
             hero_objects.append(Hero(
                 version=version,
                 id_key=hero_id,
@@ -265,6 +272,7 @@ class Command(BaseCommand):
                 specialization_desc=spec_desc,
                 sort_order=sort_order,
                 starting_skills=starting_skills,
+                starting_spells=starting_spells,
                 cost_gold=hero_data.get("costGold", 0),
                 start_level=hero_data.get("startLevel", 1),
                 start_offence=stats.get("offence", 0),
@@ -353,6 +361,23 @@ class Command(BaseCommand):
         Item.objects.bulk_create(item_objects)
         self.stdout.write(f"  Created {len(item_objects)} items (skipped {skipped_campaign} campaign items)")
 
+    def _import_item_sets(self, reader: GameDataReader, version: GameVersion):
+        """Import item set data."""
+        self.stdout.write("Importing item sets...")
+
+        item_sets_data = reader.get_all_item_sets()
+
+        item_set_objects = []
+        for set_data in item_sets_data:
+            item_set_objects.append(ItemSet(
+                version=version,
+                id_key=set_data["id"],
+                raw_data=set_data
+            ))
+
+        ItemSet.objects.bulk_create(item_set_objects)
+        self.stdout.write(f"  Created {len(item_set_objects)} item sets")
+
     def _import_advanced_classes(self, reader: GameDataReader, version: GameVersion):
         """Import advanced class data."""
         self.stdout.write("Importing advanced classes...")
@@ -387,6 +412,40 @@ class Command(BaseCommand):
 
         AdvancedClass.objects.bulk_create(advanced_class_objects)
         self.stdout.write(f"  Created {len(advanced_class_objects)} advanced classes")
+
+    def _import_magic_schools(self, reader: GameDataReader, version: GameVersion, localizations: dict):
+        """Import magic school display names."""
+        self.stdout.write("Importing magic schools...")
+
+        # Map school IDs to localization keys
+        school_localization_keys = {
+            'day': 'skill_magic_day_name',
+            'night': 'skill_magic_night_name',
+            'space': 'skill_magic_space_name',
+            'primal': 'skill_magic_primal_name',
+            'neutral': 'skill_magic_neutral_name',
+        }
+
+        # Default names in case localizations are missing
+        default_names = {
+            'day': 'Daylight Magic',
+            'night': 'Nightshade Magic',
+            'space': 'Arcane Magic',
+            'primal': 'Primal Magic',
+            'neutral': 'Neutral Magic',
+        }
+
+        school_objects = []
+        for school_id, loc_key in school_localization_keys.items():
+            display_name = localizations.get(loc_key, default_names[school_id])
+            school_objects.append(MagicSchool(
+                version=version,
+                id_key=school_id,
+                display_name=display_name
+            ))
+
+        MagicSchool.objects.bulk_create(school_objects)
+        self.stdout.write(f"  Created {len(school_objects)} magic schools")
 
     def _import_spells(self, reader: GameDataReader, version: GameVersion):
         """Import spell data."""

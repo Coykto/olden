@@ -221,6 +221,9 @@ class Hero(models.Model):
     # Starting skills (JSON array of skill IDs)
     starting_skills = models.JSONField(default=list, blank=True)
 
+    # Starting spells (JSON array of spell data from startMagics)
+    starting_spells = models.JSONField(default=list, blank=True)
+
     @property
     def non_faction_skills(self):
         """Get starting skills excluding the faction-specific skill."""
@@ -282,6 +285,102 @@ class Hero(models.Model):
             
             skills.append(info)
         return skills
+
+    @property
+    def starting_spells_info(self):
+        """Get starting spells with full info for the hero builder spellbook."""
+        from core.localizations import get_spell_info, get_spell_descriptions_by_level
+        spells = []
+
+        # Build spell replacement mapping from specialization bonuses
+        # heroMagicReplace bonuses have parameters: [base_spell_id, special_spell_id]
+        spell_replacements = {}
+        spec_info = self.specialization_info
+        for bonus in spec_info.get('raw_data', {}).get('bonuses', []):
+            if bonus.get('type') == 'heroMagicReplace':
+                params = bonus.get('parameters', [])
+                if len(params) >= 2:
+                    spell_replacements[params[0]] = params[1]
+
+        # Get spell data from raw_data.startMagics or from the starting_spells field
+        raw_spells = self.raw_data.get('startMagics', []) if self.raw_data else []
+        if not raw_spells:
+            raw_spells = self.starting_spells or []
+
+        for spell_data in raw_spells:
+            # Handle both formats: from raw_data (dict with sidConfig) or from starting_spells field
+            if isinstance(spell_data, dict):
+                spell_id = spell_data.get('sidConfig', '')
+                level = spell_data.get('level', 1)
+            else:
+                spell_id = spell_data
+                level = 1
+
+            if not spell_id:
+                continue
+
+            # Check if this spell should be replaced with a Masterful variant
+            actual_spell_id = spell_replacements.get(spell_id, spell_id)
+
+            # Get spell from database for full info
+            spell_obj = Spell.objects.filter(id_key=actual_spell_id).first()
+            if not spell_obj:
+                # Fallback to original spell_id if special not found
+                spell_obj = Spell.objects.filter(id_key=spell_id).first()
+                if not spell_obj:
+                    continue
+                actual_spell_id = spell_id
+
+            raw = spell_obj.raw_data or {}
+            spell_info = get_spell_info(actual_spell_id)
+
+            # Check if this is a masterful (special) variant
+            is_special = actual_spell_id.endswith('_special')
+
+            # Extract school from spell_id (e.g., 'day_17_magic_clear_view' -> 'day')
+            school = spell_obj.school or actual_spell_id.split('_')[0]
+
+            # Get spell type
+            spell_type = 'global' if raw.get('usedOnMap') else 'combat'
+
+            # Get descriptions by level
+            description_keys = raw.get('description', [])
+            descriptions_by_level = get_spell_descriptions_by_level(description_keys)
+
+            # Get max upgrade level
+            upgrade_cost = raw.get('upgradeCost', [])
+            mana_cost = raw.get('manaCost', [])
+            max_upgrade_level = (len(upgrade_cost) + 1) if upgrade_cost else (len(mana_cost) if mana_cost else 1)
+
+            # Get rank/tier
+            rank = raw.get('rank', spell_obj.level)
+
+            # For special spells, get the base spell name and add "Masterful" prefix
+            if is_special:
+                base_spell_info = get_spell_info(spell_id)  # Get name from base spell
+                spell_name = f"Masterful {base_spell_info['name']}"
+            else:
+                spell_name = spell_info['name']
+
+            spells.append({
+                'id': actual_spell_id,
+                'id_key': actual_spell_id,
+                'name': spell_name,
+                'icon': raw.get('icon', actual_spell_id.replace('_special', '')),  # Use base icon
+                'school': school,
+                'school_display': school.title() + ' Magic',
+                'level': rank,  # tier
+                'upgrade_level': level,  # starting upgrade level
+                'spell_type': spell_type,
+                'max_upgrade_level': max_upgrade_level,
+                'raw_data': raw,
+                'descriptions': descriptions_by_level,
+                'description_template': spell_info['description_template'],
+                'description_args': spell_info['description_args'],
+                'is_masterful': is_special,
+            })
+
+        return spells
 
     @property
     def hero_card_skill(self):
@@ -434,6 +533,35 @@ class Item(models.Model):
 
     def __str__(self):
         return f"{self.id_key} ({self.slot}, v{self.version.build_id})"
+
+
+class ItemSet(models.Model):
+    """Represents an item set (collection of items with set bonuses)."""
+    version = models.ForeignKey(GameVersion, on_delete=models.CASCADE, related_name='item_sets')
+    id_key = models.CharField(max_length=100, help_text="Set identifier from game files")
+
+    # Raw JSON data containing items list and bonuses
+    raw_data = models.JSONField(help_text="Complete raw set data from game files")
+
+    class Meta:
+        ordering = ['version', 'id_key']
+        unique_together = [['version', 'id_key']]
+
+    def __str__(self):
+        return f"{self.id_key} (v{self.version.build_id})"
+
+
+class MagicSchool(models.Model):
+    """Stores localized names for magic schools."""
+    version = models.ForeignKey(GameVersion, on_delete=models.CASCADE, related_name='magic_schools')
+    id_key = models.CharField(max_length=20)  # day, night, space, primal, neutral
+    display_name = models.CharField(max_length=100)  # Daylight Magic, etc.
+
+    class Meta:
+        unique_together = [['version', 'id_key']]
+
+    def __str__(self):
+        return f"{self.display_name} ({self.id_key})"
 
 
 class Spell(models.Model):

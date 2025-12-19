@@ -1,6 +1,6 @@
 /**
  * Auto-generated description functions from Olden Era .script files
- * Generated at: 2025-12-18T01:26:28.668Z
+ * Generated at: 2025-12-18T22:25:11.353Z
  * DO NOT EDIT - This file is regenerated during import_gamedata
  */
 
@@ -1689,11 +1689,13 @@ DescriptionFunctions["current_specialization_dungeon_hero_3_spec_bonus_alt"] = D
 // Source: DB/info/info_hero_skills/hero_specialization_dungeon.script:20
 DescriptionFunctions["alt_text_dot_damage_amount_level_base"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(GameData.buffs?.["skill_dungeon_hero_3_debuff"], "actions[0].damageDealer.minBaseDmg");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_hero_skills/hero_specialization_dungeon.script:25
 DescriptionFunctions["alt_text_dot_damage_amount_level_bonus"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(GameData.buffs?.["skill_dungeon_hero_3_debuff"], "actions[0].damageDealer.damageMultiplerPerHeroLevel");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_hero_skills/hero_specialization_dungeon.script:30
@@ -1879,21 +1881,25 @@ DescriptionFunctions["current_specialization_unfrozen_hero_18_spec_level_step"] 
 // Source: DB/info/info_script_magic/magic_info.script:3
 DescriptionFunctions["current_magic_upgrade_0_param_mana_cost"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "manaCost[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:8
 DescriptionFunctions["current_magic_upgrade_1_param_mana_cost"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "manaCost[1]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:13
 DescriptionFunctions["current_magic_upgrade_2_param_mana_cost"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "manaCost[2]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:18
 DescriptionFunctions["current_magic_upgrade_3_param_mana_cost"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "manaCost[3]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:25
@@ -1901,6 +1907,7 @@ DescriptionFunctions["current_magic_upgrade_0_1_param_mana_cost"] = DescriptionR
   let manaCostBase = DescriptionRuntime.get(ctx.currentMagic, "manaCost[0]");
   let manaCostNext = DescriptionRuntime.get(ctx.currentMagic, "manaCost[1]");
   let _return = (Number(manaCostBase) || 0) - (Number(manaCostNext) || 0);
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:33
@@ -1908,6 +1915,7 @@ DescriptionFunctions["current_magic_upgrade_1_2_param_mana_cost"] = DescriptionR
   let manaCostBase = DescriptionRuntime.get(ctx.currentMagic, "manaCost[1]");
   let manaCostNext = DescriptionRuntime.get(ctx.currentMagic, "manaCost[2]");
   let _return = (Number(manaCostBase) || 0) - (Number(manaCostNext) || 0);
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:41
@@ -1915,6 +1923,7 @@ DescriptionFunctions["current_magic_upgrade_2_3_param_mana_cost"] = DescriptionR
   let manaCostBase = DescriptionRuntime.get(ctx.currentMagic, "manaCost[2]");
   let manaCostNext = DescriptionRuntime.get(ctx.currentMagic, "manaCost[3]");
   let _return = (Number(manaCostBase) || 0) - (Number(manaCostNext) || 0);
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:51
@@ -1922,6 +1931,7 @@ DescriptionFunctions["current_magic_upgrade_0_param_damage_base"] = DescriptionR
   let minBaseDmg = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].minBaseDmg");
   let maxBaseDmg = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].maxBaseDmg");
   let _return = ((Number(minBaseDmg) || 0) + (Number(maxBaseDmg) || 0)) / 2;
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:59
@@ -1929,6 +1939,7 @@ DescriptionFunctions["current_magic_upgrade_1_param_damage_base"] = DescriptionR
   let minBaseDmg = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].minBaseDmg");
   let maxBaseDmg = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].maxBaseDmg");
   let _return = ((Number(minBaseDmg) || 0) + (Number(maxBaseDmg) || 0)) / 2;
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:67
@@ -1936,6 +1947,7 @@ DescriptionFunctions["current_magic_upgrade_2_param_damage_base"] = DescriptionR
   let minBaseDmg = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].minBaseDmg");
   let maxBaseDmg = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].maxBaseDmg");
   let _return = ((Number(minBaseDmg) || 0) + (Number(maxBaseDmg) || 0)) / 2;
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:75
@@ -1943,6 +1955,7 @@ DescriptionFunctions["current_magic_upgrade_3_param_damage_base"] = DescriptionR
   let minBaseDmg = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].minBaseDmg");
   let maxBaseDmg = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].maxBaseDmg");
   let _return = ((Number(minBaseDmg) || 0) + (Number(maxBaseDmg) || 0)) / 2;
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:85
@@ -1950,6 +1963,7 @@ DescriptionFunctions["current_magic_upgrade_0_param_damage_per_sp"] = Descriptio
   let minStackDmg = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].minStackDmg");
   let maxStackDmg = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].maxStackDmg");
   let _return = ((Number(minStackDmg) || 0) + (Number(maxStackDmg) || 0)) / 2;
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:93
@@ -1957,6 +1971,7 @@ DescriptionFunctions["current_magic_upgrade_1_param_damage_per_sp"] = Descriptio
   let minStackDmg = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].minStackDmg");
   let maxStackDmg = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].maxStackDmg");
   let _return = ((Number(minStackDmg) || 0) + (Number(maxStackDmg) || 0)) / 2;
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:101
@@ -1964,6 +1979,7 @@ DescriptionFunctions["current_magic_upgrade_2_param_damage_per_sp"] = Descriptio
   let minStackDmg = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].minStackDmg");
   let maxStackDmg = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].maxStackDmg");
   let _return = ((Number(minStackDmg) || 0) + (Number(maxStackDmg) || 0)) / 2;
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:109
@@ -1971,6 +1987,7 @@ DescriptionFunctions["current_magic_upgrade_3_param_damage_per_sp"] = Descriptio
   let minStackDmg = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].minStackDmg");
   let maxStackDmg = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].maxStackDmg");
   let _return = ((Number(minStackDmg) || 0) + (Number(maxStackDmg) || 0)) / 2;
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:119
@@ -1978,6 +1995,7 @@ DescriptionFunctions["current_magic_upgrade_0_param_damage_percent_base"] = Desc
   let minPercentDmg = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].minPercentDmg");
   let maxPercentDmg = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].maxPercentDmg");
   let _return = ((Number(minPercentDmg) || 0) + (Number(maxPercentDmg) || 0)) / 2;
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:127
@@ -1985,6 +2003,7 @@ DescriptionFunctions["current_magic_upgrade_1_param_damage_percent_base"] = Desc
   let minPercentDmg = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].minPercentDmg");
   let maxPercentDmg = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].maxPercentDmg");
   let _return = ((Number(minPercentDmg) || 0) + (Number(maxPercentDmg) || 0)) / 2;
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:135
@@ -1992,6 +2011,7 @@ DescriptionFunctions["current_magic_upgrade_2_param_damage_percent_base"] = Desc
   let minPercentDmg = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].minPercentDmg");
   let maxPercentDmg = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].maxPercentDmg");
   let _return = ((Number(minPercentDmg) || 0) + (Number(maxPercentDmg) || 0)) / 2;
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:143
@@ -1999,6 +2019,7 @@ DescriptionFunctions["current_magic_upgrade_3_param_damage_percent_base"] = Desc
   let minPercentDmg = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].minPercentDmg");
   let maxPercentDmg = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].maxPercentDmg");
   let _return = ((Number(minPercentDmg) || 0) + (Number(maxPercentDmg) || 0)) / 2;
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:153
@@ -2006,6 +2027,7 @@ DescriptionFunctions["current_magic_upgrade_0_param_damage_percent_per_sp"] = De
   let minStackPercentDmg = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].minStackPercentDmg");
   let maxStackPercentDmg = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].maxStackPercentDmg");
   let _return = ((Number(minStackPercentDmg) || 0) + (Number(maxStackPercentDmg) || 0)) / 2;
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:161
@@ -2013,6 +2035,7 @@ DescriptionFunctions["current_magic_upgrade_1_param_damage_percent_per_sp"] = De
   let minStackPercentDmg = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].minStackPercentDmg");
   let maxStackPercentDmg = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].maxStackPercentDmg");
   let _return = ((Number(minStackPercentDmg) || 0) + (Number(maxStackPercentDmg) || 0)) / 2;
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:169
@@ -2020,6 +2043,7 @@ DescriptionFunctions["current_magic_upgrade_2_param_damage_percent_per_sp"] = De
   let minStackPercentDmg = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].minStackPercentDmg");
   let maxStackPercentDmg = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].maxStackPercentDmg");
   let _return = ((Number(minStackPercentDmg) || 0) + (Number(maxStackPercentDmg) || 0)) / 2;
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:177
@@ -2027,830 +2051,979 @@ DescriptionFunctions["current_magic_upgrade_3_param_damage_percent_per_sp"] = De
   let minStackPercentDmg = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].minStackPercentDmg");
   let maxStackPercentDmg = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].maxStackPercentDmg");
   let _return = ((Number(minStackPercentDmg) || 0) + (Number(maxStackPercentDmg) || 0)) / 2;
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:187
 DescriptionFunctions["current_magic_upgrade_0_param_heal_base"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].targetMechanics[0].values[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:192
 DescriptionFunctions["current_magic_upgrade_1_param_heal_base"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].targetMechanics[0].values[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:197
 DescriptionFunctions["current_magic_upgrade_2_param_heal_base"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].targetMechanics[0].values[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:202
 DescriptionFunctions["current_magic_upgrade_3_param_heal_base"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].targetMechanics[0].values[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:209
 DescriptionFunctions["current_magic_upgrade_0_param_heal_per_sp"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].targetMechanics[0].values[2]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:214
 DescriptionFunctions["current_magic_upgrade_1_param_heal_per_sp"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].targetMechanics[0].values[2]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:219
 DescriptionFunctions["current_magic_upgrade_2_param_heal_per_sp"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].targetMechanics[0].values[2]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:224
 DescriptionFunctions["current_magic_upgrade_3_param_heal_per_sp"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].targetMechanics[0].values[2]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:231
 DescriptionFunctions["current_magic_upgrade_0_param_duration"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].buff.duration");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:236
 DescriptionFunctions["current_magic_upgrade_1_param_duration"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].buff.duration");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:241
 DescriptionFunctions["current_magic_upgrade_2_param_duration"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].buff.duration");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:246
 DescriptionFunctions["current_magic_upgrade_3_param_duration"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].buff.duration");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:253
 DescriptionFunctions["current_magic_upgrade_0_param_temp_stack_base"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].targetMechanics[0].values[2]");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:258
 DescriptionFunctions["current_magic_upgrade_1_param_temp_stack_base"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].targetMechanics[0].values[2]");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:263
 DescriptionFunctions["current_magic_upgrade_2_param_temp_stack_base"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].targetMechanics[0].values[2]");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:268
 DescriptionFunctions["current_magic_upgrade_3_param_temp_stack_base"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].targetMechanics[0].values[2]");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:275
 DescriptionFunctions["current_magic_upgrade_0_param_temp_stack_perCount"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].targetMechanics[0].values[3]");
+  return DescriptionRuntime.formatModFloatPercentF1(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:280
 DescriptionFunctions["current_magic_upgrade_1_param_temp_stack_perCount"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].targetMechanics[0].values[3]");
+  return DescriptionRuntime.formatModFloatPercentF1(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:285
 DescriptionFunctions["current_magic_upgrade_2_param_temp_stack_perCount"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].targetMechanics[0].values[3]");
+  return DescriptionRuntime.formatModFloatPercentF1(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:290
 DescriptionFunctions["current_magic_upgrade_3_param_temp_stack_perCount"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].targetMechanics[0].values[3]");
+  return DescriptionRuntime.formatModFloatPercentF1(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:297
 DescriptionFunctions["current_magic_unpgrade_0_param_buff_offence"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.offence");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:303
 DescriptionFunctions["current_magic_unpgrade_1_param_buff_offence"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.offence");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:309
 DescriptionFunctions["current_magic_unpgrade_2_param_buff_offence"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.offence");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:315
 DescriptionFunctions["current_magic_unpgrade_3_param_buff_offence"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.offence");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:323
 DescriptionFunctions["current_magic_unpgrade_0_param_buff_defence"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.defence");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:329
 DescriptionFunctions["current_magic_unpgrade_1_param_buff_defence"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.defence");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:335
 DescriptionFunctions["current_magic_unpgrade_2_param_buff_defence"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.defence");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:341
 DescriptionFunctions["current_magic_unpgrade_3_param_buff_defence"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.defence");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:349
 DescriptionFunctions["current_magic_unpgrade_0_param_buff_speed"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.speed");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:355
 DescriptionFunctions["current_magic_unpgrade_1_param_buff_speed"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.speed");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:361
 DescriptionFunctions["current_magic_unpgrade_2_param_buff_speed"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.speed");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:367
 DescriptionFunctions["current_magic_unpgrade_3_param_buff_speed"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.speed");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:375
 DescriptionFunctions["current_magic_unpgrade_0_param_buff_initiative"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.initiative");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:381
 DescriptionFunctions["current_magic_unpgrade_1_param_buff_initiative"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.initiative");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:387
 DescriptionFunctions["current_magic_unpgrade_2_param_buff_initiative"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.initiative");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:393
 DescriptionFunctions["current_magic_unpgrade_3_param_buff_initiative"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.initiative");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:401
 DescriptionFunctions["current_magic_unpgrade_0_param_buff_moral"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.moral");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:407
 DescriptionFunctions["current_magic_unpgrade_1_param_buff_moral"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.moral");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:413
 DescriptionFunctions["current_magic_unpgrade_2_param_buff_moral"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.moral");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:419
 DescriptionFunctions["current_magic_unpgrade_3_param_buff_moral"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.moral");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:427
 DescriptionFunctions["current_magic_unpgrade_0_param_buff_luck"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.luck");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:433
 DescriptionFunctions["current_magic_unpgrade_1_param_buff_luck"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.luck");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:439
 DescriptionFunctions["current_magic_unpgrade_2_param_buff_luck"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.luck");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:445
 DescriptionFunctions["current_magic_unpgrade_3_param_buff_luck"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.luck");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:453
 DescriptionFunctions["current_magic_unpgrade_0_param_buff_skipActionChanceModifier"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.skipActionChanceModifier");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:459
 DescriptionFunctions["current_magic_unpgrade_1_param_buff_skipActionChanceModifier"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.skipActionChanceModifier");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:465
 DescriptionFunctions["current_magic_unpgrade_2_param_buff_skipActionChanceModifier"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.skipActionChanceModifier");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:471
 DescriptionFunctions["current_magic_unpgrade_3_param_buff_skipActionChanceModifier"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.skipActionChanceModifier");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:479
 DescriptionFunctions["current_magic_unpgrade_0_param_buff_anticritChanceModifier"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.anticritChanceModifier");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:485
 DescriptionFunctions["current_magic_unpgrade_1_param_buff_anticritChanceModifier"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.anticritChanceModifier");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:491
 DescriptionFunctions["current_magic_unpgrade_2_param_buff_anticritChanceModifier"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.anticritChanceModifier");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:497
 DescriptionFunctions["current_magic_unpgrade_3_param_buff_anticritChanceModifier"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.anticritChanceModifier");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:505
 DescriptionFunctions["current_magic_unpgrade_0_param_buff_outAllDmgMod"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.outAllDmgMod");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:511
 DescriptionFunctions["current_magic_unpgrade_1_param_buff_outAllDmgMod"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.outAllDmgMod");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:517
 DescriptionFunctions["current_magic_unpgrade_2_param_buff_outAllDmgMod"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.outAllDmgMod");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:523
 DescriptionFunctions["current_magic_unpgrade_3_param_buff_outAllDmgMod"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.outAllDmgMod");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:531
 DescriptionFunctions["current_magic_unpgrade_0_param_buff_inAllDmgMod"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.inAllDmgMod");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:537
 DescriptionFunctions["current_magic_unpgrade_1_param_buff_inAllDmgMod"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.inAllDmgMod");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:543
 DescriptionFunctions["current_magic_unpgrade_2_param_buff_inAllDmgMod"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.inAllDmgMod");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:549
 DescriptionFunctions["current_magic_unpgrade_3_param_buff_inAllDmgMod"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.inAllDmgMod");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:557
 DescriptionFunctions["current_magic_unpgrade_0_param_buff_outAllDmgMod_alt"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].targetMechanics[0].values[0]");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.outAllDmgMod");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:563
 DescriptionFunctions["current_magic_unpgrade_1_param_buff_outAllDmgMod_alt"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].targetMechanics[0].values[0]");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.outAllDmgMod");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:569
 DescriptionFunctions["current_magic_unpgrade_2_param_buff_outAllDmgMod_alt"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].targetMechanics[0].values[0]");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.outAllDmgMod");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:575
 DescriptionFunctions["current_magic_unpgrade_3_param_buff_outAllDmgMod_alt"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].targetMechanics[0].values[0]");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.outAllDmgMod");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:583
 DescriptionFunctions["current_magic_unpgrade_0_param_buff_inAllDmgMod_alt"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].targetMechanics[0].values[0]");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.inAllDmgMod");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:589
 DescriptionFunctions["current_magic_unpgrade_1_param_buff_inAllDmgMod_alt"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].targetMechanics[0].values[0]");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.inAllDmgMod");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:595
 DescriptionFunctions["current_magic_unpgrade_2_param_buff_inAllDmgMod_alt"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].targetMechanics[0].values[0]");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.inAllDmgMod");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:601
 DescriptionFunctions["current_magic_unpgrade_3_param_buff_inAllDmgMod_alt"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].targetMechanics[0].values[0]");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.inAllDmgMod");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:609
 DescriptionFunctions["current_magic_unpgrade_0_param_buff_hpPerc"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.hpPerc");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:615
 DescriptionFunctions["current_magic_unpgrade_1_param_buff_hpPerc"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.hpPerc");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:621
 DescriptionFunctions["current_magic_unpgrade_2_param_buff_hpPerc"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.hpPerc");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:627
 DescriptionFunctions["current_magic_unpgrade_3_param_buff_hpPerc"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.hpPerc");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:635
 DescriptionFunctions["current_magic_unpgrade_0_param_buff_finalHealingBonusPercent"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.finalHealingBonusPercent");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:641
 DescriptionFunctions["current_magic_unpgrade_1_param_buff_finalHealingBonusPercent"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.finalHealingBonusPercent");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:647
 DescriptionFunctions["current_magic_unpgrade_2_param_buff_finalHealingBonusPercent"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.finalHealingBonusPercent");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:653
 DescriptionFunctions["current_magic_unpgrade_3_param_buff_finalHealingBonusPercent"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.finalHealingBonusPercent");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:661
 DescriptionFunctions["current_magic_unpgrade_0_param_buff_healthLimitMinPercent"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.healthLimitMinPercent");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:667
 DescriptionFunctions["current_magic_unpgrade_1_param_buff_healthLimitMinPercent"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.healthLimitMinPercent");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:673
 DescriptionFunctions["current_magic_unpgrade_2_param_buff_healthLimitMinPercent"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.healthLimitMinPercent");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:679
 DescriptionFunctions["current_magic_unpgrade_3_param_buff_healthLimitMinPercent"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.healthLimitMinPercent");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:687
 DescriptionFunctions["current_magic_unpgrade_0_param_buff_outDmgMods"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.outDmgMods.list[0].v");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:693
 DescriptionFunctions["current_magic_unpgrade_1_param_buff_outDmgMods"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.outDmgMods.list[0].v");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:699
 DescriptionFunctions["current_magic_unpgrade_2_param_buff_outDmgMods"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.outDmgMods.list[0].v");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:705
 DescriptionFunctions["current_magic_unpgrade_3_param_buff_outDmgMods"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.outDmgMods.list[0].v");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:713
 DescriptionFunctions["current_magic_unpgrade_0_param_buff_inDmgMods"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.inDmgMods.list[0].v");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:719
 DescriptionFunctions["current_magic_unpgrade_1_param_buff_inDmgMods"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.inDmgMods.list[0].v");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:725
 DescriptionFunctions["current_magic_unpgrade_2_param_buff_inDmgMods"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.inDmgMods.list[0].v");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:731
 DescriptionFunctions["current_magic_unpgrade_3_param_buff_inDmgMods"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.inDmgMods.list[0].v");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:739
 DescriptionFunctions["current_magic_unpgrade_0_param_buff_numCounters"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.numCounters");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:745
 DescriptionFunctions["current_magic_unpgrade_1_param_buff_numCounters"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.numCounters");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:751
 DescriptionFunctions["current_magic_unpgrade_2_param_buff_numCounters"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.numCounters");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:757
 DescriptionFunctions["current_magic_unpgrade_3_param_buff_numCounters"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.numCounters");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:765
 DescriptionFunctions["current_magic_unpgrade_0_param_buff_tauntRadius"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.tauntRadius");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:771
 DescriptionFunctions["current_magic_unpgrade_1_param_buff_tauntRadius"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.tauntRadius");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:777
 DescriptionFunctions["current_magic_unpgrade_2_param_buff_tauntRadius"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.tauntRadius");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:783
 DescriptionFunctions["current_magic_unpgrade_3_param_buff_tauntRadius"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.tauntRadius");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:791
 DescriptionFunctions["current_magic_unpgrade_0_param_buff_actionsDamage"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.targetMechanics[0].values[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:797
 DescriptionFunctions["current_magic_unpgrade_1_param_buff_actionsDamage"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.targetMechanics[0].values[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:803
 DescriptionFunctions["current_magic_unpgrade_2_param_buff_actionsDamage"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.targetMechanics[0].values[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:809
 DescriptionFunctions["current_magic_unpgrade_3_param_buff_actionsDamage"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.targetMechanics[0].values[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:817
 DescriptionFunctions["current_magic_unpgrade_0_param_assasinate_base"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].targetMechanics[0].values[0]");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:822
 DescriptionFunctions["current_magic_unpgrade_1_param_assasinate_base"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].targetMechanics[0].values[0]");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:827
 DescriptionFunctions["current_magic_unpgrade_2_param_assasinate_base"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].targetMechanics[0].values[0]");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:832
 DescriptionFunctions["current_magic_unpgrade_3_param_assasinate_base"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].targetMechanics[0].values[0]");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:839
 DescriptionFunctions["current_magic_unpgrade_0_param_assasinate_buff_base"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.targetMechanics[0].values[0]");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:845
 DescriptionFunctions["current_magic_unpgrade_1_param_assasinate_buff_base"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.targetMechanics[0].values[0]");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:851
 DescriptionFunctions["current_magic_unpgrade_2_param_assasinate_buff_base"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.targetMechanics[0].values[0]");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:857
 DescriptionFunctions["current_magic_unpgrade_3_param_assasinate_buff_base"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.targetMechanics[0].values[0]");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:865
 DescriptionFunctions["current_magic_unpgrade_0_param_kill_stacks"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].targetMechanics[0].values[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:870
 DescriptionFunctions["current_magic_unpgrade_1_param_kill_stacks"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].targetMechanics[0].values[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:875
 DescriptionFunctions["current_magic_unpgrade_2_param_kill_stacks"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].targetMechanics[0].values[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:880
 DescriptionFunctions["current_magic_unpgrade_3_param_kill_stacks"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].targetMechanics[0].values[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:887
 DescriptionFunctions["current_magic_unpgrade_0_param_summonRange"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].castTargetParams.distance");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:892
 DescriptionFunctions["current_magic_unpgrade_1_param_summonRange"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].castTargetParams.distance");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:897
 DescriptionFunctions["current_magic_unpgrade_2_param_summonRange"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].castTargetParams.distance");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:902
 DescriptionFunctions["current_magic_unpgrade_3_param_summonRange"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].castTargetParams.distance");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:909
 DescriptionFunctions["current_magic_unpgrade_0_param_summonSP"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].targetMechanics[0].values[4]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:914
 DescriptionFunctions["current_magic_unpgrade_1_param_summonSP"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].targetMechanics[0].values[4]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:919
 DescriptionFunctions["current_magic_unpgrade_2_param_summonSP"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].targetMechanics[0].values[4]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:924
 DescriptionFunctions["current_magic_unpgrade_3_param_summonSP"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].targetMechanics[0].values[4]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:931
 DescriptionFunctions["current_magic_unpgrade_0_param_minDamagePerEnergyLevel"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].minDamagePerEnergyLevel");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:936
 DescriptionFunctions["current_magic_unpgrade_1_param_minDamagePerEnergyLevel"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].minDamagePerEnergyLevel");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:941
 DescriptionFunctions["current_magic_unpgrade_2_param_minDamagePerEnergyLevel"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].minDamagePerEnergyLevel");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:946
 DescriptionFunctions["current_magic_unpgrade_3_param_minDamagePerEnergyLevel"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].minDamagePerEnergyLevel");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:953
 DescriptionFunctions["current_magic_unpgrade_0_param_add_energy"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].targetMechanics[0].values[2]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:958
 DescriptionFunctions["current_magic_unpgrade_1_param_add_energy"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].targetMechanics[0].values[2]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:963
 DescriptionFunctions["current_magic_unpgrade_2_param_add_energy"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].targetMechanics[0].values[2]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:968
 DescriptionFunctions["current_magic_unpgrade_3_param_add_energy"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].targetMechanics[0].values[2]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:975
 DescriptionFunctions["current_magic_unpgrade_0_param_levelDmg"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].levelDmg");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:980
 DescriptionFunctions["current_magic_unpgrade_1_param_levelDmg"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].levelDmg");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:985
 DescriptionFunctions["current_magic_unpgrade_2_param_levelDmg"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].levelDmg");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:990
 DescriptionFunctions["current_magic_unpgrade_3_param_levelDmg"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].levelDmg");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:997
 DescriptionFunctions["current_magic_unpgrade_0_param_numTargets"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].numTargets");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1002
 DescriptionFunctions["current_magic_unpgrade_1_param_numTargets"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].numTargets");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1007
 DescriptionFunctions["current_magic_unpgrade_2_param_numTargets"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].numTargets");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1012
 DescriptionFunctions["current_magic_unpgrade_3_param_numTargets"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].numTargets");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1019
 DescriptionFunctions["current_magic_unpgrade_0_param_blink_range"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].orderedCastParams[0].distanceFromFirst");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1024
 DescriptionFunctions["current_magic_unpgrade_1_param_blink_range"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].orderedCastParams[0].distanceFromFirst");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1029
 DescriptionFunctions["current_magic_unpgrade_2_param_blink_range"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].orderedCastParams[0].distanceFromFirst");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1034
 DescriptionFunctions["current_magic_unpgrade_3_param_blink_range"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].orderedCastParams[0].distanceFromFirst");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1041
 DescriptionFunctions["current_magic_unpgrade_0_param_castleDamage_building"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].targetMechanics[0].values[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1046
 DescriptionFunctions["current_magic_unpgrade_1_param_castleDamage_building"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].targetMechanics[0].values[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1051
 DescriptionFunctions["current_magic_unpgrade_2_param_castleDamage_building"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].targetMechanics[0].values[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1056
 DescriptionFunctions["current_magic_unpgrade_3_param_castleDamage_building"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].targetMechanics[0].values[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1063
 DescriptionFunctions["current_magic_unpgrade_0_param_castleDamage_unit"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].targetMechanics[0].values[2]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1068
 DescriptionFunctions["current_magic_unpgrade_1_param_castleDamage_unit"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].targetMechanics[0].values[2]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1073
 DescriptionFunctions["current_magic_unpgrade_2_param_castleDamage_unit"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].targetMechanics[0].values[2]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1078
 DescriptionFunctions["current_magic_unpgrade_3_param_castleDamage_unit"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].targetMechanics[0].values[2]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1085
@@ -2881,205 +3054,245 @@ DescriptionFunctions["text_description_up_effect_constant_5"] = DescriptionRunti
 // Source: DB/info/info_script_magic/magic_info.script:1114
 DescriptionFunctions["current_magic_unpgrade_0_param_add_move_points"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[0].parameters[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1119
 DescriptionFunctions["current_magic_unpgrade_1_param_add_move_points"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[1].parameters[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1124
 DescriptionFunctions["current_magic_unpgrade_2_param_add_move_points"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[2].parameters[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1129
 DescriptionFunctions["current_magic_unpgrade_3_param_add_move_points"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[3].parameters[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1136
 DescriptionFunctions["current_magic_unpgrade_0_param_create_portals"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[0].parameters[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1141
 DescriptionFunctions["current_magic_unpgrade_1_param_create_portals"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[1].parameters[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1146
 DescriptionFunctions["current_magic_unpgrade_2_param_create_portals"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[2].parameters[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1151
 DescriptionFunctions["current_magic_unpgrade_3_param_create_portals"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[3].parameters[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1158
 DescriptionFunctions["current_magic_unpgrade_0_param_farsight_range"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[0].parameters[2]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1163
 DescriptionFunctions["current_magic_unpgrade_1_param_farsight_range"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[1].parameters[2]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1168
 DescriptionFunctions["current_magic_unpgrade_2_param_farsight_range"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[2].parameters[2]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1173
 DescriptionFunctions["current_magic_unpgrade_3_param_farsight_range"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[3].parameters[2]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1180
 DescriptionFunctions["current_magic_unpgrade_0_param_farsight_radius"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[0].parameters[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1185
 DescriptionFunctions["current_magic_unpgrade_1_param_farsight_radius"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[1].parameters[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1190
 DescriptionFunctions["current_magic_unpgrade_2_param_farsight_radius"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[2].parameters[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1195
 DescriptionFunctions["current_magic_unpgrade_3_param_farsight_radius"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[3].parameters[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1202
 DescriptionFunctions["current_magic_unpgrade_0_param_nairas_veil"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[0].parameters[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1207
 DescriptionFunctions["current_magic_unpgrade_1_param_nairas_veil"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[1].parameters[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1212
 DescriptionFunctions["current_magic_unpgrade_2_param_nairas_veil"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[2].parameters[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1217
 DescriptionFunctions["current_magic_unpgrade_3_param_nairas_veil"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[3].parameters[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1224
 DescriptionFunctions["current_magic_unpgrade_0_param_assemble_radius"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[0].parameters[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1229
 DescriptionFunctions["current_magic_unpgrade_1_param_assemble_radius"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[1].parameters[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1234
 DescriptionFunctions["current_magic_unpgrade_2_param_assemble_radius"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[2].parameters[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1239
 DescriptionFunctions["current_magic_unpgrade_3_param_assemble_radius"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[3].parameters[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1246
 DescriptionFunctions["current_magic_unpgrade_0_param_dimension_door_radius"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[0].parameters[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1251
 DescriptionFunctions["current_magic_unpgrade_1_param_dimension_door_radius"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[1].parameters[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1256
 DescriptionFunctions["current_magic_unpgrade_2_param_dimension_door_radius"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[2].parameters[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1261
 DescriptionFunctions["current_magic_unpgrade_3_param_dimension_door_radius"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[3].parameters[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1268
 DescriptionFunctions["current_magic_unpgrade_0_param_reinforcements_radius"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[0].parameters[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1273
 DescriptionFunctions["current_magic_unpgrade_1_param_reinforcements_radius"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[1].parameters[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1278
 DescriptionFunctions["current_magic_unpgrade_2_param_reinforcements_radius"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[2].parameters[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1283
 DescriptionFunctions["current_magic_unpgrade_3_param_reinforcements_radius"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[3].parameters[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1290
 DescriptionFunctions["current_magic_unpgrade_0_param_primordial_chaos_radius"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[0].parameters[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1295
 DescriptionFunctions["current_magic_unpgrade_1_param_primordial_chaos_radius"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[1].parameters[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1300
 DescriptionFunctions["current_magic_unpgrade_2_param_primordial_chaos_radius"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[2].parameters[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1305
 DescriptionFunctions["current_magic_unpgrade_3_param_primordial_chaos_radius"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[3].parameters[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1312
 DescriptionFunctions["current_magic_unpgrade_0_param_primordial_chaos_power"] = DescriptionRuntime.memoize(function(ctx) {
   let data = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[0].parameters[1]");
   let _return = (Number("1") || 0) - (Number(data) || 0);
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1318
 DescriptionFunctions["current_magic_unpgrade_1_param_primordial_chaos_power"] = DescriptionRuntime.memoize(function(ctx) {
   let data = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[1].parameters[1]");
   let _return = (Number("1") || 0) - (Number(data) || 0);
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1324
 DescriptionFunctions["current_magic_unpgrade_2_param_primordial_chaos_power"] = DescriptionRuntime.memoize(function(ctx) {
   let data = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[2].parameters[1]");
   let _return = (Number("1") || 0) - (Number(data) || 0);
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_info.script:1330
 DescriptionFunctions["current_magic_unpgrade_3_param_primordial_chaos_power"] = DescriptionRuntime.memoize(function(ctx) {
   let data = DescriptionRuntime.get(ctx.currentMagic, "worldMagic.magicSettings[3].parameters[1]");
   let _return = (Number("1") || 0) - (Number(data) || 0);
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle.script:3
@@ -3118,6 +3331,7 @@ DescriptionFunctions["current_magic_object_duration"] = DescriptionRuntime.memoi
 // Source: DB/info/info_script_magic/magic_battle.script:43
 DescriptionFunctions["current_magic_numTargets"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "numTargets");
+  return DescriptionRuntime.formatInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle.script:48
@@ -3304,21 +3518,25 @@ DescriptionFunctions["current_magic_sightRadius4Multipler"] = DescriptionRuntime
 // Source: DB/info/info_script_magic/magic_battle_alts.script:175
 DescriptionFunctions["current_magic_sightRadiusMultipler0"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "parameters[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_alts.script:180
 DescriptionFunctions["current_magic_sightRadiusMultipler1"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "parameters[1]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_alts.script:185
 DescriptionFunctions["current_magic_sightRadiusMultipler2"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "parameters[2]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_alts.script:190
 DescriptionFunctions["current_magic_sightRadiusMultipler3"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "parameters[3]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_alts.script:197
@@ -3387,24 +3605,28 @@ DescriptionFunctions["current_magic_percentDamagePerCount"] = DescriptionRuntime
 DescriptionFunctions["current_magic_baseDotDamage"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.minBaseDmg");
+  return DescriptionRuntime.formatInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_alts.script:283
 DescriptionFunctions["current_magic_baseDotDamagePerCount"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.minStackDmg");
+  return DescriptionRuntime.formatInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_alts.script:291
 DescriptionFunctions["current_magic_baseRevengeDamage"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.targetMechanics[0].values[2]");
+  return DescriptionRuntime.formatInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_alts.script:297
 DescriptionFunctions["current_magic_baseRevengeDamagePerCount"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.targetMechanics[0].values[3]");
+  return DescriptionRuntime.formatInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_alts.script:305
@@ -3441,12 +3663,14 @@ DescriptionFunctions["current_magic_countBuffDuration_doreaths_tide"] = Descript
 DescriptionFunctions["alt_text_summon_hp"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "targetMechanics[0].values[5]");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.hp");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_alts.script:350
 DescriptionFunctions["alt_text_summon_dmg"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "targetMechanics[0].values[5]");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.damageMin");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_alts.script:356
@@ -3488,36 +3712,42 @@ DescriptionFunctions["current_day_1_magic_healing_water_1"] = DescriptionRuntime
 DescriptionFunctions["current_day_2_magic_sharp_edge"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.outDmgMods.list[0].v");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_day.script:44
 DescriptionFunctions["current_day_3_magic_haste"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.speed");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_day.script:52
 DescriptionFunctions["current_day_4_magic_favorable_wind"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.outDmgMods.list[0].v");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_day.script:60
 DescriptionFunctions["current_day_11_magic_masterful_parry"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.numCounters");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_day.script:66
 DescriptionFunctions["current_day_11_magic_masterful_parry_damage"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.outDmgMods.list[0].v");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_day.script:74
 DescriptionFunctions["current_day_5_magic_shorten_shadow"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.defence");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_day.script:82
@@ -3529,6 +3759,7 @@ DescriptionFunctions["current_day_6_magic_cleansing_ray"] = DescriptionRuntime.m
 DescriptionFunctions["current_day_8_magic_taunt"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.tauntRadius");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_day.script:95
@@ -3540,18 +3771,21 @@ DescriptionFunctions["current_day_8_magic_taunt_2"] = DescriptionRuntime.memoize
 DescriptionFunctions["current_day_9_magic_arinas_hymn_1"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.initiative");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_day.script:108
 DescriptionFunctions["current_day_9_magic_arinas_hymn_2"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.hpPerc");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_day.script:116
 DescriptionFunctions["current_day_7_magic_inner_light_old"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.energyPerCast");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_day.script:122
@@ -3574,42 +3808,49 @@ DescriptionFunctions["current_day_13_vengeance"] = DescriptionRuntime.memoize(fu
   let count = ctx.currentHero?.getSpellPower?.(ctx.currentMagic?.school) ?? 0;
   let stackDamage = (Number(stackBonus) || 0) * (Number(count) || 0);
   let _return = (Number(baseDamage) || 0) + (Number(stackDamage) || 0);
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_day.script:152
 DescriptionFunctions["current_day_13_vengeance_0_param_damage"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.targetMechanics[0].values[3]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_day.script:158
 DescriptionFunctions["current_day_13_vengeance_1_param_damage"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.targetMechanics[0].values[3]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_day.script:164
 DescriptionFunctions["current_day_13_vengeance_2_param_damage"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.targetMechanics[0].values[3]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_day.script:170
 DescriptionFunctions["current_day_13_vengeance_3_param_damage"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.targetMechanics[0].values[3]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_day.script:178
 DescriptionFunctions["current_day_12_magic_radiant_armor"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.inAllDmgMod");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_day.script:186
 DescriptionFunctions["current_day_16_magic_arinas_chosen"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.healthLimitMinPercent");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_day.script:192
@@ -3626,24 +3867,28 @@ DescriptionFunctions["current_day_16_magic_arinas_chosen_3"] = DescriptionRuntim
 DescriptionFunctions["current_day_13_magic_holy_arms"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.targetMechanics[0].values[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_night.script:1
 DescriptionFunctions["current_night_1_magic_unnatural_calm"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.outDmgMods.list[0].v");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_night.script:9
 DescriptionFunctions["current_night_2_magic_web"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.speed");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_night.script:17
 DescriptionFunctions["current_night_3_magic_enlarge_shadow"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.offence");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_night.script:25
@@ -3652,12 +3897,14 @@ DescriptionFunctions["current_night_4_magic_despair"] = DescriptionRuntime.memoi
   let buffData = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.minStackDmg");
   let count = ctx.currentHero?.getSpellPower?.(ctx.currentMagic?.school) ?? 0;
   let _return = (Number(count) || 0) * (Number(buffData) || 0);
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_night.script:37
 DescriptionFunctions["current_night_9_magic_twilight"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.outDmgMods.list[0].v");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_night.script:45
@@ -3669,12 +3916,14 @@ DescriptionFunctions["current_night_8_magic_sleep_bonus_4"] = DescriptionRuntime
 DescriptionFunctions["current_night_5_magic_shade_cloak"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.outAllDmgMod");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_night.script:60
 DescriptionFunctions["current_night_7_magic_fatal_decay"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.hpPerc");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_night.script:68
@@ -3686,12 +3935,14 @@ DescriptionFunctions["current_night_10_magic_silence_per_level"] = DescriptionRu
 DescriptionFunctions["current_night_11_magic_vulnerability"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.inAllDmgMod");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_night.script:83
 DescriptionFunctions["current_night_13_magic_berserker"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.outAllDmgMod");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_night.script:91
@@ -3701,17 +3952,20 @@ DescriptionFunctions["current_night_16_magic_shadow_army"] = DescriptionRuntime.
   let count = ctx.currentHero?.getSpellPower?.(ctx.currentMagic?.school) ?? 0;
   let mul = (Number(count) || 0) * (Number(healPerStack) || 0);
   let _return = (Number(baseHeal) || 0) + (Number(mul) || 0);
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_night.script:102
 DescriptionFunctions["current_night_16_magic_shadow_army_1"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "targetMechanics[0].values[5]");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_night.script:109
 DescriptionFunctions["current_night_14_magic_nairas_kiss"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.skipActionChanceModifier");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_night.script:117
@@ -3726,6 +3980,7 @@ DescriptionFunctions["current_night_14_magic_nairas_kiss_new"] = DescriptionRunt
   let stackDmg = ((Number(minStackDmg) || 0) + (Number(maxStackDmg) || 0)) / 2;
   let mul = (Number(count) || 0) * (Number(stackDmg) || 0);
   let _return = (Number(baseDmg) || 0) + (Number(mul) || 0);
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_night.script:134
@@ -3734,6 +3989,7 @@ DescriptionFunctions["current_night_14_magic_nairas_kiss_new_base"] = Descriptio
   let minBaseDmg = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.minBaseDmg");
   let maxBaseDmg = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.maxBaseDmg");
   let _return = ((Number(minBaseDmg) || 0) + (Number(maxBaseDmg) || 0)) / 2;
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_night.script:143
@@ -3742,6 +3998,7 @@ DescriptionFunctions["current_night_14_magic_nairas_kiss_new_perStack"] = Descri
   let minStackDmg = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.minStackDmg");
   let maxStackDmg = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.maxStackDmg");
   let _return = ((Number(minStackDmg) || 0) + (Number(maxStackDmg) || 0)) / 2;
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_night.script:152
@@ -3756,6 +4013,7 @@ DescriptionFunctions["current_night_14_magic_nairas_kiss_new_buff_damage"] = Des
   let stackBonus = DescriptionRuntime.get(ctx.currentBuff, "config.actions[0].damageDealer.minStackDmg");
   let stackDamage = (Number(stackBonus) || 0) * (Number(buffSP) || 0);
   let _return = (Number(baseDamage) || 0) + (Number(stackDamage) || 0);
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_night.script:170
@@ -3764,6 +4022,7 @@ DescriptionFunctions["current_night_14_magic_nairas_kiss_new_buff_damage_0_BaseD
   let minBaseDmg = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.minBaseDmg");
   let maxBaseDmg = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.maxBaseDmg");
   let _return = ((Number(minBaseDmg) || 0) + (Number(maxBaseDmg) || 0)) / 2;
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_night.script:178
@@ -3772,6 +4031,7 @@ DescriptionFunctions["current_night_14_magic_nairas_kiss_new_buff_damage_1_BaseD
   let minBaseDmg = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.minBaseDmg");
   let maxBaseDmg = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.maxBaseDmg");
   let _return = ((Number(minBaseDmg) || 0) + (Number(maxBaseDmg) || 0)) / 2;
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_night.script:186
@@ -3780,6 +4040,7 @@ DescriptionFunctions["current_night_14_magic_nairas_kiss_new_buff_damage_2_BaseD
   let minBaseDmg = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.minBaseDmg");
   let maxBaseDmg = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.maxBaseDmg");
   let _return = ((Number(minBaseDmg) || 0) + (Number(maxBaseDmg) || 0)) / 2;
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_night.script:194
@@ -3788,6 +4049,7 @@ DescriptionFunctions["current_night_14_magic_nairas_kiss_new_buff_damage_3_BaseD
   let minBaseDmg = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.minBaseDmg");
   let maxBaseDmg = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.maxBaseDmg");
   let _return = ((Number(minBaseDmg) || 0) + (Number(maxBaseDmg) || 0)) / 2;
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_night.script:204
@@ -3796,6 +4058,7 @@ DescriptionFunctions["current_night_14_magic_nairas_kiss_new_buff_damage_0_Stack
   let minStackDmg = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.minStackDmg");
   let maxStackDmg = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.maxStackDmg");
   let _return = ((Number(minStackDmg) || 0) + (Number(maxStackDmg) || 0)) / 2;
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_night.script:212
@@ -3804,6 +4067,7 @@ DescriptionFunctions["current_night_14_magic_nairas_kiss_new_buff_damage_1_Stack
   let minStackDmg = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.minStackDmg");
   let maxStackDmg = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.maxStackDmg");
   let _return = ((Number(minStackDmg) || 0) + (Number(maxStackDmg) || 0)) / 2;
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_night.script:220
@@ -3812,6 +4076,7 @@ DescriptionFunctions["current_night_14_magic_nairas_kiss_new_buff_damage_2_Stack
   let minStackDmg = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.minStackDmg");
   let maxStackDmg = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.maxStackDmg");
   let _return = ((Number(minStackDmg) || 0) + (Number(maxStackDmg) || 0)) / 2;
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_night.script:228
@@ -3820,17 +4085,20 @@ DescriptionFunctions["current_night_14_magic_nairas_kiss_new_buff_damage_3_Stack
   let minStackDmg = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.minStackDmg");
   let maxStackDmg = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.maxStackDmg");
   let _return = ((Number(minStackDmg) || 0) + (Number(maxStackDmg) || 0)) / 2;
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_night.script:238
 DescriptionFunctions["current_night_15_magic_deaths_call"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.targetMechanics[0].values[0]");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_night.script:246
 DescriptionFunctions["current_buff_magic_deaths_call_effect"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentBuff, "config.actions[0].damageDealer.targetMechanics[0].values[0]");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_night.script:253
@@ -3865,6 +4133,7 @@ DescriptionFunctions["current_bonus_magic_astral_summon_hp"] = DescriptionRuntim
   let hp = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.hp");
   let mul = (Number(count) || 0) * (Number(hp) || 0);
   let _return = (Number(mul) || 0) + (Number("50") || 0);
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_neutral.script:32
@@ -3874,6 +4143,7 @@ DescriptionFunctions["current_bonus_magic_astral_summon_damage"] = DescriptionRu
   let damage = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.damageMin");
   let mul = (Number(count) || 0) * (Number(damage) || 0);
   let _return = (Number(mul) || 0) + (Number("5") || 0);
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_primal.script:1
@@ -3890,6 +4160,7 @@ DescriptionFunctions["current_primal_1_magic_thunderbolt_bonus_2"] = Description
 DescriptionFunctions["current_primal_2_magic_thick_hide"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.inDmgMods.list[0].v");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_primal.script:23
@@ -3914,6 +4185,7 @@ DescriptionFunctions["current_primal_5_magic_crystal_crown"] = DescriptionRuntim
 // Source: DB/info/info_script_magic/magic_battle_primal.script:49
 DescriptionFunctions["current_primal_5_magic_crystal_crown_numTargets"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "numTargets");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_primal.script:54
@@ -3925,6 +4197,7 @@ DescriptionFunctions["current_primal_5_magic_crystal_crown_bonus_4"] = Descripti
 DescriptionFunctions["current_primal_6_magic_ice_bolt"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.initiative");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_primal.script:69
@@ -3945,11 +4218,13 @@ DescriptionFunctions["current_primal_7_magic_wall_of_flame"] = DescriptionRuntim
 // Source: DB/info/info_script_magic/magic_battle_primal.script:89
 DescriptionFunctions["current_primal_7_magic_wall_of_flame_duration"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "targetMechanics[0].values[2]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_primal.script:94
 DescriptionFunctions["current_primal_7_magic_wall_of_flame_numTargets"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "numTargets");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_primal.script:99
@@ -4011,11 +4286,13 @@ DescriptionFunctions["current_primal_10_magic_primordial_purity_3"] = Descriptio
 DescriptionFunctions["current_primal_10_magic_primordial_purity"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.immunities[0].tags[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_primal.script:172
 DescriptionFunctions["current_primal_10_magic_primordial_purity_effect"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentBuff, "config.data.immunities[0].tags[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_primal.script:177
@@ -4042,6 +4319,7 @@ DescriptionFunctions["current_primal_12_magic_chain_lightning"] = DescriptionRun
 DescriptionFunctions["current_primal_14_magic_hksmillas_rampage"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.outAllDmgMod");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_primal.script:211
@@ -4053,27 +4331,32 @@ DescriptionFunctions["current_primal_13_magic_avalanche_bonus_2"] = DescriptionR
 DescriptionFunctions["current_space_1_magic_early_start"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.initiative");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_space.script:9
 DescriptionFunctions["current_space_2_magic_energy_explosion"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "minDamagePerEnergyLevel");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_space.script:16
 DescriptionFunctions["current_space_3_magic_energyze"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "targetMechanics[0].values[2]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_space.script:23
 DescriptionFunctions["current_space_9_magic_impending_fate"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "levelDmg");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_space.script:30
 DescriptionFunctions["current_space_4_magic_optical_illusion"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.inDmgMods.list[0].v");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_space.script:38
@@ -4086,6 +4369,7 @@ DescriptionFunctions["current_space_5_magic_trap_jaws"] = DescriptionRuntime.mem
 // Source: DB/info/info_script_magic/magic_battle_space.script:46
 DescriptionFunctions["current_space_5_magic_trap_jaws_numTargets"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "numTargets");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_space.script:51
@@ -4106,18 +4390,21 @@ DescriptionFunctions["current_space_5_magic_trap_jaws_bonus_3"] = DescriptionRun
 // Source: DB/info/info_script_magic/magic_battle_space.script:68
 DescriptionFunctions["current_space_6_magic_blink"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "orderedCastParams[0].distanceFromFirst");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_space.script:75
 DescriptionFunctions["current_space_10_magic_mirror_copy_1"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "targetMechanics[0].values[0]");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.outAllDmgMod");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_space.script:82
 DescriptionFunctions["current_space_10_magic_mirror_copy_2"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "targetMechanics[0].values[0]");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.inAllDmgMod");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_space.script:89
@@ -4137,6 +4424,7 @@ DescriptionFunctions["current_space_10_magic_mirror_copy_duration"] = Descriptio
 DescriptionFunctions["current_space_11_magic_decimate"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.inDmgMods.list[0].v");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_space.script:115
@@ -4156,6 +4444,7 @@ DescriptionFunctions["current_space_12_magic_rewind"] = DescriptionRuntime.memoi
 DescriptionFunctions["current_space_16_magic_reality_distortion"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.targetMechanics[0].values[0]");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_space.script:140
@@ -4163,6 +4452,7 @@ DescriptionFunctions["current_space_16_magic_reality_distortion_0_param_damage"]
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[0].buff.sid");
   let buffData = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.targetMechanics[0].values[0]");
   let _return = (Number("1.01") || 0) - (Number(buffData) || 0);
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_space.script:147
@@ -4170,6 +4460,7 @@ DescriptionFunctions["current_space_16_magic_reality_distortion_1_param_damage"]
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[1].buff.sid");
   let buffData = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.targetMechanics[0].values[0]");
   let _return = (Number("1.01") || 0) - (Number(buffData) || 0);
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_space.script:154
@@ -4177,6 +4468,7 @@ DescriptionFunctions["current_space_16_magic_reality_distortion_2_param_damage"]
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[2].buff.sid");
   let buffData = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.targetMechanics[0].values[0]");
   let _return = (Number("1.01") || 0) - (Number(buffData) || 0);
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_space.script:161
@@ -4184,12 +4476,14 @@ DescriptionFunctions["current_space_16_magic_reality_distortion_3_param_damage"]
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "battleMagic.magicDealers[3].buff.sid");
   let buffData = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.targetMechanics[0].values[0]");
   let _return = (Number("1.01") || 0) - (Number(buffData) || 0);
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_space.script:170
 DescriptionFunctions["current_space_14_magic_doreaths_tide"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "targetMechanics[0].values[1]");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.speed");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_battle_space.script:176
@@ -4218,12 +4512,14 @@ DescriptionFunctions["current_space_14_magic_doreaths_tide_duration"] = Descript
 // Source: DB/info/info_script_magic/magic_battle_space.script:204
 DescriptionFunctions["current_space_15_magic_trap_snare_numTargets"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "numTargets");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_world_day.script:1
 DescriptionFunctions["current_day_18_magic_farsight_1"] = DescriptionRuntime.memoize(function(ctx) {
   let baseRadius = DescriptionRuntime.get(ctx.currentMagic, "parameters[0]");
   let bonusRadius = DescriptionRuntime.get(ctx.currentMagic, "parameters[1]");
+  let level = (ctx.currentMagic.upgradeLevel ?? 0) + 1;
   let levelSub = (Number(level) || 0) - (Number(1) || 0);
   let bonusRadiusMul = (Number(bonusRadius) || 0) * (Number(levelSub) || 0);
   let finalRadius = (Number(baseRadius) || 0) + (Number(bonusRadiusMul) || 0);
@@ -4241,11 +4537,13 @@ DescriptionFunctions["current_day_18_magic_farsight_2"] = DescriptionRuntime.mem
 // Source: DB/info/info_script_magic/magic_world_day.script:25
 DescriptionFunctions["current_day_18_magic_farsight_3"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "usageLimit");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_world_day.script:30
 DescriptionFunctions["current_day_18_magic_farsight_per_level"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "parameters[1]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_world_neutral.script:1
@@ -4276,6 +4574,7 @@ DescriptionFunctions["text_description_need_level_5"] = DescriptionRuntime.memoi
 // Source: DB/info/info_script_magic/magic_world_neutral.script:28
 DescriptionFunctions["current_neutral_1_magic_back_to_garrison_usageLimit"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "usageLimit");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_world_neutral.script:35
@@ -4288,6 +4587,7 @@ DescriptionFunctions["current_neutral_1_magic_back_to_city"] = DescriptionRuntim
 // Source: DB/info/info_script_magic/magic_world_neutral.script:44
 DescriptionFunctions["current_neutral_1_magic_back_to_city_usageLimit"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "usageLimit");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_world_neutral.script:51
@@ -4300,6 +4600,7 @@ DescriptionFunctions["current_neutral_1_magic_mana_transfer"] = DescriptionRunti
 // Source: DB/info/info_script_magic/magic_world_neutral.script:60
 DescriptionFunctions["current_neutral_1_magic_mana_transfer_usageLimit"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "usageLimit");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_world_neutral.script:65
@@ -4315,6 +4616,7 @@ DescriptionFunctions["current_neutral_1_magic_mana_transfer_2"] = DescriptionRun
 // Source: DB/info/info_script_magic/magic_world_neutral.script:77
 DescriptionFunctions["current_neutral_1_magic_units_replace_usageLimit"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "usageLimit");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_world_neutral.script:84
@@ -4331,6 +4633,7 @@ DescriptionFunctions["current_neutral_1_magic_mana_restore_2"] = DescriptionRunt
 DescriptionFunctions["current_neutral_magic_second_sight_1"] = DescriptionRuntime.memoize(function(ctx) {
   let baseMove = DescriptionRuntime.get(ctx.currentMagic, "parameters[0]");
   let bonusMove = DescriptionRuntime.get(ctx.currentMagic, "parameters[1]");
+  let level = (ctx.currentMagic.upgradeLevel ?? 0) + 1;
   let levelSub = (Number(level) || 0) - (Number(1) || 0);
   let bonusMoveMul = (Number(bonusMove) || 0) * (Number(levelSub) || 0);
   let finalMove = (Number(baseMove) || 0) + (Number(bonusMoveMul) || 0);
@@ -4340,12 +4643,14 @@ DescriptionFunctions["current_neutral_magic_second_sight_1"] = DescriptionRuntim
 // Source: DB/info/info_script_magic/magic_world_neutral.script:112
 DescriptionFunctions["current_neutral_magic_second_sight_2"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "usageLimit");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_world_neutral.script:119
 DescriptionFunctions["current_neutral_magic_shadow_form"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentMagic, "parameters[0]");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.inAllDmgMod");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_world_neutral.script:125
@@ -4362,6 +4667,7 @@ DescriptionFunctions["current_neutral_magic_shadow_form_bonus_4"] = DescriptionR
 DescriptionFunctions["current_neutral_magic_dimension_door_1"] = DescriptionRuntime.memoize(function(ctx) {
   let baseRadius = DescriptionRuntime.get(ctx.currentMagic, "parameters[0]");
   let bonusRadius = DescriptionRuntime.get(ctx.currentMagic, "parameters[1]");
+  let level = (ctx.currentMagic.upgradeLevel ?? 0) + 1;
   let levelSub = (Number(level) || 0) - (Number(1) || 0);
   let bonusRadiusMul = (Number(bonusRadius) || 0) * (Number(levelSub) || 0);
   let finalRadius = (Number(baseRadius) || 0) + (Number(bonusRadiusMul) || 0);
@@ -4371,12 +4677,14 @@ DescriptionFunctions["current_neutral_magic_dimension_door_1"] = DescriptionRunt
 // Source: DB/info/info_script_magic/magic_world_neutral.script:151
 DescriptionFunctions["current_neutral_magic_dimension_door_2"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "usageLimit");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_world_neutral.script:158
 DescriptionFunctions["current_neutral_magic_light_gate_1"] = DescriptionRuntime.memoize(function(ctx) {
   let baseRadius = DescriptionRuntime.get(ctx.currentMagic, "parameters[0]");
   let bonusRadius = DescriptionRuntime.get(ctx.currentMagic, "parameters[1]");
+  let level = (ctx.currentMagic.upgradeLevel ?? 0) + 1;
   let levelSub = (Number(level) || 0) - (Number(1) || 0);
   let bonusRadiusMul = (Number(bonusRadius) || 0) * (Number(levelSub) || 0);
   let finalRadius = (Number(baseRadius) || 0) + (Number(bonusRadiusMul) || 0);
@@ -4386,11 +4694,13 @@ DescriptionFunctions["current_neutral_magic_light_gate_1"] = DescriptionRuntime.
 // Source: DB/info/info_script_magic/magic_world_neutral.script:172
 DescriptionFunctions["current_neutral_magic_light_gate_2"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "usageLimit");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_world_neutral.script:179
 DescriptionFunctions["current_neutral_magic_town_portal"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "usageLimit");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_world_neutral.script:184
@@ -4419,6 +4729,7 @@ DescriptionFunctions["current_night_17_magic_read_minds_level_3"] = DescriptionR
 DescriptionFunctions["current_night_18_magic_nairas_veil"] = DescriptionRuntime.memoize(function(ctx) {
   let baseRadius = DescriptionRuntime.get(ctx.currentMagic, "parameters[0]");
   let bonusRadius = DescriptionRuntime.get(ctx.currentMagic, "parameters[1]");
+  let level = (ctx.currentMagic.upgradeLevel ?? 0) + 1;
   let levelSub = (Number(level) || 0) - (Number(1) || 0);
   let bonusRadiusMul = (Number(bonusRadius) || 0) * (Number(levelSub) || 0);
   let finalRadius = (Number(baseRadius) || 0) + (Number(bonusRadiusMul) || 0);
@@ -4437,11 +4748,13 @@ DescriptionFunctions["current_primal_18_magic_primordial_chaos_1"] = Description
 DescriptionFunctions["current_primal_18_magic_primordial_chaos_2"] = DescriptionRuntime.memoize(function(ctx) {
   let data = DescriptionRuntime.get(ctx.currentMagic, "parameters[1]");
   let _return = (Number("1") || 0) - (Number(data) || 0);
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_world_primal.script:19
 DescriptionFunctions["current_primal_18_magic_primordial_chaos_3"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "usageLimit");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_world_space.script:1
@@ -4455,6 +4768,7 @@ DescriptionFunctions["current_space_18_magic_assemble_1"] = DescriptionRuntime.m
 // Source: DB/info/info_script_magic/magic_world_space.script:11
 DescriptionFunctions["current_space_18_magic_assemble_2"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "usageLimit");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_magic/magic_world_space.script:18
@@ -4468,6 +4782,7 @@ DescriptionFunctions["current_space_17_magic_reinforcements_1"] = DescriptionRun
 // Source: DB/info/info_script_magic/magic_world_space.script:29
 DescriptionFunctions["current_space_17_magic_reinforcements_2"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentMagic, "usageLimit");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units.script:4
@@ -4668,124 +4983,146 @@ DescriptionFunctions["current_unit_ability_buff_revenge_damage_param"] = Descrip
   let stackBonus = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.targetMechanics[0].values[3]");
   let stackDamage = (Number(stackBonus) || 0) * (Number(currentStacks) || 0);
   let _return = (Number(baseDamage) || 0) + (Number(stackDamage) || 0);
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units.script:259
 DescriptionFunctions["current_unit_ability_buff_damage_param"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentAbility, "damageDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.damageMin");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units.script:265
 DescriptionFunctions["current_unit_ability_buff_hp_param"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentAbility, "damageDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.hp");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units.script:271
 DescriptionFunctions["current_unit_ability_buff_hpPerc_param"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentAbility, "damageDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.hpPerc");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units.script:277
 DescriptionFunctions["current_unit_ability_buff_offence_param"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentAbility, "damageDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.offence");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units.script:283
 DescriptionFunctions["current_unit_ability_buff_defence_param"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentAbility, "damageDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.defence");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units.script:289
 DescriptionFunctions["current_unit_ability_buff_speed_param"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentAbility, "damageDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.speed");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units.script:295
 DescriptionFunctions["current_unit_ability_buff_initiative_param"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentAbility, "damageDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.initiative");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units.script:301
 DescriptionFunctions["current_unit_ability_buff_moral_param"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentAbility, "damageDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.moral");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units.script:307
 DescriptionFunctions["current_unit_ability_buff_luck_param"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentAbility, "damageDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.luck");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units.script:313
 DescriptionFunctions["current_unit_ability_buff_outDmgMods_param"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentAbility, "damageDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.outDmgMods.list[0].v");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units.script:319
 DescriptionFunctions["current_unit_ability_buff_inDmgMods_param"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentAbility, "damageDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.inDmgMods.list[0].v");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units.script:325
 DescriptionFunctions["current_unit_ability_buff_inAllDmgMod_param"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentAbility, "damageDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.inAllDmgMod");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units.script:331
 DescriptionFunctions["current_unit_ability_buff_outAllDmgMod_param"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentAbility, "damageDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.outAllDmgMod");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units.script:341
 DescriptionFunctions["current_ability_selfMechanics_values_0"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentAbility, "selfMechanics[0].values[0]");
+  return DescriptionRuntime.formatInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units.script:346
 DescriptionFunctions["current_unit_damagePerHex"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "damagePerHex");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units.script:351
 DescriptionFunctions["current_unit_anticrit"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "anticrit");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units.script:356
 DescriptionFunctions["current_unit_globalPassives_morale"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "globalPassives[0].data.stats.moral");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units.script:361
 DescriptionFunctions["current_unit_globalPassives_luck"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "globalPassives[0].data.stats.luck");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units.script:366
 DescriptionFunctions["current_unit_globalPassives_mana"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "passives[0].data.sideModifiers[0].heroStat.manaCostBonus");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units.script:371
 DescriptionFunctions["current_unit_passives_attackPen"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "passives[0].data.stats.attackPen");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units.script:376
 DescriptionFunctions["current_unit_passives_armorPen"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "passives[0].data.stats.armorPen");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units.script:381
@@ -4797,56 +5134,67 @@ DescriptionFunctions["unic_unit_vampirism_passive"] = DescriptionRuntime.memoize
 // Source: DB/info/info_script_unit/units.script:388
 DescriptionFunctions["current_unit_energyPerTakeDamage"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "energyPerTakeDamage");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units.script:393
 DescriptionFunctions["current_unit_energyPerRound"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "energyPerRound");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units.script:398
 DescriptionFunctions["current_unit_energyPerCast"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "energyPerCast");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units.script:406
 DescriptionFunctions["current_unit_inDmgMods_1_param"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "inDmgMods.list[0].v");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units.script:411
 DescriptionFunctions["current_unit_inDmgMods_2_param"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "inDmgMods.list[1].v");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units.script:416
 DescriptionFunctions["current_unit_inDmgMods_3_param"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "inDmgMods.list[2].v");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units.script:421
 DescriptionFunctions["current_unit_outDmgMods_1_param"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "outDmgMods.list[0].v");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units.script:426
 DescriptionFunctions["current_unit_outDmgMods_2_param"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "outDmgMods.list[1].v");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units.script:431
 DescriptionFunctions["current_unit_outDmgMods_3_param"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "outDmgMods.list[2].v");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units.script:440
 DescriptionFunctions["base_class_caster_energy"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "maxEnergy");
+  return DescriptionRuntime.formatInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units.script:445
 DescriptionFunctions["base_class_caster_start_energy"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "startEnergy");
+  return DescriptionRuntime.formatInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units.script:450
@@ -4984,57 +5332,67 @@ DescriptionFunctions["current_unit_ability_trap_baseBuffDuration"] = Description
 // Source: DB/info/info_script_unit/units_alts.script:64
 DescriptionFunctions["current_unit_passive_bonusDamage_base"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "defaultAttacks[0].damageDealer.targetMechanics[0].values[0]");
+  return DescriptionRuntime.formatInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_alts.script:69
 DescriptionFunctions["current_unit_passive_bonusDamage_perStack"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "defaultAttacks[0].damageDealer.targetMechanics[0].values[1]");
+  return DescriptionRuntime.formatInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_alts.script:76
 DescriptionFunctions["current_unit_minStatDamage_alt_05"] = DescriptionRuntime.memoize(function(ctx) {
   let damageMin = DescriptionRuntime.get(ctx.currentUnit, "stats.damageMin");
   let _return = (Number(damageMin) || 0) * (Number("0.5") || 0);
+  return DescriptionRuntime.formatInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_alts.script:83
 DescriptionFunctions["current_unit_maxStatDamage_alt_05"] = DescriptionRuntime.memoize(function(ctx) {
   let damageMax = DescriptionRuntime.get(ctx.currentUnit, "stats.damageMax");
   let _return = (Number(damageMax) || 0) * (Number("0.5") || 0);
+  return DescriptionRuntime.formatInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_alts.script:90
 DescriptionFunctions["current_unit_minStatDamage_alt_10"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "stats.damageMin");
+  return DescriptionRuntime.formatInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_alts.script:95
 DescriptionFunctions["current_unit_maxStatDamage_alt_10"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "stats.damageMax");
+  return DescriptionRuntime.formatInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_alts.script:100
 DescriptionFunctions["current_unit_minStatDamage_alt_15"] = DescriptionRuntime.memoize(function(ctx) {
   let damageMin = DescriptionRuntime.get(ctx.currentUnit, "stats.damageMin");
   let _return = (Number(damageMin) || 0) * (Number("1.5") || 0);
+  return DescriptionRuntime.formatInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_alts.script:107
 DescriptionFunctions["current_unit_maxStatDamage_alt_15"] = DescriptionRuntime.memoize(function(ctx) {
   let damageMax = DescriptionRuntime.get(ctx.currentUnit, "stats.damageMax");
   let _return = (Number(damageMax) || 0) * (Number("1.5") || 0);
+  return DescriptionRuntime.formatInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_alts.script:114
 DescriptionFunctions["current_unit_minStatDamage_alt_20"] = DescriptionRuntime.memoize(function(ctx) {
   let damageMin = DescriptionRuntime.get(ctx.currentUnit, "stats.damageMin");
   let _return = (Number(damageMin) || 0) * (Number("2") || 0);
+  return DescriptionRuntime.formatInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_alts.script:121
 DescriptionFunctions["current_unit_maxStatDamage_alt_20"] = DescriptionRuntime.memoize(function(ctx) {
   let damageMax = DescriptionRuntime.get(ctx.currentUnit, "stats.damageMax");
   let _return = (Number(damageMax) || 0) * (Number("2") || 0);
+  return DescriptionRuntime.formatInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_alts.script:128
@@ -5114,6 +5472,7 @@ DescriptionFunctions["unic_unit_hiveQueenAbility2"] = DescriptionRuntime.memoize
   let maxStackDmg = DescriptionRuntime.get(GameData.buffs?.[buffSid], "timeoutActions[0].damageDealer.maxStackDmg");
   let stackDmg = ((Number(minStackDmg) || 0) + (Number(maxStackDmg) || 0)) / 2;
   let _return = Math.floor(Number(stackDmg) || 0);
+  return DescriptionRuntime.formatInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_alts.script:224
@@ -5183,6 +5542,7 @@ DescriptionFunctions["unic_unit_lava_larva_passive_1_base"] = DescriptionRuntime
   let minBaseDmg = DescriptionRuntime.get(ctx.currentUnit, "passives[0].actions[0].damageDealer.minBaseDmg");
   let maxBaseDmg = DescriptionRuntime.get(ctx.currentUnit, "passives[0].actions[0].damageDealer.maxBaseDmg");
   let _return = ((Number(minBaseDmg) || 0) + (Number(maxBaseDmg) || 0)) / 2;
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_demon.script:66
@@ -5191,17 +5551,20 @@ DescriptionFunctions["unic_unit_lava_larva_passive_1_base_alt"] = DescriptionRun
   let maxBaseDmg = DescriptionRuntime.get(ctx.currentUnit, "passives[0].actions[0].damageDealer.maxBaseDmg");
   let avg = ((Number(minBaseDmg) || 0) + (Number(maxBaseDmg) || 0)) / 2;
   let _return = (Number(avg) || 0) * (Number("2") || 0);
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_demon.script:76
 DescriptionFunctions["unic_unit_lava_larva_passive_2"] = DescriptionRuntime.memoize(function(ctx) {
   let baseDmg = DescriptionFunctions["unic_unit_lava_larva_passive_1"]?.(ctx) ?? null;
   let _return = (Number(baseDmg) || 0) * (Number("2") || 0);
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_demon.script:83
 DescriptionFunctions["unic_unit_trick_demon_passive_1"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "stats.damagePerDeltaLevel");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_demon.script:88
@@ -5214,37 +5577,44 @@ DescriptionFunctions["unic_unit_locust_ability_1"] = DescriptionRuntime.memoize(
 DescriptionFunctions["unic_unit_locust_ability_2"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentAbility, "selfDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.offence");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_demon.script:101
 DescriptionFunctions["unic_unit_locust_ability_3"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentAbility, "selfDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.speed");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_demon.script:107
 DescriptionFunctions["unic_unit_wasp_passive_1"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "defaultAttacks[0].damageDealer.buff.duration");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_demon.script:112
 DescriptionFunctions["unic_unit_wasp_passive_2"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "defaultAttacks[0].damageDealer.targetMechanics[0].values[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_demon.script:117
 DescriptionFunctions["unic_unit_godslayer_passive_1"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "stats.outDamageIfLevelAbove");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_demon.script:122
 DescriptionFunctions["unic_unit_olgoi_passive_1"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "passives[0].actions[0].damageDealer.targetMechanics[0].values[1]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_demon.script:127
 DescriptionFunctions["unic_unit_olgoi_ability_1"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentAbility, "damageDealer.targetMechanics[0].values[0]");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_demon.script:132
@@ -5285,11 +5655,13 @@ DescriptionFunctions["unic_unit_hive_queen_passive_2"] = DescriptionRuntime.memo
 // Source: DB/info/info_script_unit/units_demon.script:167
 DescriptionFunctions["unic_unit_hive_queen_passive_4"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "stats.damagePerDeltaLevelLower");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_demon.script:172
 DescriptionFunctions["unic_unit_hive_queen_ability_1"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentAbility, "damageDealer.targetMechanics[0].values[3]");
+  return DescriptionRuntime.formatInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_demon.script:177
@@ -5304,12 +5676,14 @@ DescriptionFunctions["unic_unit_hive_queen_ability_2"] = DescriptionRuntime.memo
   let stackDmg = ((Number(minStackDmg) || 0) + (Number(maxStackDmg) || 0)) / 2;
   let damage = (Number(currentStacks) || 0) * (Number(stackDmg) || 0);
   let _return = Math.floor(Number(damage) || 0);
+  return DescriptionRuntime.formatInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_demon.script:195
 DescriptionFunctions["unic_unit_hive_queen_ability_3"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentAbility, "damageDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.speed");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_demon.script:203
@@ -5320,6 +5694,7 @@ DescriptionFunctions["current_buff_hive_queen_ability_2"] = DescriptionRuntime.m
   let stackDmg = ((Number(minStackDmg) || 0) + (Number(maxStackDmg) || 0)) / 2;
   let damage = (Number(charges) || 0) * (Number(stackDmg) || 0);
   let _return = Math.floor(Number(damage) || 0);
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_dungeon.script:1
@@ -5331,27 +5706,32 @@ DescriptionFunctions["unic_unit_dungeon_alt_attack"] = DescriptionRuntime.memoiz
 DescriptionFunctions["unic_unit_trogl_passive_1"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentUnit, "defaultAttacks[0].damageDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.inAllDmgMod");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_dungeon.script:12
 DescriptionFunctions["unic_unit_trogl_passive_1_duration"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "defaultAttacks[0].damageDealer.buff.duration");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_dungeon.script:17
 DescriptionFunctions["unic_unit_trogl_passive_2"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentUnit, "passives[0].actions[0].damageDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.inAllDmgMod");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_dungeon.script:23
 DescriptionFunctions["unic_unit_trogl_passive_2_duration"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "passives[0].actions[0].damageDealer.buff.duration");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_dungeon.script:28
 DescriptionFunctions["unic_unit_assassin_passive_1"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "stats.crit");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_dungeon.script:33
@@ -5363,17 +5743,20 @@ DescriptionFunctions["unic_unit_assassin_passive_1_2"] = DescriptionRuntime.memo
 DescriptionFunctions["unic_unit_assassin_passive_3"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentUnit, "passives[0].actions[0].damageDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.luck");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_dungeon.script:44
 DescriptionFunctions["unic_unit_blade_dancer_passive_1"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentUnit, "defaultAttacks[0].damageDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.defence");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_dungeon.script:50
 DescriptionFunctions["unic_unit_minos_passive_1"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "stats.additionalActionChanceModifier");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_dungeon.script:55
@@ -5385,40 +5768,47 @@ DescriptionFunctions["unic_unit_minos_passive_1_2"] = DescriptionRuntime.memoize
 DescriptionFunctions["unic_unit_minos_passive_2"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentUnit, "passives[0].actions[0].damageDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.moral");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_dungeon.script:66
 DescriptionFunctions["unic_unit_minos_passive_3_1"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentUnit, "passives[1].actions[0].damageDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.speed");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_dungeon.script:72
 DescriptionFunctions["unic_unit_minos_passive_3_2"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentUnit, "passives[1].actions[0].damageDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.offence");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_dungeon.script:78
 DescriptionFunctions["unic_unit_medusa_passive_1"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentUnit, "defaultAttacks[0].damageDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.initiative");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_dungeon.script:84
 DescriptionFunctions["unic_unit_medusa_passive_1_duration"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "defaultAttacks[0].damageDealer.buff.duration");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_dungeon.script:89
 DescriptionFunctions["unic_unit_hydra_passive_1"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentUnit, "defaultAttacks[0].damageDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.outAllDmgMod");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_dungeon.script:95
 DescriptionFunctions["unic_unit_hydra_passive_1_duration"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "defaultAttacks[0].damageDealer.buff.duration");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_dungeon.script:100
@@ -5429,17 +5819,20 @@ DescriptionFunctions["unic_unit_hydra_passive_2"] = DescriptionRuntime.memoize(f
 // Source: DB/info/info_script_unit/units_dungeon.script:108
 DescriptionFunctions["unic_unit_hydra_passive_2_duration"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "passives[0].actions[0].damageDealer.buff.duration");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_dungeon.script:113
 DescriptionFunctions["unic_unit_hydra_passive_4"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentUnit, "passives[0].actions[0].damageDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.offence");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_dungeon.script:119
 DescriptionFunctions["unic_unit_black_dragon_passive_1"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "globalPassives[0].data.stats.moral");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_dungeon.script:124
@@ -5456,11 +5849,13 @@ DescriptionFunctions["unic_unit_medusa_stone_description"] = DescriptionRuntime.
 DescriptionFunctions["unic_unit_esquire_passive_1"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentUnit, "passives[0].actions[0].damageDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.defence");
+  return DescriptionRuntime.formatInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_human.script:7
 DescriptionFunctions["unic_unit_esquire_passive_2"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "aura.data.stats.inDmgMods.list[0].v");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_human.script:12
@@ -5477,17 +5872,20 @@ DescriptionFunctions["unic_unit_crossbowman_ability_2"] = DescriptionRuntime.mem
 DescriptionFunctions["unic_unit_lightweaver_passive_1"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentUnit, "passives[0].actions[0].damageDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.damageMin");
+  return DescriptionRuntime.formatInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_human.script:28
 DescriptionFunctions["unic_unit_sunlight_cavalry_passive_3"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentUnit, "passives[1].actions[0].damageDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.offence");
+  return DescriptionRuntime.formatInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_human.script:34
 DescriptionFunctions["unic_unit_angel_ability_2"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentAbility, "damageDealer.statDmgMult");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_nature.script:1
@@ -5499,6 +5897,7 @@ DescriptionFunctions["unic_unit_twinkle_passive_1"] = DescriptionRuntime.memoize
 DescriptionFunctions["unic_unit_elem_active"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentAbility, "damageDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.maxEnergy");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_nature.script:12
@@ -5520,6 +5919,7 @@ DescriptionFunctions["unic_unit_twinkle_ability_1"] = DescriptionRuntime.memoize
 // Source: DB/info/info_script_unit/units_nature.script:32
 DescriptionFunctions["unic_unit_twinkle_ability_2"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentAbility, "damageDealer.targetMechanics[0].values[2]");
+  return DescriptionRuntime.formatString(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_nature.script:37
@@ -5568,6 +5968,7 @@ DescriptionFunctions["unic_unit_druid_ability_2"] = DescriptionRuntime.memoize(f
   let maxStacks = (Number(startStacks) || 0) + (Number(1) || 0);
   let buffData = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.minStackDmg");
   let _return = (Number(currentStacks) || 0) * (Number(buffData) || 0);
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_nature.script:104
@@ -5584,6 +5985,7 @@ DescriptionFunctions["unic_unit_qilin_passive_4"] = DescriptionRuntime.memoize(f
 DescriptionFunctions["unic_unit_qilin_ability_6"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentAbility, "damageDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.inAllDmgMod");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_nature.script:120
@@ -5616,6 +6018,7 @@ DescriptionFunctions["unic_unit_phoenix_ability_4"] = DescriptionRuntime.memoize
   let maxStacks = (Number(startStacks) || 0) + (Number(1) || 0);
   let buffData = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.minStackDmg");
   let _return = (Number(currentStacks) || 0) * (Number(buffData) || 0);
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_neutral.script:1
@@ -5646,6 +6049,7 @@ DescriptionFunctions["unic_unit_obsidian_dragon_passive_3"] = DescriptionRuntime
 // Source: DB/info/info_script_unit/units_neutral.script:29
 DescriptionFunctions["unic_unit_coatl_passive_1"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "stats.maxInComingNegativeBuffDuration");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_neutral.script:34
@@ -5677,6 +6081,7 @@ DescriptionFunctions["unic_unit_giant_frog_passive_1"] = DescriptionRuntime.memo
   let maxStacks = (Number(startStacks) || 0) + (Number(1) || 0);
   let buffData = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.minStackDmg");
   let _return = (Number(currentStacks) || 0) * (Number(buffData) || 0);
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_neutral.script:69
@@ -5718,18 +6123,21 @@ DescriptionFunctions["unic_unit_flicker_passive_2"] = DescriptionRuntime.memoize
   let maxStacks = (Number(startStacks) || 0) + (Number(1) || 0);
   let buffData = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.minStackDmg");
   let _return = (Number(currentStacks) || 0) * (Number(buffData) || 0);
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_undead.script:17
 DescriptionFunctions["unic_unit_pet_passive_1"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentUnit, "defaultAttacks[0].damageDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.defence");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_undead.script:23
 DescriptionFunctions["unic_unit_pet_passive_2"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentUnit, "passives[0].actions[0].damageDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.defence");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_undead.script:29
@@ -5741,6 +6149,7 @@ DescriptionFunctions["unic_unit_pet_passive_3"] = DescriptionRuntime.memoize(fun
   let maxStacks = (Number(startStacks) || 0) + (Number(1) || 0);
   let buffData = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.minStackDmg");
   let _return = (Number(currentStacks) || 0) * (Number(buffData) || 0);
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_undead.script:44
@@ -5757,6 +6166,7 @@ DescriptionFunctions["unic_unit_pet_ability_2"] = DescriptionRuntime.memoize(fun
 // Source: DB/info/info_script_unit/units_undead.script:59
 DescriptionFunctions["unic_unit_pet_ability_2_add"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentAbility, "selfMechanics[0].values[2]");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_undead.script:64
@@ -5774,6 +6184,7 @@ DescriptionFunctions["unic_unit_graverobber_passive_2"] = DescriptionRuntime.mem
   let maxStacks = (Number(startStacks) || 0) + (Number(1) || 0);
   let buffData = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.minStackDmg");
   let _return = (Number(currentStacks) || 0) * (Number(buffData) || 0);
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_undead.script:86
@@ -5791,17 +6202,20 @@ DescriptionFunctions["unic_unit_lich_passive_2"] = DescriptionRuntime.memoize(fu
 DescriptionFunctions["unic_unit_avatar_of_war_passive_2"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentUnit, "passives[4].actions[0].damageDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.offence");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_undead.script:104
 DescriptionFunctions["unic_unit_avatar_of_war_passive_3"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentUnit, "defaultAttacks[0].damageDealer.targetMechanics[0].values[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_undead.script:109
 DescriptionFunctions["unic_unit_avatar_of_war_passive_4"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentUnit, "passives[0].actions[0].damageDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.offence");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_undead.script:115
@@ -5870,6 +6284,7 @@ DescriptionFunctions["unic_unit_unfrozen_cultist_ability_1"] = DescriptionRuntim
   let maxStacks = (Number(startStacks) || 0) + (Number(1) || 0);
   let buffData = DescriptionRuntime.get(GameData.buffs?.[buffSid], "actions[0].damageDealer.minStackDmg");
   let _return = (Number(currentStacks) || 0) * (Number(buffData) || 0);
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_unfrozen.script:34
@@ -5914,6 +6329,7 @@ DescriptionFunctions["unic_unit_succubus_passive_2_duration"] = DescriptionRunti
 // Source: DB/info/info_script_unit/units_unfrozen.script:77
 DescriptionFunctions["unic_unit_succubus_ability_3"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentAbility, "damageDealer.minDamagePerEnergyLevel");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_unit/units_unfrozen.script:82
@@ -5974,61 +6390,73 @@ DescriptionFunctions["unic_unit_unspeakable_ability_2_alt"] = DescriptionRuntime
 // Source: DB/info/info_script_buffs/buffs.script:3
 DescriptionFunctions["current_buff_outDmgMods_param"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentBuff, "config.data.stats.outDmgMods.list[0].v");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_buffs/buffs.script:8
 DescriptionFunctions["current_buff_inDmgMods_param"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentBuff, "config.data.stats.inDmgMods.list[0].v");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_buffs/buffs.script:13
 DescriptionFunctions["current_buff_inAllDmgMod_param"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentBuff, "config.data.stats.inAllDmgMod");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_buffs/buffs.script:18
 DescriptionFunctions["current_buff_outAllDmgMod_param"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentBuff, "config.data.stats.outAllDmgMod");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_buffs/buffs.script:23
 DescriptionFunctions["current_buff_finalHealingBonusPercent_param"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentBuff, "config.data.stats.finalHealingBonusPercent");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_buffs/buffs.script:28
 DescriptionFunctions["current_buff_skipActionChanceModifier_param"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentBuff, "config.data.stats.skipActionChanceModifier");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_buffs/buffs.script:33
 DescriptionFunctions["current_buff_speed_param"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentBuff, "config.data.stats.speed");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_buffs/buffs.script:38
 DescriptionFunctions["current_buff_speed_param_alt"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentBuff, "dataConfig.data.stats.speed");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_buffs/buffs.script:43
 DescriptionFunctions["current_buff_stacks"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = ctx.currentBuff.getStacks?.() ?? 1;
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_buffs/buffs.script:48
 DescriptionFunctions["current_buff_sp"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = ctx.currentBuff.getSpellPower?.() ?? 0;
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_buffs/buffs.script:53
 DescriptionFunctions["current_buff_sum_min_dmg"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = ctx.currentBuff.getSumMinDmg?.() ?? 0;
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_buffs/buffs.script:58
 DescriptionFunctions["current_buff_sum_max_dmg"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = ctx.currentBuff.getSumMaxDmg?.() ?? 0;
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_buffs/buffs.script:63
@@ -6036,6 +6464,7 @@ DescriptionFunctions["current_buff_dot_dmg"] = DescriptionRuntime.memoize(functi
   let minDmg = DescriptionFunctions["current_buff_sum_min_dmg"]?.(ctx) ?? null;
   let maxDmg = DescriptionFunctions["current_buff_sum_max_dmg"]?.(ctx) ?? null;
   let _return = ((Number(minDmg) || 0) + (Number(maxDmg) || 0)) / 2;
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_buffs/buffs.script:71
@@ -6047,6 +6476,7 @@ DescriptionFunctions["current_buff_hot_dmg"] = DescriptionRuntime.memoize(functi
   let stackHeal = (Number(stackBonus) || 0) * (Number(buffSP) || 0);
   let heal = (Number(baseHeal) || 0) + (Number(stackHeal) || 0);
   let _return = (Number(heal) || 0) * (Number(buffStacks) || 0);
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_buffs/buffs.script:84
@@ -6056,101 +6486,121 @@ DescriptionFunctions["current_buff_revenge_damage"] = DescriptionRuntime.memoize
   let stackBonus = DescriptionRuntime.get(ctx.currentBuff, "config.actions[0].damageDealer.targetMechanics[0].values[3]");
   let stackDamage = (Number(stackBonus) || 0) * (Number(buffSP) || 0);
   let _return = (Number(baseDamage) || 0) + (Number(stackDamage) || 0);
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_buffs/buffs.script:95
 DescriptionFunctions["current_buff_initiative_param"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentBuff, "config.data.stats.initiative");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_buffs/buffs.script:100
 DescriptionFunctions["current_buff_offence_param"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentBuff, "config.data.stats.offence");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_buffs/buffs.script:105
 DescriptionFunctions["current_buff_offence_param_alt"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentBuff, "dataConfig.data.stats.offence");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_buffs/buffs.script:110
 DescriptionFunctions["current_buff_defence_param"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentBuff, "config.data.stats.defence");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_buffs/buffs.script:115
 DescriptionFunctions["current_buff_defence_param_alt"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentBuff, "dataConfig.data.stats.defence");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_buffs/buffs.script:120
 DescriptionFunctions["current_buff_damageMin_param"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentBuff, "config.data.stats.damageMin");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_buffs/buffs.script:125
 DescriptionFunctions["current_buff_damageMax_param"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentBuff, "config.data.stats.damageMax");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_buffs/buffs.script:130
 DescriptionFunctions["current_buff_moral_param"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentBuff, "config.data.stats.moral");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_buffs/buffs.script:135
 DescriptionFunctions["current_buff_luck_param"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentBuff, "config.data.stats.luck");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_buffs/buffs.script:140
 DescriptionFunctions["current_buff_hp_param"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentBuff, "config.data.stats.hp");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_buffs/buffs.script:145
 DescriptionFunctions["current_buff_hpPerc_param"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentBuff, "config.data.stats.hpPerc");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_buffs/buffs.script:150
 DescriptionFunctions["current_buff_maxEnergy_param"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentBuff, "config.data.stats.maxEnergy");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_buffs/buffs.script:155
 DescriptionFunctions["current_buff_numCounters_param"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentBuff, "config.data.stats.numCounters");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_buffs/buffs.script:160
 DescriptionFunctions["current_buff_tauntRadius_param"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentBuff, "config.data.stats.tauntRadius");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_buffs/buffs.script:165
 DescriptionFunctions["current_buff_healthLimitMinPercent_param"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentBuff, "config.data.stats.healthLimitMinPercent");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_buffs/buffs.script:170
 DescriptionFunctions["current_buff_energyPerRound_param"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentBuff, "config.data.stats.energyPerRound");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_buffs/buffs.script:175
 DescriptionFunctions["current_buff_energyPerCast_param"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentBuff, "config.data.stats.energyPerCast");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_buffs/buffs.script:180
 DescriptionFunctions["current_buff_mimicStats_param"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentBuff, "config.mimicStats[0].bonusFloat");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_script_buffs/buffs.script:185
 DescriptionFunctions["current_buff_magic_holy_arms_effect_param"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentBuff, "config.actions[0].damageDealer.targetMechanics[0].values[0]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_script_buffs/buffs.script:190
@@ -6161,6 +6611,7 @@ DescriptionFunctions["current_buff_magic_arinas_chosen_effect_description_specia
 // Source: DB/info/info_script_buffs/buffs.script:195
 DescriptionFunctions["current_buff_ent_passive"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.currentBuff, "config.actions[0].damageDealer.targetMechanics[0].values[2]");
+  return DescriptionRuntime.formatModInt(_return);
 }, 5);
 
 // Source: DB/info/info_hero_ability/hero_ability.script:5
@@ -6257,6 +6708,7 @@ DescriptionFunctions["hero_ability_skill_faction_dungeon_ability"] = Description
 // Source: DB/info/info_hero_ability/hero_ability.script:132
 DescriptionFunctions["hero_ability_skill_faction_humans_ability"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.inDmgMods.list[0].v");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/info_hero_ability/hero_ability.script:138
@@ -7017,6 +7469,7 @@ DescriptionFunctions["current_arena_param_2"] = DescriptionRuntime.memoize(funct
 DescriptionFunctions["crossbowman_ability_1_add_damage"] = DescriptionRuntime.memoize(function(ctx) {
   let buffSid = DescriptionRuntime.get(ctx.currentAbility, "damageDealer.buff.sid");
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.outDmgMods.list[0].v");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/concept.script:49
@@ -7027,16 +7480,19 @@ DescriptionFunctions["crossbowman_ability_1_duration"] = DescriptionRuntime.memo
 // Source: DB/info/concept.script:38
 DescriptionFunctions["crossbowman_ability_1_description"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(GameData.buffs?.[buffSid], "data.stats.outDmgMods.list[0].v");
+  return DescriptionRuntime.formatModPercentNumeric(_return);
 }, 5);
 
 // Source: DB/info/concept.script:52
 DescriptionFunctions["map_object_test_gold"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.eventBank, "rewardSet.rewards[0].parameters[1]");
+  return DescriptionRuntime.formatInt(_return);
 }, 5);
 
 // Source: DB/info/concept.script:57
 DescriptionFunctions["map_object_test_gem"] = DescriptionRuntime.memoize(function(ctx) {
   let _return = DescriptionRuntime.get(ctx.eventBank, "rewardSet.rewards[0].parameters[3]");
+  return DescriptionRuntime.formatInt(_return);
 }, 5);
 
 // Source: DB/info/concept.script:71

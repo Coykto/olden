@@ -541,6 +541,44 @@ def get_item_info(item_id: str) -> dict:
     }
 
 
+def get_item_set_info(set_id: str, bonuses: list) -> dict:
+    """
+    Get display info for an item set including name and bonus descriptions.
+
+    Args:
+        set_id: The item set's id_key (e.g., 'knights_honor_item_set')
+        bonuses: List of bonus objects from raw_data containing desc keys
+
+    Returns:
+        dict with name and bonuses array containing localized descriptions
+    """
+    localizations = get_localizations()
+    args_data = get_item_args()
+
+    # Set name key is just the set_id
+    name = localizations.get(set_id, set_id.replace("_", " ").title())
+
+    # Process each bonus to add localized description
+    localized_bonuses = []
+    for bonus in bonuses:
+        desc_key = bonus.get("desc", "")
+        description_template = localizations.get(desc_key, "")
+        description_args = args_data.get(desc_key, [])
+
+        localized_bonuses.append({
+            "requiredItemsAmount": int(bonus.get("requiredItemsAmount", 0)),
+            "description_template": description_template,
+            "description_args": description_args,
+            "heroBonuses": bonus.get("heroBonuses", []),
+            "unitBonuses": bonus.get("unitBonuses", []),
+        })
+
+    return {
+        "name": name,
+        "bonuses": localized_bonuses,
+    }
+
+
 @lru_cache(maxsize=1)
 def get_specialization_data() -> dict:
     """
@@ -610,3 +648,86 @@ def get_hero_specialization_info(hero_id: str) -> dict:
         "description_args": description_args,
         "raw_data": raw_data,
     }
+
+
+@lru_cache(maxsize=1)
+def get_spell_args(lang: str = "english") -> dict:
+    """
+    Load spell description args from game files.
+    Returns a dict mapping sid -> list of function names.
+    """
+    args_file = settings.GAME_DATA_PATH / "StreamingAssets" / "Lang" / "args" / "magic.json"
+
+    if not args_file.exists():
+        return {}
+
+    try:
+        with open(args_file, 'r', encoding='utf-8-sig') as f:
+            data = json.load(f)
+            tokens_args = data.get("tokensArgs", [])
+            return {item["sid"]: item.get("args", []) for item in tokens_args}
+    except Exception:
+        return {}
+
+
+def get_spell_info(spell_id: str) -> dict:
+    """
+    Get display info for a spell including name and description template/args.
+
+    Args:
+        spell_id: The spell's id_key (e.g., 'day_10_magic_second_song')
+
+    Returns:
+        dict with name, description_template, description_args
+    """
+    localizations = get_localizations()
+    args_data = get_spell_args()
+
+    # Spell localization keys follow pattern: {spell_id}_{field}
+    name_key = f"{spell_id}_name"
+    desc_key = f"{spell_id}_description"
+
+    name = localizations.get(name_key, spell_id.replace("_", " ").title())
+    description_template = localizations.get(desc_key, "")
+
+    # Get args for description
+    description_args = args_data.get(desc_key, [])
+
+    return {
+        "name": name,
+        "description_template": description_template,
+        "description_args": description_args,
+    }
+
+
+def get_spell_descriptions_by_level(description_keys: list) -> list:
+    """
+    Get description templates and args for each upgrade level.
+
+    Spells have different descriptions at different levels (e.g., Haste gains
+    "Dispels Web effect" at level 3). The description_keys array contains
+    one key per level.
+
+    Args:
+        description_keys: Array of description keys from raw_data.description
+                         e.g., ["spell_desc", "spell_desc", "spell_desc_1", "spell_desc_1"]
+
+    Returns:
+        List of dicts with description_template and description_args per level
+    """
+    if not description_keys:
+        return []
+
+    localizations = get_localizations()
+    args_data = get_spell_args()
+
+    result = []
+    for desc_key in description_keys:
+        template = localizations.get(desc_key, "")
+        args = args_data.get(desc_key, [])
+        result.append({
+            "description_template": template,
+            "description_args": args,
+        })
+
+    return result

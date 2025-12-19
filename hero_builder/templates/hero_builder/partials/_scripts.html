@@ -8,6 +8,27 @@
 <script src="{% static 'js/hero-state.js' %}?v=7"></script>
 
 <script>
+// Auto-focus search bar when any modal opens
+// Uses MutationObserver to handle all current and future modals
+(function() {
+    const modalContainer = document.getElementById('skill-modal-container');
+    if (!modalContainer) return;
+
+    const observer = new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+            if (mutation.addedNodes.length > 0) {
+                const searchInput = modalContainer.querySelector('.skill-search');
+                if (searchInput) {
+                    setTimeout(() => searchInput.focus(), 50);
+                }
+                break;
+            }
+        }
+    });
+
+    observer.observe(modalContainer, { childList: true });
+})();
+
 // Client-side state for hero build
 const heroBuild = {
     heroId: '',
@@ -744,6 +765,22 @@ const ItemSelectionModal = {
                            (item.bonuses || []).join(', ') ||
                            'No description';
 
+        // Check if item belongs to a set
+        let setHTML = '';
+        if (item.item_set) {
+            const setData = ItemSetManager.getSetForItem(item.id);
+            if (setData) {
+                const equippedCount = ItemSetManager.getEquippedSetItemCount(item.item_set);
+                const totalItems = setData.items.length;
+                setHTML = `
+                    <div class="item-set-badge" title="${setData.name}">
+                        <span class="set-name">${setData.name}</span>
+                        <span class="set-count">(${equippedCount}/${totalItems})</span>
+                    </div>
+                `;
+            }
+        }
+
         return `
             <div class="skill-option" data-item-id="${item.id}"
                  onclick="ItemSelectionModal.select('${item.id}')">
@@ -751,7 +788,10 @@ const ItemSelectionModal = {
                     <img src="/media/gamedata/items/${item.icon}.png" class="skill-icon" alt="${item.name}">
                 </div>
                 <div class="skill-info">
-                    <div class="skill-name" style="color: ${rarityColor};">${item.name.toUpperCase()}</div>
+                    <div class="skill-name-row">
+                        <span class="skill-name" style="color: ${rarityColor};">${item.name.toUpperCase()}</span>
+                        ${setHTML}
+                    </div>
                     <div class="skill-desc" style="color: ${rarityColor}; opacity: 0.7; font-size: 0.8rem; margin-bottom: 5px;">
                         ${item.rarity.charAt(0).toUpperCase() + item.rarity.slice(1)}
                     </div>
@@ -1383,6 +1423,28 @@ const EquipmentManager = {
             }
         }
 
+        // Add bonuses from active item sets
+        if (typeof ItemSetManager !== 'undefined' && ItemSetManager.itemSets.length > 0) {
+            const setStatBonuses = ItemSetManager.getActiveSetStatBonuses();
+            const statMap = {
+                'viewRadius': 'viewRadius',
+                'offence': 'offence',
+                'defence': 'defence',
+                'spellPower': 'spellPower',
+                'intelligence': 'intelligence',
+                'luck': 'luck',
+                'moral': 'moral',
+                'morale': 'moral',
+            };
+
+            for (const [statName, value] of Object.entries(setStatBonuses)) {
+                const key = statMap[statName];
+                if (key) {
+                    stats[key] = (stats[key] || 0) + value;
+                }
+            }
+        }
+
         return stats;
     },
 
@@ -1660,6 +1722,11 @@ const EquipmentManager = {
         }
         // Re-render equipment UI to show updated descriptions
         this.updateUI();
+
+        // Also update spell descriptions (hero stats may affect spell calculations)
+        if (typeof SpellBookManager !== 'undefined') {
+            SpellBookManager.updateAllDescriptions();
+        }
     },
 
     maxAllUpgrades() {
@@ -1839,6 +1906,41 @@ const EquipmentManager = {
                     ? `<div class="tooltip-narrative">${itemData.narrative_description}</div>`
                     : '';
 
+                // Generate set bonus section if item belongs to a set
+                let setHTML = '';
+                if (itemData.item_set) {
+                    const setData = ItemSetManager.getSetForItem(itemData.id);
+                    if (setData) {
+                        const equippedCount = ItemSetManager.getEquippedSetItemCount(itemData.item_set);
+                        const totalItems = setData.items.length;
+
+                        // Build bonus list with active/inactive styling
+                        const bonusListHTML = setData.bonuses.map(bonus => {
+                            const isActive = equippedCount >= bonus.requiredItemsAmount;
+                            const description = ItemSetManager.formatBonusDescription(setData, bonus);
+                            const activeClass = isActive ? 'set-bonus-active' : 'set-bonus-inactive';
+                            return `
+                                <div class="set-bonus-item ${activeClass}">
+                                    <span class="set-bonus-req">(${bonus.requiredItemsAmount})</span>
+                                    <span class="set-bonus-desc">${description}</span>
+                                </div>
+                            `;
+                        }).join('');
+
+                        setHTML = `
+                            <div class="tooltip-set-section">
+                                <div class="set-header">
+                                    <span class="set-name">${setData.name}</span>
+                                    <span class="set-progress">(${equippedCount}/${totalItems})</span>
+                                </div>
+                                <div class="set-bonus-list">
+                                    ${bonusListHTML}
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+
                 slotElement.innerHTML = `
                     <img src="/media/gamedata/items/${itemData.icon}.png"
                          alt="${itemData.name}"
@@ -1852,10 +1954,18 @@ const EquipmentManager = {
                             ${bonusesHTML}
                         </div>
                         ${narrativeHTML}
+                        ${setHTML}
                         ${upgradeControlsHTML}
                     </div>
                 `;
                 slotElement.style.borderColor = rarityColor;
+
+                // Add/remove upgrade glow class based on level
+                if (currentLevel > 1) {
+                    slotElement.classList.add('item-upgraded');
+                } else {
+                    slotElement.classList.remove('item-upgraded');
+                }
             } else {
                 // Show empty slot with default icon
                 const slotType = slotElement.dataset.slotType;
@@ -1878,8 +1988,865 @@ const EquipmentManager = {
                     <img src="/media/gamedata/ui/${defaultIcon}" alt="${slotType}">
                 `;
                 slotElement.style.borderColor = '#3a4555';
+                slotElement.classList.remove('item-upgraded');
             }
         }
+    }
+};
+
+const ItemSetManager = {
+    // Cached item sets data from API
+    itemSets: [],  // Array of {id, name, items, bonuses, raw_data}
+    itemToSetMap: {},  // Map of item_id -> set data for quick lookup
+
+    async init() {
+        try {
+            const response = await fetch('/api/item-sets/');
+            const data = await response.json();
+            this.itemSets = data.item_sets || [];
+
+            // Build item -> set lookup map
+            this.itemToSetMap = {};
+            for (const set of this.itemSets) {
+                for (const itemId of set.items) {
+                    this.itemToSetMap[itemId] = set;
+                }
+            }
+
+            console.log(`[ItemSetManager] Loaded ${this.itemSets.length} item sets`);
+        } catch (error) {
+            console.error('[ItemSetManager] Failed to load item sets:', error);
+        }
+    },
+
+    /**
+     * Get the set that an item belongs to, if any.
+     * @param {string} itemId - The item's id_key
+     * @returns {object|null} Set data or null
+     */
+    getSetForItem(itemId) {
+        return this.itemToSetMap[itemId] || null;
+    },
+
+    /**
+     * Count unique equipped items from a specific set.
+     * Two copies of the same item count as 1.
+     * @param {string} setId - The set's id_key
+     * @returns {number} Number of unique items equipped from this set
+     */
+    getEquippedSetItemCount(setId) {
+        const equippedItemIds = new Set();
+        for (const slotData of Object.values(heroBuild.equipment.slots)) {
+            if (slotData && slotData.item_set === setId) {
+                equippedItemIds.add(slotData.id);  // Set ensures uniqueness
+            }
+        }
+        return equippedItemIds.size;
+    },
+
+    /**
+     * Get all items from a set and their equipped status.
+     * @param {string} setId - The set's id_key
+     * @returns {Array} Array of {itemId, equipped: boolean}
+     */
+    getSetItemsStatus(setId) {
+        const set = this.itemSets.find(s => s.id === setId);
+        if (!set) return [];
+
+        const equippedIds = new Set();
+        for (const slotData of Object.values(heroBuild.equipment.slots)) {
+            if (slotData && slotData.item_set === setId) {
+                equippedIds.add(slotData.id);
+            }
+        }
+
+        return set.items.map(itemId => ({
+            itemId,
+            equipped: equippedIds.has(itemId)
+        }));
+    },
+
+    /**
+     * Format a set bonus description using the transpiler system.
+     * @param {object} setData - The full set data object
+     * @param {object} bonus - The specific bonus object
+     * @returns {string} Formatted description
+     */
+    formatBonusDescription(setData, bonus) {
+        if (!bonus.description_template) return '';
+
+        // Create context for CurrentItemSet
+        const ctx = {
+            currentItemSet: {
+                id: setData.id,
+                config: setData.raw_data
+            },
+            currentHero: {
+                heroStat: EquipmentManager.getEffectiveHeroStats()
+            }
+        };
+
+        try {
+            return DescriptionRuntime.formatDescription(
+                bonus.description_template,
+                bonus.description_args || [],
+                ctx
+            );
+        } catch (e) {
+            console.error('[ItemSetManager] Error formatting bonus:', e);
+            return bonus.description_template;
+        }
+    },
+
+    /**
+     * Get active set bonuses (those with enough items equipped).
+     * @param {string} setId - The set's id_key
+     * @returns {Array} Array of active bonus objects
+     */
+    getActiveSetBonuses(setId) {
+        const set = this.itemSets.find(s => s.id === setId);
+        if (!set) return [];
+
+        const equippedCount = this.getEquippedSetItemCount(setId);
+        return set.bonuses.filter(bonus => equippedCount >= bonus.requiredItemsAmount);
+    },
+
+    /**
+     * Calculate total hero stat bonuses from all active set bonuses.
+     * @returns {object} Map of stat_name -> total bonus value
+     */
+    getActiveSetStatBonuses() {
+        const bonuses = {};
+
+        for (const set of this.itemSets) {
+            const equippedCount = this.getEquippedSetItemCount(set.id);
+            if (equippedCount === 0) continue;
+
+            for (const bonus of set.bonuses) {
+                if (equippedCount < bonus.requiredItemsAmount) continue;
+
+                // Process hero bonuses
+                for (const heroBonus of (bonus.heroBonuses || [])) {
+                    if (heroBonus.type === 'heroStat') {
+                        const [statName, value] = heroBonus.parameters;
+                        const numValue = parseFloat(value) || 0;
+                        bonuses[statName] = (bonuses[statName] || 0) + numValue;
+                    }
+                }
+            }
+        }
+
+        return bonuses;
+    }
+};
+
+const SpellBookManager = {
+    // State
+    availableSpells: [],
+    schools: [],
+    equippedSpells: new Array(5).fill(null), // 5 initial slots
+    currentSlotIndex: null,
+    currentSchoolFilter: 'all',  // Filter for picker modal (school)
+    currentModalTypeFilter: 'all',  // Filter for picker modal (combat/global)
+    currentBookFilter: 'all',  // Filter for the spell book view (school)
+    currentTypeFilter: 'all',  // Filter for the spell book view (combat/global)
+    showEquippedInPicker: false,  // Toggle for showing equipped spells in picker modal
+    isAddingNewSlot: false,
+
+    // Initialize - fetch spells from API
+    async init() {
+        try {
+            const response = await fetch('/api/spells/available/');
+            const data = await response.json();
+            this.availableSpells = data.spells || [];
+            this.schools = data.schools || [];
+            console.log(`[SpellBookManager] Loaded ${this.availableSpells.length} spells`);
+        } catch (error) {
+            console.error('[SpellBookManager] Failed to load spells:', error);
+        }
+
+        // Load starting spells from hero card data attribute
+        this.loadStartingSpells();
+
+        this.renderSchoolTabs();
+        this.rebuildSpellGrid();  // Build the initial grid with just the "+" button
+    },
+
+    // Load starting spells from hero card data attribute
+    loadStartingSpells() {
+        const heroCard = document.querySelector('[data-hero-starting-spells]');
+        if (!heroCard) return;
+
+        try {
+            const startingSpells = JSON.parse(heroCard.dataset.heroStartingSpells || '[]');
+            if (!startingSpells.length) return;
+
+            console.log(`[SpellBookManager] Loading ${startingSpells.length} starting spells`);
+
+            // Clear the initial empty slots
+            this.equippedSpells = [];
+
+            // Add each starting spell
+            startingSpells.forEach(spellData => {
+                // The spellData from the template already has all the info we need
+                // It matches the structure from api_available_spells
+                this.equippedSpells.push({
+                    spell: spellData,
+                    upgradeLevel: spellData.upgrade_level || 1,
+                    isStartingSpell: true  // Mark as starting spell - cannot be removed
+                });
+                console.log(`[SpellBookManager] Added starting spell: ${spellData.name} (${spellData.id})`);
+            });
+        } catch (error) {
+            console.error('[SpellBookManager] Error loading starting spells:', error);
+        }
+    },
+
+    // Render school tabs for filtering the spell book
+    renderSchoolTabs() {
+        const container = document.getElementById('spell-school-tabs');
+        if (!container) return;
+
+        container.innerHTML = `
+            <button class="spell-school-tab active" data-school="all" onclick="SpellBookManager.filterBookBySchool('all')">All</button>
+            ${this.schools.map(school => `
+                <button class="spell-school-tab" data-school="${school.id}" onclick="SpellBookManager.filterBookBySchool('${school.id}')">
+                    ${school.name.replace(' Magic', '')}
+                </button>
+            `).join('')}
+        `;
+    },
+
+    // Filter the spell book view by school
+    filterBookBySchool(schoolId) {
+        this.currentBookFilter = schoolId;
+
+        // Update active tab
+        document.querySelectorAll('#spell-school-tabs .spell-school-tab').forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.school === schoolId);
+        });
+
+        // Apply all filters
+        this.applyAllFilters();
+    },
+
+    // Filter the spell book view by type
+    filterBookByType(type) {
+        this.currentTypeFilter = type;
+
+        // Update active button
+        document.querySelectorAll('.spell-type-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.type === type);
+        });
+
+        // Apply all filters
+        this.applyAllFilters();
+    },
+
+    // Apply both school and type filters
+    applyAllFilters() {
+        document.querySelectorAll('.spell-slot').forEach((slot, index) => {
+            const equipped = this.equippedSpells[index];
+
+            if (!equipped || !equipped.spell) {
+                // Empty slots: hide unless both filters are 'all'
+                const showEmpty = this.currentBookFilter === 'all' && this.currentTypeFilter === 'all';
+                slot.classList.toggle('filtered-out', !showEmpty);
+            } else {
+                // Check school filter
+                const matchesSchool = this.currentBookFilter === 'all' ||
+                                      equipped.spell.school === this.currentBookFilter;
+
+                // Check type filter
+                const matchesType = this.currentTypeFilter === 'all' ||
+                                   equipped.spell.spell_type === this.currentTypeFilter;
+
+                // Must match BOTH filters
+                slot.classList.toggle('filtered-out', !(matchesSchool && matchesType));
+            }
+        });
+    },
+
+    // Open the spell picker modal
+    openSpellPicker(slotIndex) {
+        this.isAddingNewSlot = false; // We're replacing/filling an existing slot
+        this.currentSlotIndex = slotIndex;
+        this.renderSpellPicker();
+    },
+
+    // Add new spell slot
+    addNewSpell() {
+        this.isAddingNewSlot = true;
+        this.currentSlotIndex = this.equippedSpells.length; // Next available index
+        this.renderSpellPicker();
+    },
+
+    // Render the modal with spell list
+    renderSpellPicker() {
+        const container = document.getElementById('skill-modal-container');
+
+        // Sync modal filters from spell book filters
+        this.currentSchoolFilter = this.currentBookFilter;
+        this.currentModalTypeFilter = this.currentTypeFilter;
+
+        container.innerHTML = `
+            <div class="modal-overlay" onclick="SpellBookManager.closeSpellPicker()">
+                <div class="skill-modal" onclick="event.stopPropagation()">
+                    <div class="modal-header">
+                        <h2>Select Spell</h2>
+                        <div class="modal-controls">
+                            <input type="text"
+                                   id="spell-search-input"
+                                   class="skill-search"
+                                   placeholder="Search spells..."
+                                   oninput="SpellBookManager.filterSpells(this.value)">
+                            <label class="scroll-toggle">
+                                <input type="checkbox"
+                                       id="show-equipped-toggle"
+                                       ${this.showEquippedInPicker ? 'checked' : ''}
+                                       onchange="SpellBookManager.toggleShowEquipped(this.checked)">
+                                Show in book
+                            </label>
+                        </div>
+                    </div>
+                    <div class="spell-school-tabs-modal">
+                        <button class="spell-school-tab-modal ${this.currentSchoolFilter === 'all' ? 'active' : ''}" data-school="all" onclick="SpellBookManager.filterBySchool('all')">All</button>
+                        ${this.schools.map(school => `
+                            <button class="spell-school-tab-modal ${this.currentSchoolFilter === school.id ? 'active' : ''}" data-school="${school.id}" onclick="SpellBookManager.filterBySchool('${school.id}')">
+                                ${school.name.replace(' Magic', '')}
+                            </button>
+                        `).join('')}
+                    </div>
+                    <div class="spell-type-tabs-modal">
+                        <button class="spell-type-tab-modal ${this.currentModalTypeFilter === 'all' ? 'active' : ''}" data-type="all" onclick="SpellBookManager.filterModalByType('all')">All</button>
+                        <button class="spell-type-tab-modal ${this.currentModalTypeFilter === 'combat' ? 'active' : ''}" data-type="combat" onclick="SpellBookManager.filterModalByType('combat')">Combat</button>
+                        <button class="spell-type-tab-modal ${this.currentModalTypeFilter === 'global' ? 'active' : ''}" data-type="global" onclick="SpellBookManager.filterModalByType('global')">Global Map</button>
+                    </div>
+                    <div class="skill-list" id="spell-picker-list">
+                        ${this.renderSpellList(this.getFilteredSpells())}
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    // Check if a spell is already equipped
+    isSpellEquipped(spellId) {
+        return this.equippedSpells.some(eq => eq && eq.spell && eq.spell.id === spellId);
+    },
+
+    // Render the list of spells
+    renderSpellList(spells) {
+        if (spells.length === 0) {
+            return '<div class="no-results">No spells found</div>';
+        }
+
+        return spells.map(spell => {
+            const isEquipped = this.isSpellEquipped(spell.id);
+            const description = this.formatSpellDescription(spell, 1);
+            const clickHandler = isEquipped ? '' : `onclick="SpellBookManager.selectSpell('${spell.id}')"`;
+            const disabledClass = isEquipped ? ' spell-option-disabled' : '';
+
+            return `
+                <div class="skill-option spell-option${disabledClass}" ${clickHandler}>
+                    <div class="skill-icon-wrapper spell-icon-round">
+                        <img src="/media/gamedata/spells/${spell.icon || spell.id}.png"
+                             class="skill-icon"
+                             alt="${spell.id}"
+                             onerror="SpellBookManager.handleSpellIconError(this, '${spell.icon || spell.id}')">
+                        ${isEquipped ? '<div class="spell-equipped-badge">In Book</div>' : ''}
+                    </div>
+                    <div class="skill-info">
+                        <div class="skill-name">${this.formatSpellName(spell.id_key || spell.id)}</div>
+                        <div class="skill-meta" style="color: #7ec8e3; font-size: 0.8rem; margin-bottom: 6px;">
+                            ${spell.school_display} • Tier ${spell.level} • ${spell.spell_type === 'global' ? 'Global Map' : 'Combat'}
+                        </div>
+                        <div class="skill-desc spell-description">${description}</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    },
+
+    // Filter by search text
+    filterSpells(searchText) {
+        document.getElementById('spell-picker-list').innerHTML = this.renderSpellList(this.getFilteredSpells(searchText));
+    },
+
+    // Filter by school tab
+    filterBySchool(schoolId) {
+        this.currentSchoolFilter = schoolId;
+
+        // Update active tab
+        document.querySelectorAll('.spell-school-tab-modal').forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.school === schoolId);
+        });
+
+        // Clear search input when changing school
+        const searchInput = document.getElementById('spell-search-input');
+        if (searchInput) searchInput.value = '';
+
+        document.getElementById('spell-picker-list').innerHTML = this.renderSpellList(this.getFilteredSpells());
+    },
+
+    // Filter by type tab (Combat/Global Map)
+    filterModalByType(type) {
+        this.currentModalTypeFilter = type;
+
+        // Update active tab
+        document.querySelectorAll('.spell-type-tab-modal').forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.type === type);
+        });
+
+        // Clear search input when changing type
+        const searchInput = document.getElementById('spell-search-input');
+        if (searchInput) searchInput.value = '';
+
+        document.getElementById('spell-picker-list').innerHTML = this.renderSpellList(this.getFilteredSpells());
+    },
+
+    // Get spells filtered by current school, type, and equipped toggle
+    getFilteredSpells(searchText = '') {
+        let spells = this.availableSpells;
+
+        // Filter by school
+        if (this.currentSchoolFilter !== 'all') {
+            spells = spells.filter(s => s.school === this.currentSchoolFilter);
+        }
+
+        // Filter by type (combat/global)
+        if (this.currentModalTypeFilter !== 'all') {
+            spells = spells.filter(s => s.spell_type === this.currentModalTypeFilter);
+        }
+
+        // Filter by search text
+        if (searchText) {
+            const search = searchText.toLowerCase();
+            spells = spells.filter(spell => {
+                const formattedName = this.formatSpellName(spell.id_key || spell.id).toLowerCase();
+                return formattedName.includes(search) ||
+                       spell.id.toLowerCase().includes(search) ||
+                       spell.school_display.toLowerCase().includes(search);
+            });
+        }
+
+        // Filter out equipped spells if toggle is off
+        if (!this.showEquippedInPicker) {
+            spells = spells.filter(spell => !this.isSpellEquipped(spell.id));
+        }
+
+        return spells;
+    },
+
+    // Toggle showing equipped spells in picker
+    toggleShowEquipped(checked) {
+        this.showEquippedInPicker = checked;
+        const searchText = document.getElementById('spell-search-input')?.value || '';
+        document.getElementById('spell-picker-list').innerHTML = this.renderSpellList(this.getFilteredSpells(searchText));
+    },
+
+    // Select a spell and assign it to the slot
+    selectSpell(spellId) {
+        const spell = this.availableSpells.find(s => s.id === spellId);
+        if (!spell) {
+            console.error('[SpellBookManager] Spell not found:', spellId);
+            return;
+        }
+
+        if (this.isAddingNewSlot) {
+            // Create a new slot with the spell
+            this.equippedSpells.push({
+                spell: spell,
+                upgradeLevel: 1
+            });
+            // Create new slot element in the DOM
+            this.createNewSlotElement(this.equippedSpells.length - 1);
+        } else {
+            // Fill existing empty slot
+            this.equippedSpells[this.currentSlotIndex] = {
+                spell: spell,
+                upgradeLevel: 1  // Start at level 1
+            };
+            this.updateSlot(this.currentSlotIndex);
+        }
+
+        console.log(`[SpellBookManager] Equipped ${spell.id}, total slots: ${this.equippedSpells.length}`);
+
+        this.isAddingNewSlot = false;
+        this.closeSpellPicker();
+    },
+
+    // Helper to format spell name from id_key
+    formatSpellName(idKey) {
+        // Convert "day_01_magic_blessing" to "Blessing"
+        // Remove school prefix and number, capitalize
+        const parts = idKey.split('_');
+        // Find the meaningful part (usually after "magic")
+        const magicIndex = parts.indexOf('magic');
+        if (magicIndex >= 0 && magicIndex < parts.length - 1) {
+            return parts.slice(magicIndex + 1).map(word =>
+                word.charAt(0).toUpperCase() + word.slice(1)
+            ).join(' ');
+        }
+        // Fallback: just capitalize all parts
+        return parts.map(word =>
+            word.charAt(0).toUpperCase() + word.slice(1)
+        ).join(' ');
+    },
+
+    // Get fallback icon path for _special variants
+    getFallbackIconPath(spellId) {
+        // Strip _special suffix to get base spell icon
+        if (spellId.endsWith('_special')) {
+            return `/media/gamedata/spells/${spellId.replace(/_special$/, '')}.png`;
+        }
+        // For other cases, try a generic fallback
+        return '/media/gamedata/ui/magic_icon.png';
+    },
+
+    // Handle spell icon load error - try fallback
+    handleSpellIconError(img, spellId) {
+        const fallbackPath = this.getFallbackIconPath(spellId);
+        if (img.src !== fallbackPath && !img.dataset.triedFallback) {
+            img.dataset.triedFallback = 'true';
+            img.src = fallbackPath;
+        }
+    },
+
+    // Format spell description using the description pipeline
+    formatSpellDescription(spell, upgradeLevel = 1) {
+        // Check if description runtime is available
+        if (typeof DescriptionRuntime === 'undefined' || typeof DescriptionFunctions === 'undefined') {
+            console.warn('[SpellBookManager] Description runtime not available');
+            return spell.description_template || 'No description available';
+        }
+
+        try {
+            // Get effective hero stats
+            const effectiveStats = EquipmentManager ? EquipmentManager.getEffectiveHeroStats() : {};
+
+            // Create context for the spell using the same structure as HeroState
+            // The transpiled functions expect data like targetMechanics to be directly on currentMagic
+            // Use the magicDealer for the current upgrade level (0-indexed)
+            const magicDealers = spell.raw_data?.battleMagic?.magicDealers || [];
+            const dealerIndex = Math.min(upgradeLevel - 1, magicDealers.length - 1);
+            const magicDealer = magicDealers[Math.max(0, dealerIndex)] || {};
+            const ctx = {
+                currentMagic: {
+                    id: spell.id_key || spell.id,
+                    upgradeLevel: upgradeLevel - 1,  // 0-indexed
+                    level: spell.level,
+                    school: spell.school,
+                    // Spread magicDealer data so targetMechanics is directly accessible
+                    ...magicDealer,
+                    // Also include the full raw_data for functions that need config
+                    config: spell.raw_data || {},
+                },
+                currentHero: {
+                    stats: effectiveStats,
+                    getSpellPower: (school) => {
+                        // Base spell power + school-specific bonuses
+                        return effectiveStats.spellPower || 0;
+                    }
+                }
+            };
+
+            // Select the correct description template/args for this upgrade level
+            // spell.descriptions is an array where index 0 = level 1, index 1 = level 2, etc.
+            const descriptions = spell.descriptions || [];
+            const descIndex = Math.min(upgradeLevel - 1, descriptions.length - 1);
+            const levelDesc = descriptions[Math.max(0, descIndex)] || {};
+
+            // Use level-specific template/args, falling back to legacy fields
+            const template = levelDesc.description_template || spell.description_template || '';
+            const args = levelDesc.description_args || spell.description_args || [];
+
+            if (!template) {
+                return 'No description available';
+            }
+
+            return DescriptionRuntime.formatDescription(template, args, ctx);
+        } catch (error) {
+            console.warn('[SpellBookManager] Error formatting spell description:', error);
+            return spell.description_template || 'Error loading description';
+        }
+    },
+
+    // Create a new slot element in the DOM
+    createNewSlotElement(index) {
+        const grid = document.getElementById('spell-grid');
+        const equipped = this.equippedSpells[index];
+        const spell = equipped.spell;
+        const description = this.formatSpellDescription(spell, equipped.upgradeLevel);
+        const maxLevel = spell.max_upgrade_level || 3;
+        const currentLevel = equipped.upgradeLevel;
+
+        const slotDiv = document.createElement('div');
+        slotDiv.className = 'spell-slot equipped';
+        slotDiv.dataset.slotIndex = index;
+        const isStarting = equipped.isStartingSpell;
+        slotDiv.innerHTML = `
+            <img src="/media/gamedata/spells/${spell.icon || spell.id_key || spell.id}.png"
+                 alt="${spell.id_key || spell.id}"
+                 class="spell-icon"
+                 onerror="SpellBookManager.handleSpellIconError(this, '${spell.icon || spell.id_key || spell.id}')">
+            <button class="spell-slot-remove" onclick="event.stopPropagation(); SpellBookManager.removeSpell(${index})" ${isStarting ? 'disabled' : ''}>×</button>
+            ${isStarting ? '<div class="spell-starting-badge">Starting</div>' : ''}
+            <div class="spell-tooltip">
+                <div class="spell-tooltip-name">${spell.name || this.formatSpellName(spell.id_key || spell.id)}</div>
+                <div class="spell-tooltip-school">${spell.school_display}</div>
+                <div class="spell-tooltip-type">${spell.spell_type === 'global' ? 'Global Map' : 'Combat'} Spell</div>
+                <div class="spell-tooltip-tier">Tier ${spell.level}</div>
+                <div class="spell-tooltip-level">Level ${currentLevel}/${maxLevel}</div>
+                <div class="spell-tooltip-desc">${description}</div>
+                <div class="spell-tooltip-actions">
+                    <button class="spell-action-btn"
+                            onclick="event.stopPropagation(); SpellBookManager.upgradeSpell(${index})"
+                            ${currentLevel >= maxLevel ? 'disabled' : ''}>
+                        Upgrade
+                    </button>
+                    <button class="spell-action-btn"
+                            onclick="event.stopPropagation(); SpellBookManager.downgradeSpell(${index})"
+                            ${currentLevel <= 1 ? 'disabled' : ''}>
+                        Downgrade
+                    </button>
+                    <button class="spell-action-btn spell-remove-btn"
+                            onclick="event.stopPropagation(); SpellBookManager.removeSpell(${index})"
+                            ${isStarting ? 'disabled' : ''}>
+                        Remove
+                    </button>
+                </div>
+            </div>
+        `;
+
+        // Add click handler for spell replacement
+        slotDiv.addEventListener('click', () => this.openSpellPicker(index));
+
+        // Insert before the "+" add button (which should always be last)
+        const addButton = grid.querySelector('.spell-slot-add');
+        if (addButton) {
+            grid.insertBefore(slotDiv, addButton);
+        } else {
+            grid.appendChild(slotDiv);
+        }
+    },
+
+    // Update a single slot's UI to show equipped spell or empty state
+    updateSlot(index) {
+        const slotElement = document.querySelector(`.spell-slot[data-slot-index="${index}"]`);
+        if (!slotElement) return;
+
+        const equipped = this.equippedSpells[index];
+
+        if (equipped === null) {
+            // Empty slot
+            slotElement.innerHTML = '<span class="add-text">+</span>';
+            slotElement.classList.remove('equipped');
+        } else {
+            // Filled slot with spell
+            const spell = equipped.spell;
+            const description = this.formatSpellDescription(spell, equipped.upgradeLevel);
+            const maxLevel = spell.max_upgrade_level || 3;
+            const currentLevel = equipped.upgradeLevel;
+            const isStarting = equipped.isStartingSpell;
+
+            slotElement.innerHTML = `
+                <img src="/media/gamedata/spells/${spell.icon || spell.id_key || spell.id}.png"
+                     alt="${spell.id_key || spell.id}"
+                     class="spell-icon"
+                     onerror="SpellBookManager.handleSpellIconError(this, '${spell.icon || spell.id_key || spell.id}')">
+                <button class="spell-slot-remove" onclick="event.stopPropagation(); SpellBookManager.removeSpell(${index})" ${isStarting ? 'disabled' : ''}>×</button>
+                ${isStarting ? '<div class="spell-starting-badge">Starting</div>' : ''}
+                <div class="spell-tooltip">
+                    <div class="spell-tooltip-name">${spell.name || this.formatSpellName(spell.id_key || spell.id)}</div>
+                    <div class="spell-tooltip-school">${spell.school_display}</div>
+                    <div class="spell-tooltip-type">${spell.spell_type === 'global' ? 'Global Map' : 'Combat'} Spell</div>
+                    <div class="spell-tooltip-tier">Tier ${spell.level}</div>
+                    <div class="spell-tooltip-level">Level ${currentLevel}/${maxLevel}</div>
+                    <div class="spell-tooltip-desc">${description}</div>
+                    <div class="spell-tooltip-actions">
+                        <button class="spell-action-btn"
+                                onclick="event.stopPropagation(); SpellBookManager.upgradeSpell(${index})"
+                                ${currentLevel >= maxLevel ? 'disabled' : ''}>
+                            Upgrade
+                        </button>
+                        <button class="spell-action-btn"
+                                onclick="event.stopPropagation(); SpellBookManager.downgradeSpell(${index})"
+                                ${currentLevel <= 1 ? 'disabled' : ''}>
+                            Downgrade
+                        </button>
+                        <button class="spell-action-btn spell-remove-btn"
+                                onclick="event.stopPropagation(); SpellBookManager.removeSpell(${index})"
+                                ${isStarting ? 'disabled' : ''}>
+                            Remove
+                        </button>
+                    </div>
+                </div>
+            `;
+            slotElement.classList.add('equipped');
+        }
+
+        // Reapply all filters
+        this.applyAllFilters();
+    },
+
+    // Upgrade spell to next level
+    upgradeSpell(index) {
+        const equipped = this.equippedSpells[index];
+        if (!equipped) return;
+
+        const maxLevel = equipped.spell.max_upgrade_level || 3;
+        if (equipped.upgradeLevel >= maxLevel) return;
+
+        equipped.upgradeLevel++;
+        console.log(`[SpellBookManager] Upgraded spell to level ${equipped.upgradeLevel}`);
+
+        this.updateSlot(index);
+    },
+
+    // Downgrade spell to previous level
+    downgradeSpell(index) {
+        const equipped = this.equippedSpells[index];
+        if (!equipped) return;
+
+        if (equipped.upgradeLevel <= 1) return;
+
+        equipped.upgradeLevel--;
+        console.log(`[SpellBookManager] Downgraded spell to level ${equipped.upgradeLevel}`);
+
+        this.updateSlot(index);
+    },
+
+    // Remove spell from slot
+    removeSpell(index) {
+        const equipped = this.equippedSpells[index];
+        if (!equipped) return;
+
+        // Cannot remove starting spells
+        if (equipped.isStartingSpell) {
+            console.log(`[SpellBookManager] Cannot remove starting spell`);
+            return;
+        }
+
+        const spellName = this.formatSpellName(equipped.spell.id_key || equipped.spell.id);
+        console.log(`[SpellBookManager] Removing spell ${spellName} from slot ${index}`);
+
+        // Remove the spell and shift remaining spells up
+        this.equippedSpells.splice(index, 1);
+        this.rebuildSpellGrid();
+    },
+
+    // Max all equipped spells
+    maxAllSpells() {
+        let upgraded = 0;
+        this.equippedSpells.forEach((equipped, index) => {
+            if (equipped !== null) {
+                const maxLevel = equipped.spell.max_upgrade_level || 3;
+                if (equipped.upgradeLevel < maxLevel) {
+                    equipped.upgradeLevel = maxLevel;
+                    upgraded++;
+                }
+            }
+        });
+
+        if (upgraded > 0) {
+            console.log(`[SpellBookManager] Maxed ${upgraded} spells`);
+            this.rebuildSpellGrid();
+        }
+    },
+
+    // Reset all equipped spells to level 1
+    resetAllSpells() {
+        let reset = 0;
+        this.equippedSpells.forEach((equipped, index) => {
+            if (equipped !== null && equipped.upgradeLevel > 1) {
+                equipped.upgradeLevel = 1;
+                reset++;
+            }
+        });
+
+        if (reset > 0) {
+            console.log(`[SpellBookManager] Reset ${reset} spells to level 1`);
+            this.rebuildSpellGrid();
+        }
+    },
+
+    // Rebuild the entire grid - shows filled spells + one "+" button to add more
+    rebuildSpellGrid() {
+        const grid = document.getElementById('spell-grid');
+        grid.innerHTML = '';
+
+        // Remove any null entries (clean up the array)
+        this.equippedSpells = this.equippedSpells.filter(e => e !== null);
+
+        // Render all equipped spells
+        this.equippedSpells.forEach((equipped, index) => {
+            const slotDiv = document.createElement('div');
+            slotDiv.className = 'spell-slot equipped';
+            slotDiv.dataset.slotIndex = index;
+
+            const spell = equipped.spell;
+            const description = this.formatSpellDescription(spell, equipped.upgradeLevel);
+            const maxLevel = spell.max_upgrade_level || 4;
+            const currentLevel = equipped.upgradeLevel;
+            const isStarting = equipped.isStartingSpell;
+
+            slotDiv.innerHTML = `
+                <img src="/media/gamedata/spells/${spell.icon || spell.id_key || spell.id}.png"
+                     alt="${spell.id_key || spell.id}"
+                     class="spell-icon"
+                     onerror="SpellBookManager.handleSpellIconError(this, '${spell.icon || spell.id_key || spell.id}')">
+                <button class="spell-slot-remove" onclick="event.stopPropagation(); SpellBookManager.removeSpell(${index})" ${isStarting ? 'disabled' : ''}>×</button>
+                ${isStarting ? '<div class="spell-starting-badge">Starting</div>' : ''}
+                <div class="spell-tooltip">
+                    <div class="spell-tooltip-name">${spell.name || this.formatSpellName(spell.id_key || spell.id)}</div>
+                    <div class="spell-tooltip-school">${spell.school_display}</div>
+                    <div class="spell-tooltip-type">${spell.spell_type === 'global' ? 'Global Map' : 'Combat'} Spell</div>
+                    <div class="spell-tooltip-tier">Tier ${spell.level}</div>
+                    <div class="spell-tooltip-level">Level ${currentLevel}/${maxLevel}</div>
+                    <div class="spell-tooltip-desc">${description}</div>
+                    <div class="spell-tooltip-actions">
+                        <button class="spell-action-btn"
+                                onclick="event.stopPropagation(); SpellBookManager.upgradeSpell(${index})"
+                                ${currentLevel >= maxLevel ? 'disabled' : ''}>Upgrade</button>
+                        <button class="spell-action-btn"
+                                onclick="event.stopPropagation(); SpellBookManager.downgradeSpell(${index})"
+                                ${currentLevel <= 1 ? 'disabled' : ''}>Downgrade</button>
+                        <button class="spell-action-btn spell-remove-btn"
+                                onclick="event.stopPropagation(); SpellBookManager.removeSpell(${index})"
+                                ${isStarting ? 'disabled' : ''}>Remove</button>
+                    </div>
+                </div>
+            `;
+
+            // Click to replace this spell
+            slotDiv.addEventListener('click', () => this.openSpellPicker(index));
+            grid.appendChild(slotDiv);
+        });
+
+        // Add the "+" button at the end to add new spells
+        const addSlot = document.createElement('div');
+        addSlot.className = 'spell-slot spell-slot-add';
+        addSlot.innerHTML = '<span class="add-text">+</span>';
+        addSlot.addEventListener('click', () => this.addNewSpell());
+        grid.appendChild(addSlot);
+
+        this.applyAllFilters();
+    },
+
+    // Update all spell descriptions (called when hero stats change)
+    updateAllDescriptions() {
+        console.log('[SpellBookManager] Updating all spell descriptions');
+
+        // Rebuild the grid to recalculate all descriptions
+        this.rebuildSpellGrid();
+    },
+
+    // Close the modal
+    closeSpellPicker() {
+        this.currentSlotIndex = null;
+        this.isAddingNewSlot = false;
+        document.getElementById('skill-modal-container').innerHTML = '';
     }
 };
 
@@ -1887,7 +2854,9 @@ const EquipmentManager = {
 document.addEventListener('DOMContentLoaded', function() {
     SkillManager.init();
     AdvancedClassManager.init();
+    ItemSetManager.init();  // Load item sets before equipment
     EquipmentManager.init();
+    SpellBookManager.init();
 
     // Close modal on Escape key
     document.addEventListener('keydown', function(event) {
@@ -1895,6 +2864,7 @@ document.addEventListener('DOMContentLoaded', function() {
             SkillSelectionModal.close();
             SubskillSelectionModal.close();
             ItemSelectionModal.close();
+            SpellBookManager.closeSpellPicker();
         }
     });
 });
