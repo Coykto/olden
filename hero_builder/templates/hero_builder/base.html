@@ -7,6 +7,25 @@
     {% load static %}
     <link rel="stylesheet" href="{% static 'hero_builder/css/tooltip.css' %}?v=7">
     <script src="{% static 'js/tooltip.js' %}?v=14"></script>
+    <script>
+    // Debug utility - set Debug.enabled = true in browser console to enable debug logging
+    window.Debug = {
+        enabled: false,
+        log: function(...args) {
+            if (this.enabled) console.log(...args);
+        },
+        warn: function(...args) {
+            if (this.enabled) console.warn(...args);
+        },
+        info: function(...args) {
+            if (this.enabled) console.info(...args);
+        },
+        error: function(...args) {
+            // Errors always print
+            console.error(...args);
+        }
+    };
+    </script>
     <style>
         * {
             margin: 0;

@@ -165,7 +165,7 @@ const DescriptionRuntime = {
         if (!func) {
           // Only warn for fallbacks, error for last option
           if (funcNames.indexOf(funcName) < funcNames.length - 1) {
-            console.warn(`[DescriptionRuntime] Placeholder ${placeholder}: Function "${trimmedName}" not found, trying fallback...`);
+            if (typeof Debug !== 'undefined') Debug.warn(`[DescriptionRuntime] Placeholder ${placeholder}: Function "${trimmedName}" not found, trying fallback...`);
           }
           continue;
         }
@@ -196,7 +196,7 @@ const DescriptionRuntime = {
             return result;
           }
           // Result is null, try fallback
-          console.warn(`[DescriptionRuntime] Placeholder ${placeholder}: Function "${trimmedName}" returned null, trying fallback...`);
+          if (typeof Debug !== 'undefined') Debug.warn(`[DescriptionRuntime] Placeholder ${placeholder}: Function "${trimmedName}" returned null, trying fallback...`);
         } catch (e) {
           console.error(`[DescriptionRuntime] Placeholder ${placeholder}: Error in "${trimmedName}": ${e.message}`);
           // Try fallback on error

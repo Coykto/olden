@@ -196,10 +196,11 @@ class AssetExtractor:
 
     def _extract_units(self, force: bool = False) -> int:
         """
-        Extract unit icon textures.
+        Extract unit portrait sprites.
 
         GENERAL SOLUTION: Dynamically discovers all unit IDs from game data,
-        then matches textures to those IDs. No hardcoded unit list needed.
+        then extracts Sprite objects (not Texture2D) which are properly cropped
+        portrait images rather than raw 3D model diffuse textures.
         """
         output_path = self.output_dir / "units"
         output_path.mkdir(parents=True, exist_ok=True)
@@ -217,10 +218,9 @@ class AssetExtractor:
         for full_name, unit_id in self.UNIT_FULL_NAME_TO_ID.items():
             name_to_id[full_name.lower()] = unit_id
 
-        # Patterns to skip (not unit icons)
-        skip_patterns = ['diffuse', 'emissive', 'normal', 'mask', 'vfx',
-                        'gradient', 'particle', 'glow', 'throne', 'ability',
-                        'passive', 'debuff', 'buff', 'projectile']
+        # Patterns to skip (not unit portraits)
+        skip_patterns = ['ability', 'passive', 'aura', 'buff', 'debuff',
+                        'icon', 'name', 'build', 'campaign', 'selfbuff']
 
         # Extract from all asset files
         for asset_file in self.game_data_path.glob("*.assets"):
@@ -228,7 +228,8 @@ class AssetExtractor:
                 env = UnityPy.load(str(asset_file))
 
                 for obj in env.objects:
-                    if obj.type.name != 'Texture2D':
+                    # Use Sprite objects for proper portrait images
+                    if obj.type.name != 'Sprite':
                         continue
 
                     try:
@@ -236,7 +237,7 @@ class AssetExtractor:
                         name = data.m_Name
                         name_lower = name.lower()
 
-                        # Skip non-icon textures
+                        # Skip non-portrait sprites (abilities, passives, etc.)
                         if any(p in name_lower for p in skip_patterns):
                             continue
 

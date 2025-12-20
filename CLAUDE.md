@@ -278,3 +278,28 @@ const findTooltipElement = (selector) => {
 - `/static/js/tooltip.js` - Tooltip system with nested support
 - `/hero_builder/templates/hero_builder/partials/_scripts.html` - EquipmentManager, SpellBookManager, ArmyManager
 - `/hero_builder/static/hero_builder/css/tooltip.css` - Tooltip styles
+
+## Debug Logging
+
+The codebase uses a global `Debug` utility for conditional logging. Debug output is disabled by default to keep the browser console clean.
+
+### Enabling Debug Logging
+In the browser console:
+```javascript
+Debug.enabled = true;  // Enable debug output
+Debug.enabled = false; // Disable debug output (default)
+```
+
+### Usage in Code
+```javascript
+Debug.log('[Component] Informational message');
+Debug.warn('[Component] Warning message');
+Debug.info('[Component] Info message');
+Debug.error('[Component] Error message');  // Always prints, regardless of enabled flag
+```
+
+### Key Points
+- Defined in `/hero_builder/templates/hero_builder/base.html` before other scripts
+- For standalone JS files, check availability: `if (typeof Debug !== 'undefined') Debug.log(...)`
+- `console.error` calls remain for actual errors that should always be visible
+- Debug messages include component prefixes like `[SpellBookManager]`, `[ArmyManager]`, etc.

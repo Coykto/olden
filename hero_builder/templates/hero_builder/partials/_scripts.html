@@ -162,7 +162,7 @@ const SkillManager = {
                 // Re-render UI now that skills have full data
                 this.updateUI();
             })
-            .catch(err => console.warn('Could not enrich starting skills:', err));
+            .catch(err => Debug.warn('Could not enrich starting skills:', err));
 
         // Set up all click handlers (including subskill buttons for starting skills)
         this.updateUI();
@@ -1522,7 +1522,7 @@ const EquipmentManager = {
 
                 return result;
             } catch (e) {
-                console.warn('[EquipmentManager] Transpiled function error, falling back:', e);
+                Debug.warn('[EquipmentManager] Transpiled function error, falling back:', e);
             }
         }
 
@@ -1607,7 +1607,7 @@ const EquipmentManager = {
                     ctx
                 );
             } catch (e) {
-                console.warn('[EquipmentManager] Upgrade description error, falling back:', e);
+                Debug.warn('[EquipmentManager] Upgrade description error, falling back:', e);
             }
         }
 
@@ -1727,7 +1727,7 @@ const EquipmentManager = {
                     ctx
                 );
             } catch (e) {
-                console.warn('[EquipmentManager] Spell description error, falling back:', e);
+                Debug.warn('[EquipmentManager] Spell description error, falling back:', e);
             }
         }
 
@@ -2067,7 +2067,7 @@ const ItemSetManager = {
                 }
             }
 
-            console.log(`[ItemSetManager] Loaded ${this.itemSets.length} item sets`);
+            Debug.log(`[ItemSetManager] Loaded ${this.itemSets.length} item sets`);
         } catch (error) {
             console.error('[ItemSetManager] Failed to load item sets:', error);
         }
@@ -2217,7 +2217,7 @@ const SpellBookManager = {
             this.availableSpells = data.spells || [];
             this.bonusSpells = data.bonus_spells || [];
             this.schools = data.schools || [];
-            console.log(`[SpellBookManager] Loaded ${this.availableSpells.length} spells, ${this.bonusSpells.length} bonus spells`);
+            Debug.log(`[SpellBookManager] Loaded ${this.availableSpells.length} spells, ${this.bonusSpells.length} bonus spells`);
         } catch (error) {
             console.error('[SpellBookManager] Failed to load spells:', error);
         }
@@ -2241,7 +2241,7 @@ const SpellBookManager = {
             const startingSpells = JSON.parse(heroCard.dataset.heroStartingSpells || '[]');
             if (!startingSpells.length) return;
 
-            console.log(`[SpellBookManager] Loading ${startingSpells.length} starting spells`);
+            Debug.log(`[SpellBookManager] Loading ${startingSpells.length} starting spells`);
 
             // Clear the initial empty slots
             this.equippedSpells = [];
@@ -2255,7 +2255,7 @@ const SpellBookManager = {
                     upgradeLevel: spellData.upgrade_level || 1,
                     isStartingSpell: true  // Mark as starting spell - cannot be removed
                 });
-                console.log(`[SpellBookManager] Added starting spell: ${spellData.name} (${spellData.id})`);
+                Debug.log(`[SpellBookManager] Added starting spell: ${spellData.name} (${spellData.id})`);
             });
         } catch (error) {
             console.error('[SpellBookManager] Error loading starting spells:', error);
@@ -2340,7 +2340,7 @@ const SpellBookManager = {
         const newIds = newGrantedSpells.map(s => s.spell.id).sort().join(',');
 
         if (oldIds !== newIds) {
-            console.log(`[SpellBookManager] Granted spells updated: ${newGrantedSpells.length} spells`);
+            Debug.log(`[SpellBookManager] Granted spells updated: ${newGrantedSpells.length} spells`);
             this.skillGrantedSpells = newGrantedSpells;
             this.rebuildSpellGrid();
         }
@@ -2623,7 +2623,7 @@ const SpellBookManager = {
             this.updateSlot(this.currentSlotIndex);
         }
 
-        console.log(`[SpellBookManager] Equipped ${spell.id}, total slots: ${this.equippedSpells.length}`);
+        Debug.log(`[SpellBookManager] Equipped ${spell.id}, total slots: ${this.equippedSpells.length}`);
 
         this.isAddingNewSlot = false;
         this.closeSpellPicker();
@@ -2670,7 +2670,7 @@ const SpellBookManager = {
     formatSpellDescription(spell, upgradeLevel = 1) {
         // Check if description runtime is available
         if (typeof DescriptionRuntime === 'undefined' || typeof DescriptionFunctions === 'undefined') {
-            console.warn('[SpellBookManager] Description runtime not available');
+            Debug.warn('[SpellBookManager] Description runtime not available');
             return spell.description_template || 'No description available';
         }
 
@@ -2727,7 +2727,7 @@ const SpellBookManager = {
 
             return DescriptionRuntime.formatDescription(template, args, ctx);
         } catch (error) {
-            console.warn('[SpellBookManager] Error formatting spell description:', error);
+            Debug.warn('[SpellBookManager] Error formatting spell description:', error);
             return spell.description_template || 'Error loading description';
         }
     },
@@ -2869,7 +2869,7 @@ const SpellBookManager = {
         if (equipped.upgradeLevel >= maxLevel) return;
 
         equipped.upgradeLevel++;
-        console.log(`[SpellBookManager] Upgraded spell to level ${equipped.upgradeLevel}`);
+        Debug.log(`[SpellBookManager] Upgraded spell to level ${equipped.upgradeLevel}`);
 
         this.updateSlotInPlace(index, isSkillGranted);
     },
@@ -2883,7 +2883,7 @@ const SpellBookManager = {
         if (equipped.upgradeLevel <= 1) return;
 
         equipped.upgradeLevel--;
-        console.log(`[SpellBookManager] Downgraded spell to level ${equipped.upgradeLevel}`);
+        Debug.log(`[SpellBookManager] Downgraded spell to level ${equipped.upgradeLevel}`);
 
         this.updateSlotInPlace(index, isSkillGranted);
     },
@@ -2943,12 +2943,12 @@ const SpellBookManager = {
 
         // Cannot remove starting spells
         if (equipped.isStartingSpell) {
-            console.log(`[SpellBookManager] Cannot remove starting spell`);
+            Debug.log(`[SpellBookManager] Cannot remove starting spell`);
             return;
         }
 
         const spellName = this.formatSpellName(equipped.spell.id_key || equipped.spell.id);
-        console.log(`[SpellBookManager] Removing spell ${spellName} from slot ${index}`);
+        Debug.log(`[SpellBookManager] Removing spell ${spellName} from slot ${index}`);
 
         // Remove the spell and shift remaining spells up
         this.equippedSpells.splice(index, 1);
@@ -2969,7 +2969,7 @@ const SpellBookManager = {
         });
 
         if (upgraded > 0) {
-            console.log(`[SpellBookManager] Maxed ${upgraded} spells`);
+            Debug.log(`[SpellBookManager] Maxed ${upgraded} spells`);
             this.rebuildSpellGrid();
         }
     },
@@ -2985,7 +2985,7 @@ const SpellBookManager = {
         });
 
         if (reset > 0) {
-            console.log(`[SpellBookManager] Reset ${reset} spells to level 1`);
+            Debug.log(`[SpellBookManager] Reset ${reset} spells to level 1`);
             this.rebuildSpellGrid();
         }
     },
@@ -3085,7 +3085,7 @@ const SpellBookManager = {
 
     // Update all spell descriptions (called when hero stats change)
     updateAllDescriptions() {
-        console.log('[SpellBookManager] Updating all spell descriptions');
+        Debug.log('[SpellBookManager] Updating all spell descriptions');
 
         // Rebuild the grid to recalculate all descriptions
         this.rebuildSpellGrid();
@@ -3106,7 +3106,7 @@ const ArmyManager = {
 
     // Initialize the army panel
     async init() {
-        console.log('[ArmyManager] Initializing...');
+        Debug.log('[ArmyManager] Initializing...');
 
         // Get hero faction from heroBuild (already set by SkillManager)
         const faction = heroBuild.heroFaction;
@@ -3191,7 +3191,7 @@ const ArmyManager = {
             if (!isNaN(newCount) && newCount > 0 && armySlot && armySlot.count !== newCount) {
                 armySlot.count = newCount;
                 self.render();
-                console.log(`[ArmyManager] Updated stack count for slot ${slotIndex} to ${newCount}`);
+                Debug.log(`[ArmyManager] Updated stack count for slot ${slotIndex} to ${newCount}`);
             }
         });
     },
@@ -3235,7 +3235,7 @@ const ArmyManager = {
             abilitiesRow.outerHTML = this.buildTooltipAbilitiesHtml(armySlot.unitData, newCount);
         }
 
-        console.log(`[ArmyManager] Updated stack count for slot ${slotIndex} to ${newCount}`);
+        Debug.log(`[ArmyManager] Updated stack count for slot ${slotIndex} to ${newCount}`);
 
         // Keep focus on the input and select the text
         stackInput.focus();
@@ -3255,7 +3255,7 @@ const ArmyManager = {
                 heroBuild.factionUnits = heroFaction.units_by_tier || {};
             }
 
-            console.log(`[ArmyManager] Loaded ${this.allFactions.length} factions with units`);
+            Debug.log(`[ArmyManager] Loaded ${this.allFactions.length} factions with units`);
         } catch (error) {
             console.error('[ArmyManager] Failed to load units:', error);
             this.allFactions = [];
@@ -3294,7 +3294,7 @@ const ArmyManager = {
 
     // Populate starting army from startSquad data
     populateStartingArmy(startSquad) {
-        console.log('[ArmyManager] Populating starting army:', startSquad);
+        Debug.log('[ArmyManager] Populating starting army:', startSquad);
 
         startSquad.forEach((entry, index) => {
             if (index >= 7) return; // Only 7 slots
@@ -3313,7 +3313,7 @@ const ArmyManager = {
                     unitData: unitData,
                     isStartingUnit: true
                 };
-                console.log(`[ArmyManager] Added starting unit: ${unitData.name} x${count}`);
+                Debug.log(`[ArmyManager] Added starting unit: ${unitData.name} x${count}`);
             }
         });
 
@@ -3536,7 +3536,7 @@ const ArmyManager = {
 
             // Debug logging for cavalry
             if (rawData.id && rawData.id.includes('cavalry')) {
-                console.log('[DEBUG] Description resolved:', {
+                Debug.log('[DEBUG] Description resolved:', {
                     abilityId: ability.id,
                     template: ability.description_template?.substring(0, 50),
                     resolved: resolved?.substring(0, 100),
@@ -3554,7 +3554,7 @@ const ArmyManager = {
 
             return resolved;
         } catch (e) {
-            console.warn('[ArmyManager] Error formatting ability description:', e);
+            Debug.warn('[ArmyManager] Error formatting ability description:', e);
             return ability.description_template;
         }
     },
@@ -3575,7 +3575,7 @@ const ArmyManager = {
 
         // Debug logging
         if (unitId && unitId.includes('cavalry')) {
-            console.log('[DEBUG] injectBuffLinksIntoPassives:', {
+            Debug.log('[DEBUG] injectBuffLinksIntoPassives:', {
                 unitId,
                 passivesCount: passives?.length,
                 descriptionArgs,
@@ -3627,7 +3627,7 @@ const ArmyManager = {
 
         // Debug logging for cavalry
         if (unitId && unitId.includes('cavalry')) {
-            console.log(`[DEBUG] Found ${allBuffLinks.length} buff links for ${baseUnitId}:`,
+            Debug.log(`[DEBUG] Found ${allBuffLinks.length} buff links for ${baseUnitId}:`,
                 allBuffLinks.map(b => b.buffId));
         }
 
