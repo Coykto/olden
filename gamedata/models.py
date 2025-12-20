@@ -79,6 +79,7 @@ class Unit(models.Model):
     version = models.ForeignKey(GameVersion, on_delete=models.CASCADE, related_name='units')
     id_key = models.CharField(max_length=100, help_text="Unit identifier from game files")
     display_name = models.CharField(max_length=200, default="", help_text="Localized display name")
+    description = models.TextField(default="", blank=True, help_text="Unit lore/narrative description")
     faction = models.ForeignKey(Faction, on_delete=models.CASCADE, related_name='units')
     tier = models.IntegerField()
     squad_value = models.IntegerField(help_text="AI value of the unit")

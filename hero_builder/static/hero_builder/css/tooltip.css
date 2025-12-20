@@ -16,7 +16,7 @@
     --tooltip-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     --tooltip-padding: 12px 14px;
     --tooltip-min-width: 200px;
-    --tooltip-max-width: 300px;
+    --tooltip-max-width: 350px;
     --tooltip-z-index: 9999;
 
     /* Text colors */
@@ -393,6 +393,53 @@
 /* ==========================================================================
    Unit Tooltip
    ========================================================================== */
+.tooltip-unit .tooltip-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 4px;
+}
+
+.tooltip-unit .tooltip-header .tooltip-title {
+    margin-bottom: 0;
+    flex: 1;
+}
+
+.tooltip-unit .unit-stack-input {
+    width: 60px;
+    padding: 4px 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--tooltip-title-color);
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--tooltip-border);
+    border-radius: 4px;
+    text-align: center;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.tooltip-unit .unit-stack-input:focus {
+    outline: none;
+    border-color: var(--tooltip-title-gold);
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.tooltip-unit .unit-stack-input:hover {
+    border-color: var(--tooltip-text-highlight);
+}
+
+/* Hide spinner buttons on number input */
+.tooltip-unit .unit-stack-input::-webkit-outer-spin-button,
+.tooltip-unit .unit-stack-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.tooltip-unit .unit-stack-input[type=number] {
+    -moz-appearance: textfield;
+}
+
 .tooltip-unit .tooltip-title {
     margin-bottom: 4px;
 }

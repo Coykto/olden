@@ -75,13 +75,23 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
+#
+# Two databases:
+# - 'default': User data (hero builds, etc.) - NOT tracked in git
+# - 'gamedata': Game data (items, spells, units) - tracked in git, read-only in production
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    },
+    'gamedata': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db_gamedata.sqlite3',
+    },
 }
+
+DATABASE_ROUTERS = ['core.db_router.GameDataRouter']
 
 
 # Password validation

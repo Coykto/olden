@@ -3134,19 +3134,112 @@ const ArmyManager = {
             }
         }
 
-        // Bind click events on unit slots
+        // Bind click events on unit slots - always open picker to select/replace unit
         document.querySelectorAll('.unit-slot').forEach(slot => {
             slot.addEventListener('click', () => {
                 const slotIndex = parseInt(slot.dataset.slotIndex, 10);
-                if (heroBuild.army[slotIndex]) {
-                    this.openUnitEditor(slotIndex);
-                } else {
-                    this.openUnitPicker(slotIndex);
-                }
+                this.openUnitPicker(slotIndex);
             });
         });
 
+        // Set up tooltip callbacks for unit tooltips
+        this.setupTooltipCallbacks();
+
         this.render();
+    },
+
+    // Setup tooltip callbacks for auto-focus and save on close
+    setupTooltipCallbacks() {
+        const self = this;
+
+        // On tooltip show: focus the stack input if it's a unit tooltip
+        Tooltip.setOnShow((tooltip, trigger) => {
+            if (!tooltip.classList.contains('tooltip-unit')) return;
+
+            const stackInput = tooltip.querySelector('.unit-stack-input');
+            if (stackInput) {
+                // Small delay to ensure tooltip is fully visible
+                setTimeout(() => {
+                    stackInput.focus();
+                    stackInput.select();
+                }, 50);
+
+                // Handle Enter key to save and update descriptions (without closing)
+                stackInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        self.saveAndUpdateTooltip(tooltip, stackInput);
+                    }
+                });
+            }
+        });
+
+        // On tooltip hide: save the stack count if valid
+        Tooltip.setOnHide((tooltip, trigger) => {
+            if (!tooltip.classList.contains('tooltip-unit')) return;
+
+            const slotIndex = parseInt(tooltip.dataset.unitSlotIndex, 10);
+            if (isNaN(slotIndex)) return;
+
+            const stackInput = tooltip.querySelector('.unit-stack-input');
+            if (!stackInput) return;
+
+            const newCount = parseInt(stackInput.value, 10);
+            const armySlot = heroBuild.army[slotIndex];
+
+            // Only update if valid positive integer and different from current
+            if (!isNaN(newCount) && newCount > 0 && armySlot && armySlot.count !== newCount) {
+                armySlot.count = newCount;
+                self.render();
+                console.log(`[ArmyManager] Updated stack count for slot ${slotIndex} to ${newCount}`);
+            }
+        });
+    },
+
+    // Save stack count and update tooltip descriptions in-place (without closing)
+    saveAndUpdateTooltip(tooltip, stackInput) {
+        const slotIndex = parseInt(tooltip.dataset.unitSlotIndex, 10);
+        if (isNaN(slotIndex)) return;
+
+        const newCount = parseInt(stackInput.value, 10);
+        const armySlot = heroBuild.army[slotIndex];
+
+        // Validate: must be a positive integer
+        if (isNaN(newCount) || newCount <= 0) {
+            // Reset to current value if invalid
+            stackInput.value = armySlot?.count || 1;
+            return;
+        }
+
+        if (!armySlot) return;
+
+        // Update the count in the data model
+        armySlot.count = newCount;
+
+        // Update the slot display (the badge showing count)
+        const slots = document.querySelectorAll('.unit-slot');
+        const slot = slots[slotIndex];
+        if (slot) {
+            const countBadge = slot.querySelector('.unit-count');
+            if (countBadge) {
+                countBadge.textContent = newCount;
+            }
+        }
+
+        // Update army value display
+        this.updateArmyValue();
+
+        // Update the abilities section in the tooltip with new stack count
+        const abilitiesRow = tooltip.querySelector('.tooltip-abilities-row');
+        if (abilitiesRow && armySlot.unitData) {
+            abilitiesRow.outerHTML = this.buildTooltipAbilitiesHtml(armySlot.unitData, newCount);
+        }
+
+        console.log(`[ArmyManager] Updated stack count for slot ${slotIndex} to ${newCount}`);
+
+        // Keep focus on the input and select the text
+        stackInput.focus();
+        stackInput.select();
     },
 
     // Fetch all units from all factions
@@ -3248,18 +3341,17 @@ const ArmyManager = {
                 slot.innerHTML = `
                     <img src="${unit.icon_url}" alt="${unit.name}" class="unit-icon" onerror="this.src='/media/gamedata/ui/unit_placeholder.png'">
                     <span class="unit-count">${armySlot.count}</span>
-                    <div class="tooltip tooltip-unit">
-                        <div class="tooltip-title">${unit.name}</div>
-                        <div class="tooltip-tier">Tier ${unit.tier}</div>
-                        <div class="tooltip-stats">
-                            <div class="stat-item"><span class="stat-label">ATK:</span> <span class="stat-value">${unit.stats.offence}</span></div>
-                            <div class="stat-item"><span class="stat-label">DEF:</span> <span class="stat-value">${unit.stats.defence}</span></div>
-                            <div class="stat-item"><span class="stat-label">HP:</span> <span class="stat-value">${unit.stats.hp}</span></div>
-                            <div class="stat-item"><span class="stat-label">DMG:</span> <span class="stat-value">${unit.stats.damage_min}-${unit.stats.damage_max}</span></div>
-                            <div class="stat-item"><span class="stat-label">Speed:</span> <span class="stat-value">${unit.stats.speed}</span></div>
-                            <div class="stat-item"><span class="stat-label">Value:</span> <span class="stat-value">${unit.squad_value}</span></div>
+                    <button class="unit-remove-btn" onclick="event.stopPropagation(); ArmyManager.removeUnitFromSlot(${slot.dataset.slotIndex});" title="Remove unit">&times;</button>
+                    <div class="tooltip tooltip-unit" data-unit-slot-index="${index}">
+                        <div class="tooltip-header">
+                            <span class="tooltip-title">${unit.name}</span>
+                            <input type="number" class="unit-stack-input" value="${armySlot.count}" min="1" step="1" title="Stack size">
                         </div>
-                        <div class="tooltip-type">${this.formatUnitType(unit)}</div>
+                        <div class="tooltip-tier">Tier ${unit.tier} · ${this.formatUnitType(unit)}</div>
+                        <div class="unit-stat-bar tooltip-stat-bar">${this.buildStatBar(unit.stats)}</div>
+                        ${this.buildTooltipAbilitiesHtml(unit, armySlot.count)}
+                        <div class="tooltip-value">${unit.squad_value} gold</div>
+                        ${unit.description ? `<div class="tooltip-description">${unit.description}</div>` : ''}
                     </div>
                 `;
             } else {
@@ -3381,17 +3473,18 @@ const ArmyManager = {
     hasFailedResolution(text) {
         if (!text) return false;
         // Patterns that indicate failed resolution: +0, -0, 0%, 0–0, etc.
+        // Be careful not to flag valid ranges like "0 to 5" or "–5 to 0"
         const failurePatterns = [
-            /[+\-–]\s*0\s*(?:%|$|\s|,|\.)/,  // +0, -0, +0%, -0%, –0%
-            /\b0[–-]0\b/,                      // 0-0, 0–0 (damage ranges)
+            /[+\-–]\s*0\s*(?:%|$|[,\.])/,     // +0, -0, +0%, -0% (not followed by space/word)
+            /\b0[–-]0\b/,                      // 0-0, 0–0 (damage ranges of zero)
             /\bby\s+0\b/,                      // "by 0", "increases by 0"
-            /:\s*0\s*(?:$|,|\s)/,              // ": 0" (durations, counts)
+            /:\s*0\s+(?:round|turn|second)/i,  // ": 0 round(s)" (zero duration)
         ];
         return failurePatterns.some(pattern => pattern.test(text));
     },
 
     // Format ability description using DescriptionRuntime
-    formatAbilityDescription(ability, unitData) {
+    formatAbilityDescription(ability, unitData, stackCount = 1) {
         if (!ability.description_template) {
             return ability.name || '';
         }
@@ -3402,13 +3495,36 @@ const ArmyManager = {
 
         try {
             const rawData = unitData?.raw_data || {};
+            const unitId = rawData.id || unitData?.id || '';
 
-            // Get the raw ability data from the unit's raw_data
-            // Description functions expect currentAbility to have the raw structure
-            const rawAbility = this.getRawAbilityData(ability.id, rawData);
+            // Use raw ability data from backend if available (includes upgrade variant fallback)
+            // Otherwise fall back to index-based lookup for backwards compatibility
+            let rawAbility = ability.raw_data || this.getRawAbilityData(ability.id, rawData);
+
+            // Inject buff data into ability if missing (for functions like current_unit_ability_buff_duration)
+            rawAbility = this.injectBuffDataIntoAbility(rawAbility, ability, unitId);
+
+            // Deep clone passives and inject buff links so description functions can find them
+            // Functions access paths like passives[0].actions[0].damageDealer.buff.sid
+            const passives = this.injectBuffLinksIntoPassives(
+                rawData.passives || [],
+                ability.description_args,
+                unitId
+            );
+
+            // Flatten stats to top level for description functions that expect ctx.currentUnit.damageMin
+            // fullStacks is the actual stack count (defaults to 1 if not provided)
+            // Note: Game uses fullStacks - 1 internally, so we pass count - 1 to match game behavior
+            const currentUnit = {
+                ...rawData,
+                ...rawData.stats,  // Flatten stats (damageMin, damageMax, etc.) to top level
+                passives: passives,  // Use enriched passives with buff links
+                fullStacks: stackCount - 1,  // Game script adds 1 to this value
+                startBattleFullStacks: stackCount - 1,
+            };
 
             const ctx = {
-                currentUnit: rawData,
+                currentUnit: currentUnit,
                 currentAbility: rawAbility || ability,
             };
 
@@ -3417,6 +3533,17 @@ const ArmyManager = {
                 ability.description_args,
                 ctx
             );
+
+            // Debug logging for cavalry
+            if (rawData.id && rawData.id.includes('cavalry')) {
+                console.log('[DEBUG] Description resolved:', {
+                    abilityId: ability.id,
+                    template: ability.description_template?.substring(0, 50),
+                    resolved: resolved?.substring(0, 100),
+                    passivesLength: passives.length,
+                    passive2HasBuff: passives[2]?.actions?.[0]?.damageDealer?.buff?.sid
+                });
+            }
 
             // If resolution produced obvious "0" placeholders, fall back to template
             // (This happens when base units lack the data structure that upgraded units have)
@@ -3430,6 +3557,192 @@ const ArmyManager = {
             console.warn('[ArmyManager] Error formatting ability description:', e);
             return ability.description_template;
         }
+    },
+
+    /**
+     * Inject buff links into passives so description functions can find them.
+     * Description functions access paths like passives[n].actions[0].damageDealer.buff.sid
+     * but our static data doesn't have this structure. This method creates it using
+     * GameData.passiveBuffLinks which maps passive name keys to their linked buffs.
+     *
+     * Also handles cases where an ability exists in the ability list but its raw_data
+     * passive doesn't exist (e.g., upgrade-only abilities shown on base units).
+     */
+    injectBuffLinksIntoPassives(passives, descriptionArgs, unitId) {
+        if (!descriptionArgs) {
+            return passives || [];
+        }
+
+        // Debug logging
+        if (unitId && unitId.includes('cavalry')) {
+            console.log('[DEBUG] injectBuffLinksIntoPassives:', {
+                unitId,
+                passivesCount: passives?.length,
+                descriptionArgs,
+                hasGameData: typeof GameData !== 'undefined',
+                hasPassiveBuffLinks: typeof GameData !== 'undefined' && !!GameData.passiveBuffLinks
+            });
+        }
+
+        // Extract base unit ID (remove _upg, _upg_alt suffixes)
+        const baseUnitId = unitId ? unitId.replace(/_upg(_alt)?$/, '') : '';
+
+        // Deep clone passives to avoid modifying original data
+        const enrichedPassives = (passives || []).map(passive =>
+            JSON.parse(JSON.stringify(passive))
+        );
+
+        // Find the maximum passive index referenced by description functions
+        // Function names are like "unic_unit_{unitId}_passive_{N}"
+        let maxPassiveIndex = enrichedPassives.length - 1;
+        for (const funcName of descriptionArgs) {
+            const match = funcName.match(/unic_unit_([^_]+(?:_[^_]+)*)_passive_(\d+)/);
+            if (match) {
+                const passiveNum = parseInt(match[2], 10);  // 1-based
+                const passiveIndex = passiveNum - 1;  // 0-based
+                if (passiveIndex > maxPassiveIndex) {
+                    maxPassiveIndex = passiveIndex;
+                }
+            }
+        }
+
+        // Extend passives array if needed (for upgrade-only abilities on base units)
+        while (enrichedPassives.length <= maxPassiveIndex) {
+            enrichedPassives.push({ data: {} });
+        }
+
+        // Find ALL buff links for this unit (any passive index)
+        // Different unit variants may have the same logical passive at different array indices
+        // So we collect all buff links and inject them into ALL passives
+        const allBuffLinks = [];
+        if (typeof GameData !== 'undefined' && GameData.passiveBuffLinks) {
+            for (let n = 1; n <= 10; n++) {
+                const passiveKey = `${baseUnitId}_passive_${n}`;
+                const buffLink = GameData.passiveBuffLinks[passiveKey];
+                if (buffLink) {
+                    allBuffLinks.push(buffLink);
+                }
+            }
+        }
+
+        // Debug logging for cavalry
+        if (unitId && unitId.includes('cavalry')) {
+            console.log(`[DEBUG] Found ${allBuffLinks.length} buff links for ${baseUnitId}:`,
+                allBuffLinks.map(b => b.buffId));
+        }
+
+        // Inject ALL buff links into EVERY passive
+        // This ensures the description function finds the data regardless of which index it checks
+        for (let index = 0; index < enrichedPassives.length; index++) {
+            const enriched = enrichedPassives[index];
+
+            // Inject all buff links so functions can find them at any index
+            for (const buffLink of allBuffLinks) {
+                if (!enriched.actions) {
+                    enriched.actions = [];
+                }
+                if (!enriched.actions[0]) {
+                    enriched.actions[0] = {};
+                }
+                if (!enriched.actions[0].damageDealer) {
+                    enriched.actions[0].damageDealer = {};
+                }
+                // Use the first buff link (most specific to this passive type)
+                if (!enriched.actions[0].damageDealer.buff) {
+                    enriched.actions[0].damageDealer.buff = {
+                        sid: buffLink.buffId,
+                        ...buffLink.buffData,
+                        // Include duration at the buff level
+                        ...(buffLink.duration !== undefined ? { duration: buffLink.duration } : {})
+                    };
+                }
+            }
+        }
+
+        return enrichedPassives;
+    },
+
+    /**
+     * Inject buff data into ability if missing.
+     * For functions like current_unit_ability_buff_duration that access currentAbility.damageDealer.buff.duration
+     */
+    injectBuffDataIntoAbility(rawAbility, ability, unitId) {
+        // If rawAbility already has complete buff data, return as-is
+        if (rawAbility?.damageDealer?.buff?.duration !== undefined) {
+            return rawAbility;
+        }
+
+        // Extract base unit ID and ability index from ability.id
+        // Format: {unitId}_ability_{N} (0-based)
+        const match = ability.id?.match(/^(.+?)(?:_upg(?:_alt)?)?_ability_(\d+)$/);
+        if (!match) {
+            return rawAbility || ability;
+        }
+
+        const baseUnitId = match[1].replace(/_upg(_alt)?$/, '');
+        const abilityIndex = parseInt(match[2], 10);
+        const abilityKey = `${baseUnitId}_ability_${abilityIndex + 1}`;  // Convert to 1-based for lookup
+
+        // Look up buff link for this ability
+        const buffLink = typeof GameData !== 'undefined' && GameData.passiveBuffLinks
+            ? GameData.passiveBuffLinks[abilityKey]
+            : null;
+
+        if (!buffLink) {
+            return rawAbility || ability;
+        }
+
+        // Clone and inject buff data
+        const enriched = rawAbility ? JSON.parse(JSON.stringify(rawAbility)) : {};
+        if (!enriched.damageDealer) {
+            enriched.damageDealer = {};
+        }
+        if (!enriched.damageDealer.buff) {
+            enriched.damageDealer.buff = {};
+        }
+
+        // Inject buff data from the link
+        // Include duration at the buff level (this is where description functions expect it)
+        enriched.damageDealer.buff = {
+            ...enriched.damageDealer.buff,
+            sid: buffLink.buffId,
+            ...buffLink.buffData,
+            // Duration is at the top level of buffLink, not inside buffData
+            ...(buffLink.duration !== undefined ? { duration: buffLink.duration } : {})
+        };
+
+        return enriched;
+    },
+
+    // Build abilities row for tooltip (with nested tooltips for each ability)
+    buildTooltipAbilitiesHtml(unit, stackCount = 1) {
+        const allAbilities = [
+            ...(unit.passives || []),
+            ...(unit.actives || [])
+        ];
+
+        if (allAbilities.length === 0) return '';
+
+        const abilitiesHtml = allAbilities.map(ability => {
+            const iconHtml = ability.icon_url
+                ? `<img src="${ability.icon_url}" alt="${ability.name}" class="tooltip-ability-icon">`
+                : `<span class="tooltip-ability-placeholder">${ability.name.charAt(0)}</span>`;
+            const description = this.formatAbilityDescription(ability, unit, stackCount) || '';
+            const baseClass = ability.is_base_passive ? ' base-passive' : '';
+            const typeClass = (unit.actives || []).includes(ability) ? 'active' : 'passive';
+
+            return `
+                <div class="tooltip-ability-item ${typeClass}${baseClass} has-tooltip" data-tooltip-placement="top">
+                    ${iconHtml}
+                    <div class="tooltip">
+                        <div class="tooltip-title">${ability.name}</div>
+                        ${description ? `<div class="tooltip-text">${description}</div>` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        return `<div class="tooltip-abilities-row">${abilitiesHtml}</div>`;
     },
 
     // Build side abilities HTML for new card layout (vertical column)
@@ -3628,7 +3941,6 @@ const ArmyManager = {
         if (!armySlot || !armySlot.unitData) return;
 
         const unit = armySlot.unitData;
-        const canRemove = !armySlot.isStartingUnit;
 
         // Build stats object from unit data (handle both old and new property names)
         const stats = unit.stats || {
@@ -3662,6 +3974,7 @@ const ArmyManager = {
                             </div>
                             <div class="unit-stat-bar editor-stat-bar">${statBarHtml}</div>
                             ${abilitiesHtml}
+                            ${unit.description ? `<div class="unit-description">${unit.description}</div>` : ''}
                             <div class="unit-editor-value">${unit.squad_value} gold per unit</div>
                             <div class="unit-count-control">
                                 <label>Stack Size:</label>
@@ -3670,7 +3983,7 @@ const ArmyManager = {
                             </div>
                             <div class="unit-editor-actions">
                                 <button class="btn btn-primary" onclick="ArmyManager.updateUnitCount()">Update</button>
-                                ${canRemove ? '<button class="btn btn-danger" onclick="ArmyManager.removeUnit()">Remove</button>' : ''}
+                                <button class="btn btn-danger" onclick="ArmyManager.removeUnit()">Remove</button>
                             </div>
                         </div>
                     </div>
@@ -3709,12 +4022,20 @@ const ArmyManager = {
         }
     },
 
-    // Remove unit from slot
+    // Remove unit from slot (used by editor modal)
     removeUnit() {
         if (this.currentSlotIndex !== null) {
             heroBuild.army[this.currentSlotIndex] = null;
             this.render();
             this.closeUnitEditor();
+        }
+    },
+
+    // Remove unit from slot by index (used by remove button on slot)
+    removeUnitFromSlot(slotIndex) {
+        if (slotIndex !== undefined && heroBuild.army[slotIndex]) {
+            heroBuild.army[slotIndex] = null;
+            this.render();
         }
     },
 

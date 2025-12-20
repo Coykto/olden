@@ -58,6 +58,10 @@ cover/
 # Django stuff:
 *.log
 local_settings.py
+
+# Databases:
+# - db.sqlite3: User data, NOT tracked
+# - db_gamedata.sqlite3: Game data, IS tracked
 db.sqlite3
 db.sqlite3-journal
 
@@ -216,11 +220,13 @@ ideas.md
 .python-version
 
 .DS_Store
-*.sqlite3
 media/
 *.pyc
 *.db
+# Note: db_gamedata.sqlite3 IS tracked (game data)
+# db_users.sqlite3 is ignored above (user data)
 
 decompiled/
 .playwright-mcp/
 **/node_modules/
+design_examples/

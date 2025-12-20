@@ -28,6 +28,10 @@ When you encounter an issue, ask: "What is the underlying system or pattern that
    - BAD: Add `Tooltip.hideActive()` to `setItemLevel()`, `maxAllUpgrades()`, `resetAllUpgrades()`
    - GOOD: Understand WHY tooltips go stale (tooltip system moves them to `document.body`), then fix it in ONE place (`updateUI()`) so ALL callers automatically work. See "Tooltip System Architecture" section below.
 
+6. **Nested tooltip disappears when moving between sibling triggers**
+   - BAD: Add special case handling for "moving from ability A to ability B"
+   - GOOD: Understand the general pattern (need to check if trigger is inside ANY tooltip in the stack, not just `activeTooltip`). The nested tooltip was moved to body, so `activeTooltip.contains(trigger)` fails for siblings. Fix by iterating through entire `tooltipStack`.
+
 ## Project Overview
 Olden Forge is a hero builder web application for Heroes of Might & Magic: Olden Era.
 
@@ -183,37 +187,85 @@ Google for game screenshots: `"Heroes of Might and Magic Olden Era" [feature]`
 
 ## Tooltip System Architecture
 
-**CRITICAL:** The tooltip system (`/static/js/tooltip.js`) moves tooltip elements to `document.body` when displaying them. This has important implications:
+**Serena memory:** `tooltip-system` (contains detailed implementation notes and lessons learned)
 
-### The Problem
-When a tooltip is visible:
-1. The tooltip DOM element is moved from its parent (e.g., equipment slot) to `document.body`
-2. If code regenerates the parent's innerHTML, a NEW tooltip is created inside the parent
-3. But the OLD tooltip is still in `document.body` being displayed
-4. User sees stale content
+The tooltip system (`/static/js/tooltip.js`) is a sophisticated system supporting:
+- Configurable placement (top, bottom, left, right) with automatic boundary detection
+- Gap-free hover using an invisible bridge element
+- **Nested tooltips** with proper stack management
+- DOM movement to `document.body` to avoid CSS transform issues
 
-### The Solution Pattern
-When updating UI that contains tooltips:
+### Key Concepts
 
-**For full DOM regeneration (like `EquipmentManager.updateUI()`):**
+**1. Tooltips are moved to `document.body` when shown**
+This avoids CSS transform/filter issues but means:
+- The tooltip is no longer a child of its trigger element
+- When regenerating parent's innerHTML, hide active tooltips first
+- Nested tooltip triggers remain inside parent tooltip (which is in body)
+
+**2. Tooltip Stack for Nesting**
 ```javascript
-// Hide active tooltip BEFORE regenerating DOM
+tooltipStack = [{tooltip, trigger}, ...]  // Index 0 = parent, higher = children
+```
+- Parent tooltip at index 0, nested tooltips at higher indices
+- When showing a sibling nested tooltip, pop and hide tooltips above the common parent
+- When entering parent area without trigger, hide child tooltips
+
+**3. Critical Event Handling Patterns**
+
+In `handleMouseEnter`:
+```javascript
+if (enteredTooltip && isTooltipInStack(enteredTooltip)) {
+    if (trigger && !tooltipStack.some(t => t.trigger === trigger)) {
+        // New nested trigger - show its tooltip
+    } else if (!trigger) {
+        // Entered tooltip area with NO trigger - hide child tooltips
+    }
+    // else: trigger already in stack - do nothing (keep nested tooltip)
+}
+```
+
+In `showTooltip`:
+```javascript
+// Check if trigger is inside ANY tooltip in the stack (not just activeTooltip)
+for (let i = tooltipStack.length - 1; i >= 0; i--) {
+    if (tooltipStack[i].tooltip.contains(trigger)) {
+        parentStackIndex = i;
+        break;
+    }
+}
+// If moving to sibling, pop tooltips above parent
+```
+
+In `isHoveringTooltipArea`:
+```javascript
+// Only count tooltips at same or higher stack index (children)
+// Parent tooltips (lower index) should NOT keep nested tooltip visible
+if (hoveredIndex >= ourIndex) return true;
+```
+
+### Common Pitfalls (Lessons Learned)
+
+1. **Don't check only `activeTooltip`** - When nesting, check the entire stack
+2. **Stack index matters** - Parent at lower index, children at higher index
+3. **Trigger already in stack** - Don't hide its tooltip when re-entering
+4. **`closest('.tooltip')` finds parent** - Nested tooltips are in body, so `closest()` from trigger finds the parent tooltip, not the nested one
+
+### Solution Patterns
+
+**For full DOM regeneration:**
+```javascript
 if (typeof Tooltip !== 'undefined') {
     Tooltip.hideActive();
 }
-// Now safe to regenerate innerHTML
 this.updateUI();
-// Optionally re-show tooltip for same element
-Tooltip.show(element);
 ```
 
-**For in-place updates (like `SpellBookManager.updateSlotInPlace()`):**
+**For in-place updates:**
 ```javascript
-// Query both the slot AND the active tooltip in body
 const findTooltipElement = (selector) => {
     let el = slotElement.querySelector(selector);
     if (el) return el;
-    // Tooltip may have been moved to body
     const activeTooltip = document.body.querySelector('.tooltip[style*="display: block"]');
     if (activeTooltip) {
         el = activeTooltip.querySelector(selector);
@@ -223,5 +275,6 @@ const findTooltipElement = (selector) => {
 ```
 
 ### Key Files
-- `/static/js/tooltip.js` - Tooltip system (moves tooltips to body on show)
-- `/hero_builder/templates/hero_builder/partials/_scripts.html` - EquipmentManager, SpellBookManager
+- `/static/js/tooltip.js` - Tooltip system with nested support
+- `/hero_builder/templates/hero_builder/partials/_scripts.html` - EquipmentManager, SpellBookManager, ArmyManager
+- `/hero_builder/static/hero_builder/css/tooltip.css` - Tooltip styles

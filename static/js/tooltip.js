@@ -33,6 +33,13 @@ const Tooltip = (function() {
     let hoverBridge = null;
     let isHoveringTooltip = false; // Track if mouse is over active tooltip or its trigger
 
+    // Stack for nested tooltips
+    let tooltipStack = []; // [{tooltip, trigger}, ...]
+
+    // Callbacks for tooltip lifecycle events
+    let onShowCallback = null;
+    let onHideCallback = null;
+
     /**
      * Initialize tooltip system
      */
@@ -64,27 +71,60 @@ const Tooltip = (function() {
         // Ensure target is an Element (not Document, Window, or Text node)
         if (!(e.target instanceof Element)) return;
 
-        // Check if entering a tooltip that's already active (keep it visible)
-        const enteredTooltip = e.target.closest('.tooltip');
-        if (enteredTooltip && enteredTooltip === activeTooltip) {
-            isHoveringTooltip = true;
-            return;
-        }
-
         // Check if entering the hover bridge
         if (e.target === hoverBridge) {
             isHoveringTooltip = true;
             return;
         }
 
+        // First check if there's a tooltip trigger at this element
         const trigger = e.target.closest('.has-tooltip');
+
+        // Check if entering a tooltip that's already active
+        const enteredTooltip = e.target.closest('.tooltip');
+
+        if (enteredTooltip && isTooltipInStack(enteredTooltip)) {
+            isHoveringTooltip = true;
+            // If there's a nested trigger inside a stacked tooltip, show its tooltip
+            if (trigger && !tooltipStack.some(t => t.trigger === trigger)) {
+                // New nested trigger - show its tooltip
+                const nestedTooltip = trigger.querySelector(':scope > .tooltip');
+                if (nestedTooltip && !isTooltipInStack(nestedTooltip)) {
+                    showTooltip(trigger, nestedTooltip);
+                }
+            } else if (!trigger) {
+                // Entered tooltip area with NO trigger - hide child tooltips
+                const enteredIndex = tooltipStack.findIndex(t => t.tooltip === enteredTooltip);
+                if (enteredIndex >= 0 && enteredIndex < tooltipStack.length - 1) {
+                    // There are child tooltips above this one - hide them
+                    while (tooltipStack.length > enteredIndex + 1) {
+                        const {tooltip: t} = tooltipStack.pop();
+                        hideTooltipElement(t);
+                    }
+                    // Update active tooltip
+                    const top = tooltipStack[tooltipStack.length - 1];
+                    activeTooltip = top.tooltip;
+                    activeTrigger = top.trigger;
+                }
+            }
+            // else: trigger is already in stack - do nothing (keep current nested tooltip visible)
+            return;
+        }
+
         if (!trigger) return;
 
-        const tooltip = trigger.querySelector('.tooltip');
+        const tooltip = trigger.querySelector(':scope > .tooltip');
         if (!tooltip) return;
 
         isHoveringTooltip = true;
         showTooltip(trigger, tooltip);
+    }
+
+    /**
+     * Check if a tooltip is in our stack
+     */
+    function isTooltipInStack(tooltip) {
+        return tooltipStack.some(t => t.tooltip === tooltip);
     }
 
     /**
@@ -94,68 +134,124 @@ const Tooltip = (function() {
         // Ensure target is an Element (not Document, Window, or Text node)
         if (!(e.target instanceof Element)) return;
 
-        // Check if leaving from tooltip
+        const relatedTarget = e.relatedTarget;
+
+        // Check if leaving from a tooltip in the stack
         const leavingTooltip = e.target.closest('.tooltip');
-        if (leavingTooltip && leavingTooltip === activeTooltip) {
-            // Check if moving to trigger, bridge, or staying in tooltip
-            const relatedTarget = e.relatedTarget;
+        if (leavingTooltip && isTooltipInStack(leavingTooltip)) {
             if (relatedTarget instanceof Element) {
-                if (activeTrigger && activeTrigger.contains(relatedTarget)) return;
+                // Check if moving to another tooltip in the stack
+                const targetTooltip = relatedTarget.closest('.tooltip');
+                if (targetTooltip && isTooltipInStack(targetTooltip)) return;
+                // Check if moving to a trigger in the stack
+                for (const {trigger} of tooltipStack) {
+                    if (trigger.contains(relatedTarget)) return;
+                }
+                // Check if moving to a nested trigger (has-tooltip inside any stacked tooltip)
+                const nestedTrigger = relatedTarget.closest('.has-tooltip');
+                if (nestedTrigger) {
+                    // Check if this trigger is inside any tooltip in our stack
+                    for (const {tooltip} of tooltipStack) {
+                        if (tooltip.contains(nestedTrigger)) return;
+                    }
+                }
                 if (relatedTarget === hoverBridge) return;
-                if (relatedTarget.closest('.tooltip') === activeTooltip) return;
             }
-            // Leaving tooltip area - hide it
-            hideTooltip(activeTooltip);
+            // Leaving tooltip area - hide this tooltip (and nested ones)
+            hideTooltip(leavingTooltip);
             return;
         }
 
         // Check if leaving from hover bridge
         if (e.target === hoverBridge) {
-            const relatedTarget = e.relatedTarget;
             if (relatedTarget instanceof Element) {
-                if (relatedTarget.closest('.tooltip') === activeTooltip) return;
-                if (activeTrigger && activeTrigger.contains(relatedTarget)) return;
+                const targetTooltip = relatedTarget.closest('.tooltip');
+                if (targetTooltip && isTooltipInStack(targetTooltip)) return;
+                for (const {trigger} of tooltipStack) {
+                    if (trigger.contains(relatedTarget)) return;
+                }
             }
-            hideTooltip(activeTooltip);
+            hideAllTooltips();
             return;
         }
 
         const trigger = e.target.closest('.has-tooltip');
         if (!trigger) return;
 
-        // Get tooltip - check inside trigger first, or use activeTooltip if this is the active trigger
-        // (tooltip may have been moved to document.body by showTooltip)
-        let tooltip = trigger.querySelector('.tooltip');
-        if (!tooltip && trigger === activeTrigger) {
-            tooltip = activeTooltip;
-        }
+        // Find the tooltip for this trigger in the stack
+        const stackEntry = tooltipStack.find(t => t.trigger === trigger);
+        let tooltip = stackEntry ? stackEntry.tooltip : trigger.querySelector(':scope > .tooltip');
         if (!tooltip) return;
 
         // Check if we're moving to the tooltip or hover bridge
-        const relatedTarget = e.relatedTarget;
         if (relatedTarget instanceof Element) {
             if (relatedTarget.closest('.tooltip') === tooltip) return;
             if (relatedTarget === hoverBridge) return;
             if (trigger.contains(relatedTarget)) return;
+            // Check if moving to another tooltip in the stack
+            const targetTooltip = relatedTarget.closest('.tooltip');
+            if (targetTooltip && isTooltipInStack(targetTooltip)) {
+                // Only stay visible if moving to the same tooltip or a child (higher index)
+                // If moving to a parent tooltip (lower index), we should hide this nested tooltip
+                const targetIndex = tooltipStack.findIndex(t => t.tooltip === targetTooltip);
+                const ourIndex = tooltipStack.findIndex(t => t.tooltip === tooltip);
+                if (targetIndex >= ourIndex) return;
+                // Moving to parent - don't return, let it hide
+            }
+            // Check if moving to a sibling nested trigger inside a parent tooltip
+            const nestedTrigger = relatedTarget.closest('.has-tooltip');
+            if (nestedTrigger && nestedTrigger !== trigger) {
+                for (const {tooltip: stackTooltip} of tooltipStack) {
+                    if (stackTooltip.contains(nestedTrigger)) return;
+                }
+            }
         }
-
         // Small delay to allow moving to tooltip
         setTimeout(() => {
-            if (activeTooltip === tooltip && !isHoveringTooltipArea(tooltip, trigger)) {
+            if (isTooltipInStack(tooltip) && !isHoveringTooltipArea(tooltip, trigger)) {
                 hideTooltip(tooltip);
             }
         }, 50);
     }
 
     /**
-     * Check if mouse is over tooltip area (tooltip, trigger, or bridge)
+     * Check if mouse is over the tooltip area (this tooltip, its trigger, children, or bridge)
+     * Does NOT return true for parent tooltips - only same level or children.
      */
     function isHoveringTooltipArea(tooltip, trigger) {
         const hovered = document.querySelectorAll(':hover');
+        const ourIndex = tooltipStack.findIndex(t => t.tooltip === tooltip);
+
+        // If tooltip not in stack, only check direct hover
+        if (ourIndex === -1) {
+            for (const el of hovered) {
+                if (el === tooltip || el.closest('.tooltip') === tooltip) return true;
+                if (el === trigger || trigger.contains(el)) return true;
+            }
+            return false;
+        }
+
         for (const el of hovered) {
+            // Check hover bridge
+            if (el === hoverBridge) return true;
+
+            // Check if hovering this tooltip or a child tooltip (same or higher index in stack)
+            const hoveredTooltip = el.closest('.tooltip');
+            if (hoveredTooltip) {
+                const hoveredIndex = tooltipStack.findIndex(t => t.tooltip === hoveredTooltip);
+                // Only count as hovering if it's our tooltip or a child (higher index)
+                if (hoveredIndex >= ourIndex) return true;
+            }
+
+            // Check if hovering this trigger or child triggers (in tooltips at same or higher level)
+            for (let i = ourIndex; i < tooltipStack.length; i++) {
+                const stackTrigger = tooltipStack[i].trigger;
+                if (el === stackTrigger || stackTrigger.contains(el)) return true;
+            }
+
+            // Check the specific tooltip/trigger (for cases where they're not in stack yet)
             if (el === tooltip || el.closest('.tooltip') === tooltip) return true;
             if (el === trigger || trigger.contains(el)) return true;
-            if (el === hoverBridge) return true;
         }
         return false;
     }
@@ -179,13 +275,46 @@ const Tooltip = (function() {
      * Show tooltip and position it
      */
     function showTooltip(trigger, tooltip) {
-        // Hide any other active tooltip
-        if (activeTooltip && activeTooltip !== tooltip) {
-            hideTooltip(activeTooltip);
+        // Check if this tooltip is already in the stack
+        const existingIndex = tooltipStack.findIndex(t => t.tooltip === tooltip);
+        if (existingIndex >= 0) return; // Already showing
+
+        // Check if this is a nested tooltip (trigger is inside ANY tooltip in the stack)
+        // This handles sibling nested triggers (e.g., moving from ability A to ability B)
+        let parentStackIndex = -1;
+        for (let i = tooltipStack.length - 1; i >= 0; i--) {
+            if (tooltipStack[i].tooltip.contains(trigger)) {
+                parentStackIndex = i;
+                break;
+            }
         }
 
+        if (parentStackIndex === -1 && activeTooltip && activeTooltip !== tooltip) {
+            // Not nested - hide all active tooltips
+            hideAllTooltips();
+        } else if (parentStackIndex >= 0 && parentStackIndex < tooltipStack.length - 1) {
+            // Nested, but there are sibling tooltips above the parent - hide them
+            // (e.g., moving from ability A to ability B within the same parent tooltip)
+            while (tooltipStack.length > parentStackIndex + 1) {
+                const {tooltip: t} = tooltipStack.pop();
+                hideTooltipElement(t);
+            }
+            // Update active tooltip to the new top of stack
+            if (tooltipStack.length > 0) {
+                const top = tooltipStack[tooltipStack.length - 1];
+                activeTooltip = top.tooltip;
+                activeTrigger = top.trigger;
+            }
+        }
+
+        // Push to stack
+        tooltipStack.push({tooltip, trigger});
         activeTooltip = tooltip;
         activeTrigger = trigger;
+
+        // Nested tooltips get higher z-index
+        const baseZIndex = 9999;
+        tooltip.style.zIndex = baseZIndex + tooltipStack.length;
 
         // Move tooltip to body to avoid transform/filter issues from ancestors
         // (CSS transforms break position:fixed by creating a new containing block)
@@ -202,16 +331,48 @@ const Tooltip = (function() {
         positionTooltip(trigger, tooltip);
 
         tooltip.style.visibility = 'visible';
+
+        // Invoke onShow callback
+        if (onShowCallback) {
+            try {
+                onShowCallback(tooltip, trigger);
+            } catch (e) {
+                console.warn('Tooltip onShow callback error:', e);
+            }
+        }
     }
 
     /**
-     * Hide tooltip
+     * Hide all tooltips in the stack
      */
-    function hideTooltip(tooltip) {
+    function hideAllTooltips() {
+        while (tooltipStack.length > 0) {
+            const {tooltip} = tooltipStack.pop();
+            hideTooltipElement(tooltip);
+        }
+        activeTooltip = null;
+        activeTrigger = null;
+    }
+
+    /**
+     * Hide a tooltip element (low-level, just hides the DOM element)
+     */
+    function hideTooltipElement(tooltip) {
         if (!tooltip) return;
+
+        // Invoke onHide callback BEFORE hiding (so we can access tooltip content)
+        if (onHideCallback) {
+            try {
+                // Find the trigger for this tooltip (it was stored when shown)
+                const trigger = tooltip._originalParent || null;
+                onHideCallback(tooltip, trigger);
+            } catch (e) {
+                console.warn('Tooltip onHide callback error:', e);
+            }
+        }
+
         tooltip.style.display = 'none';
         tooltip.removeAttribute('data-actual-placement');
-        hoverBridge.style.display = 'none';
 
         // Restore tooltip to its original position in DOM
         if (tooltip._originalParent) {
@@ -234,11 +395,36 @@ const Tooltip = (function() {
             delete tooltip._originalParent;
             delete tooltip._originalNextSibling;
         }
+    }
 
-        if (activeTooltip === tooltip) {
+    /**
+     * Hide tooltip and update stack
+     */
+    function hideTooltip(tooltip) {
+        if (!tooltip) return;
+
+        // Remove from stack
+        const index = tooltipStack.findIndex(t => t.tooltip === tooltip);
+        if (index >= 0) {
+            // Hide all tooltips above this one in the stack (nested ones)
+            while (tooltipStack.length > index) {
+                const {tooltip: t} = tooltipStack.pop();
+                hideTooltipElement(t);
+            }
+        } else {
+            hideTooltipElement(tooltip);
+        }
+
+        // Update active tooltip to the top of stack (or null)
+        if (tooltipStack.length > 0) {
+            const top = tooltipStack[tooltipStack.length - 1];
+            activeTooltip = top.tooltip;
+            activeTrigger = top.trigger;
+        } else {
             activeTooltip = null;
             activeTrigger = null;
             isHoveringTooltip = false;
+            hoverBridge.style.display = 'none';
         }
     }
 
@@ -445,6 +631,22 @@ const Tooltip = (function() {
         }
     }
 
+    /**
+     * Set callback for when a tooltip is shown
+     * @param {Function} callback - Function(tooltip, trigger) called after tooltip is shown
+     */
+    function setOnShow(callback) {
+        onShowCallback = callback;
+    }
+
+    /**
+     * Set callback for when a tooltip is hidden
+     * @param {Function} callback - Function(tooltip, trigger) called before tooltip is hidden
+     */
+    function setOnHide(callback) {
+        onHideCallback = callback;
+    }
+
     // Initialize when DOM is ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
@@ -457,6 +659,8 @@ const Tooltip = (function() {
         init,
         show,
         hide,
-        hideActive: hideActiveTooltip
+        hideActive: hideActiveTooltip,
+        setOnShow,
+        setOnHide
     };
 })();

@@ -10,11 +10,14 @@ from core.localizations import get_skill_info, get_localizations, get_item_info,
 import re
 
 
-def get_ability_display_name(ability_id: str) -> str:
+def get_ability_display_name(ability_id: str, unit_raw_data: dict = None) -> str:
     """Convert ability ID to display name using localizations.
 
     Ability IDs use 0-based indexing (e.g., fairy_dragon_ability_0)
     but localizations use 1-based indexing (e.g., fairy_dragon_ability_1_name).
+
+    For auras that are localized as passives (e.g., Aegis), pass unit_raw_data
+    to correctly determine the passive index for localization lookup.
     """
     localizations = get_localizations()
 
@@ -45,6 +48,31 @@ def get_ability_display_name(ability_id: str) -> str:
         if aura_name_key in localizations:
             return localizations[aura_name_key]
 
+    # Some auras are localized as passives (e.g., Aegis uses esquire_passive_2)
+    if ability_id.endswith('_aura'):
+        base_unit_id = re.sub(r'_upg(_alt)?_aura$', '', ability_id)
+        if base_unit_id == ability_id:  # No _upg suffix
+            base_unit_id = ability_id.replace('_aura', '')
+
+        # Calculate the correct passive index based on displayable passives count
+        start_idx = 1
+        if unit_raw_data:
+            # Count displayable passives (those with effects other than just immunities)
+            displayable_count = 0
+            for passive in unit_raw_data.get('passives', []):
+                data = passive.get('data', {})
+                if data and list(data.keys()) == ['immunities']:
+                    continue
+                displayable_count += 1
+            # Aura localized as passive uses the next index after displayable passives
+            start_idx = displayable_count + 1
+
+        # Try passive indices starting from the calculated index
+        for idx in range(start_idx, start_idx + 5):
+            passive_name_key = f"{base_unit_id}_passive_{idx}_name"
+            if passive_name_key in localizations:
+                return localizations[passive_name_key]
+
     # Fallback: prettify the ability_id
     # Remove unit prefix and clean up
     pretty = ability_id
@@ -59,11 +87,14 @@ def get_ability_display_name(ability_id: str) -> str:
     return pretty
 
 
-def get_ability_info(ability_id: str) -> dict:
+def get_ability_info(ability_id: str, unit_raw_data: dict = None) -> dict:
     """Get ability info including name, description template, args, and icon URL.
 
     Uses the same index conversion logic as get_ability_display_name.
     Returns dict with: name, description_template, description_args, icon_url
+
+    For auras that are localized as passives (e.g., Aegis), pass unit_raw_data
+    to correctly determine the passive index for localization lookup.
     """
     import os
     from django.conf import settings
@@ -97,17 +128,165 @@ def get_ability_info(ability_id: str) -> dict:
         description_template = localizations.get(aura_desc_key, "")
         description_args = args_data.get(aura_desc_key, [])
 
+    # Some auras are localized as passives (e.g., Aegis uses esquire_passive_2)
+    # Try passive localization keys if aura-specific keys not found
+    if not description_template and ability_id.endswith('_aura'):
+        base_unit_id = re.sub(r'_upg(_alt)?_aura$', '', ability_id)
+        if base_unit_id == ability_id:  # No _upg suffix
+            base_unit_id = ability_id.replace('_aura', '')
+
+        # Calculate the correct passive index based on displayable passives count
+        start_idx = 1
+        if unit_raw_data:
+            # Count displayable passives (those with effects other than just immunities)
+            displayable_count = 0
+            for passive in unit_raw_data.get('passives', []):
+                data = passive.get('data', {})
+                if data and list(data.keys()) == ['immunities']:
+                    continue
+                displayable_count += 1
+            # Aura localized as passive uses the next index after displayable passives
+            start_idx = displayable_count + 1
+
+        # Try passive indices starting from the calculated index
+        for idx in range(start_idx, start_idx + 5):
+            passive_desc_key = f"{base_unit_id}_passive_{idx}_description"
+            if passive_desc_key in localizations:
+                description_template = localizations.get(passive_desc_key, "")
+                description_args = args_data.get(passive_desc_key, [])
+                icon_key = f"{base_unit_id}_passive_{idx}"
+                break
+
     # Generate icon URL - icons are named {unit}_{passive|ability}_{n}_name.png
     icon_filename = f"{icon_key}_name.png"
     icon_path = os.path.join(settings.MEDIA_ROOT, 'gamedata', 'passives', icon_filename)
     icon_url = f"/media/gamedata/passives/{icon_filename}" if os.path.exists(icon_path) else None
 
     return {
-        'name': get_ability_display_name(ability_id),
+        'name': get_ability_display_name(ability_id, unit_raw_data),
         'description_template': description_template,
         'description_args': description_args,
         'icon_url': icon_url,
     }
+
+
+def get_raw_ability_data(ability_id: str, unit_raw_data: dict, unit_id: str = None) -> dict | None:
+    """Extract raw ability data from unit's raw_data based on ability ID.
+
+    Ability IDs are in format: {unit_id}_{type}_{index} where:
+    - type is 'passive', 'ability', or 'aura'
+    - index is 0-based and cumulative across the baseSid inheritance chain
+
+    For units with baseSid inheritance (e.g., graverobber_upg_alt -> graverobber_upg):
+    - Abilities are inherited from the base unit first
+    - New abilities are added at higher indices
+    - E.g., ability_0/ability_1 may be in the base unit, ability_2/ability_3 in the derived unit
+
+    Returns the raw ability dict or None if not found.
+    """
+    if not ability_id:
+        return None
+
+    # Handle auras
+    if ability_id.endswith('_aura'):
+        aura_data = unit_raw_data.get('aura')
+        if aura_data:
+            return aura_data
+        return None
+
+    # Parse ability ID to get type and index
+    passive_match = re.search(r'_passive_(\d+)$', ability_id)
+    if passive_match:
+        index = int(passive_match.group(1))
+        return _find_ability_with_inheritance(unit_raw_data, 'passives', index)
+
+    ability_match = re.search(r'_ability_(\d+)$', ability_id)
+    if ability_match:
+        index = int(ability_match.group(1))
+        return _find_ability_with_inheritance(unit_raw_data, 'abilities', index)
+
+    return None
+
+
+def _find_ability_with_inheritance(unit_raw_data: dict, ability_type: str, index: int) -> dict | None:
+    """Find ability data following the baseSid inheritance chain.
+
+    Units can inherit abilities from their baseSid parent. The indices are cumulative:
+    - Base unit abilities come first
+    - Derived unit abilities are appended after
+
+    For example, if baseSid unit has 2 abilities and this unit has 2 more:
+    - index 0, 1 -> baseSid unit's abilities[0], [1]
+    - index 2, 3 -> this unit's abilities[0], [1]
+    """
+    if not unit_raw_data:
+        return None
+
+    # Build the full ability list by following baseSid chain
+    all_abilities = _collect_abilities_from_chain(unit_raw_data, ability_type)
+
+    if index < len(all_abilities):
+        return all_abilities[index]
+
+    return None
+
+
+def _collect_abilities_from_chain(unit_raw_data: dict, ability_type: str, visited: set = None) -> list:
+    """Collect abilities from the entire baseSid inheritance chain.
+
+    Returns a list where base unit abilities come first, followed by derived unit abilities.
+    """
+    if visited is None:
+        visited = set()
+
+    if not unit_raw_data:
+        return []
+
+    # Get baseSid and prevent infinite loops
+    base_sid = unit_raw_data.get('baseSid')
+
+    base_abilities = []
+    if base_sid and base_sid not in visited:
+        visited.add(base_sid)
+        try:
+            base_unit = Unit.objects.filter(id_key=base_sid).first()
+            if base_unit and base_unit.raw_data:
+                base_abilities = _collect_abilities_from_chain(base_unit.raw_data, ability_type, visited)
+        except Exception:
+            pass
+
+    # Append this unit's abilities after base abilities
+    own_abilities = unit_raw_data.get(ability_type, [])
+
+    return base_abilities + own_abilities
+
+
+def _find_ability_in_upgrades(unit_id: str, ability_type: str, index: int) -> dict | None:
+    """Find ability data in upgrade variants when base unit doesn't have it.
+
+    Some abilities are defined in localization but only have raw data in
+    upgraded unit variants (e.g., crossbowman_ability_1 exists in crossbowman_upg_alt).
+    """
+    if not unit_id:
+        return None
+
+    # Get base unit ID (remove _upg, _upg_alt suffixes if present)
+    base_unit_id = re.sub(r'_upg(_alt)?$', '', unit_id)
+
+    # Try upgrade variants in order of likelihood
+    upgrade_suffixes = ['_upg_alt', '_upg']
+    for suffix in upgrade_suffixes:
+        upgrade_id = f"{base_unit_id}{suffix}"
+        try:
+            upgrade_unit = Unit.objects.filter(id_key=upgrade_id).first()
+            if upgrade_unit and upgrade_unit.raw_data:
+                abilities_list = upgrade_unit.raw_data.get(ability_type, [])
+                if index < len(abilities_list):
+                    return abilities_list[index]
+        except Exception:
+            pass
+
+    return None
 
 
 def get_creature_type(unit_raw_data: dict) -> str:
@@ -129,21 +308,25 @@ def get_base_passives(unit_raw_data: dict, attack_type: str) -> list:
     """Generate base passive info (creature type and attack type) for a unit.
 
     Returns list of passive dicts with id, name, description, icon_url.
+
+    DEPRECATED: Use get_passives_from_view() instead when view data is available.
     """
     localizations = get_localizations()
+    args_data = get_unit_ability_args()
     base_passives = []
 
     # Get creature type passive
     creature_type = get_creature_type(unit_raw_data)
     creature_key = f'base_class_{creature_type}'
+    creature_desc_key = f'{creature_key}_description'
     creature_name = localizations.get(creature_key, creature_type.replace('_', ' ').title())
-    creature_desc = localizations.get(f'{creature_key}_description', '')
+    creature_desc = localizations.get(creature_desc_key, '')
 
     base_passives.append({
         'id': creature_key,
         'name': creature_name,
         'description_template': creature_desc,
-        'description_args': [],
+        'description_args': args_data.get(creature_desc_key, []),
         'icon_url': f'/media/gamedata/passives/{creature_key}.png',
         'is_base_passive': True,
     })
@@ -155,19 +338,150 @@ def get_base_passives(unit_raw_data: dict, attack_type: str) -> list:
         'long_reach': 'base_passive_remote_attack',
     }
     attack_key = attack_type_map.get(attack_type, 'base_passive_melee_attack')
+    attack_desc_key = f'{attack_key}_description'
     attack_name = localizations.get(f'{attack_key}_name', 'Attack')
-    attack_desc = localizations.get(f'{attack_key}_description', '')
+    attack_desc = localizations.get(attack_desc_key, '')
 
     base_passives.append({
         'id': attack_key,
         'name': attack_name,
         'description_template': attack_desc,
-        'description_args': [],
+        'description_args': args_data.get(attack_desc_key, []),
         'icon_url': f'/media/gamedata/passives/{attack_key}_name.png',
         'is_base_passive': True,
     })
 
     return base_passives
+
+
+def get_passives_from_view(unit_raw_data: dict) -> tuple[dict | None, list]:
+    """Get creature type and passives from unit's view file data.
+
+    The view file contains pre-computed localization keys for all display data:
+    - baseClass: creature type (e.g., {"name": "base_class_living"})
+    - passives: all passives including attack type, Double Strike, Flying, Defence, etc.
+
+    Returns:
+        Tuple of (creature_type_passive, passives_list)
+        Returns (None, []) if view data is not available.
+    """
+    import os
+    from django.conf import settings
+
+    view_data = unit_raw_data.get('view')
+    if not view_data:
+        return None, []
+
+    localizations = get_localizations()
+    args_data = get_unit_ability_args()
+
+    # Get creature type from baseClass
+    creature_type_passive = None
+    base_class = view_data.get('baseClass', {})
+    # Handle both list and dict format (some units have baseClass as a list with one element)
+    if isinstance(base_class, list) and base_class:
+        base_class = base_class[0]
+    if base_class:
+        creature_key = base_class.get('name', '')  # e.g., "base_class_living"
+        creature_desc_key = base_class.get('description', f'{creature_key}_description')
+
+        creature_name = localizations.get(creature_key, '')
+        creature_desc = localizations.get(creature_desc_key, '')
+
+        icon_path = os.path.join(settings.MEDIA_ROOT, 'gamedata', 'passives', f'{creature_key}.png')
+        icon_url = f'/media/gamedata/passives/{creature_key}.png' if os.path.exists(icon_path) else None
+
+        creature_type_passive = {
+            'id': creature_key,
+            'name': creature_name,
+            'description_template': creature_desc,
+            'description_args': args_data.get(creature_desc_key, []),
+            'icon_url': icon_url,
+            'is_base_passive': True,
+        }
+
+    # Get all passives from view file
+    passives = []
+    for passive_data in view_data.get('passives', []):
+        name_key = passive_data.get('name', '')  # e.g., "base_passive_melee_attack_name"
+        desc_key = passive_data.get('description', '')  # e.g., "base_passive_melee_attack_description"
+
+        # Get localized name and description
+        name = localizations.get(name_key, '')
+        description_template = localizations.get(desc_key, '')
+        description_args = args_data.get(desc_key, [])
+
+        # Generate icon URL - icons use the name key (e.g., base_passive_melee_attack_name.png)
+        icon_filename = f"{name_key}.png"
+        icon_path = os.path.join(settings.MEDIA_ROOT, 'gamedata', 'passives', icon_filename)
+        icon_url = f"/media/gamedata/passives/{icon_filename}" if os.path.exists(icon_path) else None
+
+        passives.append({
+            'id': name_key.replace('_name', ''),  # Remove _name suffix for ID
+            'name': name,
+            'description_template': description_template,
+            'description_args': description_args,
+            'icon_url': icon_url,
+            'is_base_passive': True,
+        })
+
+    return creature_type_passive, passives
+
+
+def get_abilities_from_view(unit_raw_data: dict) -> list:
+    """Get abilities from unit's view file data.
+
+    The view file contains pre-computed localization keys for abilities:
+    - abilities: list of {name, description} with correct localization keys
+
+    The view file abilities are matched to raw_data abilities by array index,
+    not by the ability ID number (which refers to the base unit's naming scheme).
+
+    Returns:
+        List of ability dicts with id, name, description_template, description_args, icon_url, raw_data
+        Returns [] if view data is not available.
+    """
+    import os
+    from django.conf import settings
+
+    view_data = unit_raw_data.get('view')
+    if not view_data:
+        return []
+
+    localizations = get_localizations()
+    args_data = get_unit_ability_args()
+    raw_abilities = unit_raw_data.get('abilities', [])
+
+    abilities = []
+    for idx, ability_data in enumerate(view_data.get('abilities', [])):
+        name_key = ability_data.get('name', '')  # e.g., "lightweaver_ability_4_name"
+        desc_key = ability_data.get('description', '')  # e.g., "lightweaver_ability_4_description"
+
+        # Get localized name and description
+        name = localizations.get(name_key, '')
+        description_template = localizations.get(desc_key, '')
+        description_args = args_data.get(desc_key, [])
+
+        # Generate icon URL - icons use the name key
+        icon_filename = f"{name_key}.png"
+        icon_path = os.path.join(settings.MEDIA_ROOT, 'gamedata', 'passives', icon_filename)
+        icon_url = f"/media/gamedata/passives/{icon_filename}" if os.path.exists(icon_path) else None
+
+        # Get ability ID (for display) and raw data (for description resolution)
+        # Raw data is matched by index, not by the number in the localization key
+        ability_id = name_key.replace('_name', '')  # Remove _name suffix for ID
+        raw_ability = raw_abilities[idx] if idx < len(raw_abilities) else None
+
+        abilities.append({
+            'id': ability_id,
+            'name': name,
+            'description_template': description_template,
+            'description_args': description_args,
+            'icon_url': icon_url,
+            'raw_data': raw_ability,
+        })
+
+    return abilities
 
 
 def index(request):
@@ -414,32 +728,44 @@ def api_faction_units(request, faction_slug):
         if tier not in units_by_tier:
             units_by_tier[tier] = []
 
-        # Get base passives (creature type and attack type)
-        base_passives = get_base_passives(unit.raw_data, unit.attack_type)
+        # Try to get passives and abilities from view file data (preferred)
+        creature_type_passive, view_passives = get_passives_from_view(unit.raw_data)
+        view_abilities = get_abilities_from_view(unit.raw_data)
 
-        # Convert ability IDs to full ability info, separated by type
-        passives = list(base_passives)  # Start with base passives
-        actives = []
-        for ability_id in (unit.abilities or []):
-            ability_info = get_ability_info(ability_id)
-            # Skip placeholder abilities with no description and no icon
-            if not ability_info['description_template'] and not ability_info.get('icon_url'):
-                continue
-            ability_data = {
-                'id': ability_id,
-                'name': ability_info['name'],
-                'description_template': ability_info['description_template'],
-                'description_args': ability_info['description_args'],
-                'icon_url': ability_info.get('icon_url'),
-            }
-            if '_passive_' in ability_id or ability_id.endswith('_aura'):
-                passives.append(ability_data)
-            else:
-                actives.append(ability_data)
+        if view_passives:
+            # Use view file data (includes all passives: attack type, Double Strike, Defence, etc.)
+            passives = []
+            if creature_type_passive:
+                passives.append(creature_type_passive)
+            passives.extend(view_passives)
+            actives = view_abilities
+        else:
+            # Fallback to legacy derivation if view data not available
+            base_passives = get_base_passives(unit.raw_data, unit.attack_type)
+            passives = list(base_passives)
+            actives = []
+            for ability_id in (unit.abilities or []):
+                ability_info = get_ability_info(ability_id, unit.raw_data)
+                if not ability_info['description_template'] and not ability_info.get('icon_url'):
+                    continue
+                raw_ability = get_raw_ability_data(ability_id, unit.raw_data, unit.id_key)
+                ability_data = {
+                    'id': ability_id,
+                    'name': ability_info['name'],
+                    'description_template': ability_info['description_template'],
+                    'description_args': ability_info['description_args'],
+                    'icon_url': ability_info.get('icon_url'),
+                    'raw_data': raw_ability,
+                }
+                if '_passive_' in ability_id or ability_id.endswith('_aura'):
+                    passives.append(ability_data)
+                else:
+                    actives.append(ability_data)
 
         units_by_tier[tier].append({
             'id': unit.id_key,
             'name': unit.display_name,
+            'description': unit.description,
             'tier': unit.tier,
             'icon_url': unit.icon_url,
             'stats': {
@@ -497,33 +823,44 @@ def api_all_units(request):
             if tier not in units_by_tier:
                 units_by_tier[tier] = []
 
-            # Get base passives (creature type and attack type)
-            base_passives = get_base_passives(unit.raw_data, unit.attack_type)
+            # Try to get passives and abilities from view file data (preferred)
+            creature_type_passive, view_passives = get_passives_from_view(unit.raw_data)
+            view_abilities = get_abilities_from_view(unit.raw_data)
 
-            # Convert ability IDs to full ability info, separated by type
-            passives = list(base_passives)  # Start with base passives
-            actives = []
-            for ability_id in (unit.abilities or []):
-                ability_info = get_ability_info(ability_id)
-                # Skip placeholder abilities with no description and no icon
-                if not ability_info['description_template'] and not ability_info.get('icon_url'):
-                    continue
-                ability_data = {
-                    'id': ability_id,
-                    'name': ability_info['name'],
-                    'description_template': ability_info['description_template'],
-                    'description_args': ability_info['description_args'],
-                    'icon_url': ability_info.get('icon_url'),
-                }
-                # Classify by ID pattern: passive_, aura = passive; ability_ = active
-                if '_passive_' in ability_id or ability_id.endswith('_aura'):
-                    passives.append(ability_data)
-                else:
-                    actives.append(ability_data)
+            if view_passives:
+                # Use view file data (includes all passives: attack type, Double Strike, Defence, etc.)
+                passives = []
+                if creature_type_passive:
+                    passives.append(creature_type_passive)
+                passives.extend(view_passives)
+                actives = view_abilities
+            else:
+                # Fallback to legacy derivation if view data not available
+                base_passives = get_base_passives(unit.raw_data, unit.attack_type)
+                passives = list(base_passives)
+                actives = []
+                for ability_id in (unit.abilities or []):
+                    ability_info = get_ability_info(ability_id, unit.raw_data)
+                    if not ability_info['description_template'] and not ability_info.get('icon_url'):
+                        continue
+                    raw_ability = get_raw_ability_data(ability_id, unit.raw_data, unit.id_key)
+                    ability_data = {
+                        'id': ability_id,
+                        'name': ability_info['name'],
+                        'description_template': ability_info['description_template'],
+                        'description_args': ability_info['description_args'],
+                        'icon_url': ability_info.get('icon_url'),
+                        'raw_data': raw_ability,
+                    }
+                    if '_passive_' in ability_id or ability_id.endswith('_aura'):
+                        passives.append(ability_data)
+                    else:
+                        actives.append(ability_data)
 
             units_by_tier[tier].append({
                 'id': unit.id_key,
                 'name': unit.display_name,
+                'description': unit.description,
                 'tier': unit.tier,
                 'icon_url': unit.icon_url,
                 'stats': {

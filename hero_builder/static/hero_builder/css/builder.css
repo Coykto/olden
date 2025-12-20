@@ -935,6 +935,126 @@
     font-style: italic;
 }
 
+.tooltip-description {
+    color: #9aa5b0;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid #2a3545;
+    font-style: italic;
+}
+
+/* Unit tooltip stat bar - more compact version */
+.tooltip-stat-bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px 8px;
+    margin: 8px 0;
+}
+
+.tooltip-stat-bar .unit-stat {
+    padding: 2px 4px;
+}
+
+.tooltip-stat-bar .unit-stat-icon img {
+    width: 14px;
+    height: 14px;
+}
+
+.tooltip-stat-bar .unit-stat-value {
+    font-size: 0.8rem;
+}
+
+.tooltip-value {
+    color: #d4af37;
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+/* Unit slot remove button */
+.unit-remove-btn {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgba(180, 60, 60, 0.9);
+    color: #fff;
+    font-size: 14px;
+    line-height: 16px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 10;
+}
+
+.unit-slot:hover .unit-remove-btn {
+    opacity: 1;
+}
+
+.unit-remove-btn:hover {
+    background: rgba(220, 80, 80, 1);
+}
+
+/* Tooltip abilities row */
+.tooltip-abilities-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    margin: 8px 0;
+    padding: 8px 0;
+    border-top: 1px solid #2a3545;
+    border-bottom: 1px solid #2a3545;
+}
+
+.tooltip-ability-item {
+    position: relative;
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid #3a4a5a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.tooltip-ability-item.passive {
+    border-color: #4a6a5a;
+}
+
+.tooltip-ability-item.active {
+    border-color: #6a5a4a;
+}
+
+.tooltip-ability-item.base-passive {
+    border-color: #5a5a6a;
+}
+
+.tooltip-ability-item:hover {
+    border-color: #7a8a9a;
+    background: rgba(50, 60, 70, 0.5);
+}
+
+.tooltip-ability-icon {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+}
+
+.tooltip-ability-placeholder {
+    font-size: 12px;
+    color: #8a9aaa;
+    font-weight: bold;
+}
+
 /* Item Set Styles */
 .tooltip-set-section {
     margin-top: 10px;
@@ -2045,7 +2165,6 @@
     font-size: 0.65rem;
     font-weight: 600;
     margin-top: 2px;
-    width: 400%;
 }
 
 /* Portrait Section - main image with abilities on sides */
@@ -2236,6 +2355,19 @@
 .unit-editor-type {
     color: #7ec8e3;
     font-size: 0.8rem;
+}
+
+.unit-description {
+    color: #a8b8c8;
+    font-size: 0.85rem;
+    font-style: italic;
+    line-height: 1.4;
+    padding: 10px 12px;
+    background: rgba(0,0,0,0.25);
+    border-radius: 6px;
+    border-left: 3px solid #4a5a6a;
+    max-height: 150px;
+    overflow-y: auto;
 }
 
 .unit-editor-value {

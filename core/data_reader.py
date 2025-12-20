@@ -99,6 +99,26 @@ class GameDataReader:
 
         return units
 
+    def get_unit_view(self, unit_id: str) -> Dict[str, Any] | None:
+        """
+        Get view file data for a unit (contains localization keys for abilities/passives).
+
+        Args:
+            unit_id: The unit's ID (e.g., "esquire_upg", "lightweaver_upg_alt")
+
+        Returns:
+            View data dict or None if not found
+        """
+        views_dir = self.extract_to / "units" / "units_views"
+
+        # Search for the view file matching the unit_id
+        for json_file in views_dir.rglob(f"{unit_id}_v.json"):
+            data = self.read_json(json_file.relative_to(self.extract_to))
+            if "array" in data and data["array"]:
+                return data["array"][0]
+
+        return None
+
     def get_all_heroes(self) -> List[Dict[str, Any]]:
         """Get all hero data from heroes directory."""
         heroes = []
