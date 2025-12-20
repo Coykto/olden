@@ -491,7 +491,7 @@ def index(request):
     if not version:
         return render(request, 'hero_builder/no_data.html')
 
-    factions = Faction.objects.filter(version=version)
+    factions = Faction.objects.filter(version=version).exclude(id_key='neutral')
 
     # Check for faction query param, otherwise default to first faction (Temple)
     faction_slug = request.GET.get('faction')
