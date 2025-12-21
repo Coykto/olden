@@ -41,11 +41,3 @@ uv run python manage.py runserver
 
 Visit http://127.0.0.1:8000/ for the hero builder.
 
-## Admin
-
-```bash
-# Create admin user
-uv run python manage.py createsuperuser
-```
-
-Visit http://127.0.0.1:8000/admin/ to manage data.
