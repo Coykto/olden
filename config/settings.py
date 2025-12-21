@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -150,5 +151,10 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Heroes of Might and Magic: Olden Era game data settings
-GAME_DATA_PATH = Path("/Users/eb/Downloads/gamedata/steamapps/common/Heroes of Might & Magic Olden Era Demo/HeroesOE_Data")
+# NOTE: These paths are only needed for import_gamedata command.
+# Runtime reads from database. Set to non-existent path for production.
+GAME_DATA_PATH = Path(os.environ.get(
+    "GAME_DATA_PATH",
+    "/Users/eb/Downloads/gamedata/steamapps/common/Heroes of Might & Magic Olden Era Demo/HeroesOE_Data"
+))
 GAME_DATA_CORE_ZIP = GAME_DATA_PATH / "StreamingAssets" / "Core.zip"

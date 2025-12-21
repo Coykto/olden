@@ -725,3 +725,60 @@ class AdvancedClass(models.Model):
     def display_info(self):
         from core.localizations import get_advanced_class_info
         return get_advanced_class_info(self.id_key)
+
+
+class Localization(models.Model):
+    """
+    Stores localization strings and description argument mappings from game files.
+    
+    This model centralizes all localization data needed for runtime display,
+    eliminating the need to read from game files at runtime.
+    
+    Types:
+    - 'text': Localization string (e.g., skill_logistics_name -> "Logistics")
+    - 'args': Description argument mapping (e.g., skill_logistics_description -> ["logistics_bonus"])
+    
+    Categories map to the game's Lang/args/*.json files:
+    - 'skills': heroSkills.json
+    - 'items': artifacts.json
+    - 'spells': magic.json
+    - 'abilities': unitsAbility.json
+    - 'specs': heroInfo.json
+    """
+    TYPE_CHOICES = [
+        ('text', 'Localization Text'),
+        ('args', 'Description Arguments'),
+    ]
+    
+    CATEGORY_CHOICES = [
+        ('general', 'General'),
+        ('skills', 'Skills'),
+        ('items', 'Items'),
+        ('spells', 'Spells'),
+        ('abilities', 'Unit Abilities'),
+        ('specs', 'Hero Specializations'),
+    ]
+    
+    version = models.ForeignKey(GameVersion, on_delete=models.CASCADE, related_name='localizations')
+    loc_type = models.CharField(max_length=10, choices=TYPE_CHOICES)
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='general')
+    key = models.CharField(max_length=255, help_text="Localization key (e.g., skill_logistics_name)")
+    
+    # For 'text' type: the localized string
+    text = models.TextField(blank=True, default='')
+    
+    # For 'args' type: list of function names for description placeholders
+    args = models.JSONField(default=list, blank=True)
+    
+    class Meta:
+        ordering = ['version', 'category', 'key']
+        unique_together = [['version', 'loc_type', 'category', 'key']]
+        indexes = [
+            models.Index(fields=['version', 'loc_type', 'key']),
+            models.Index(fields=['version', 'category']),
+        ]
+    
+    def __str__(self):
+        if self.loc_type == 'text':
+            return f"{self.key}: {self.text[:50]}..."
+        return f"{self.key}: {self.args}"

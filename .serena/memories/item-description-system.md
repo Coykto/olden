@@ -1,4 +1,4 @@
-# Item Description System
+# Entity Description System
 
 ## Summary
 The game uses a multi-layer system to resolve description placeholders ({0}, {1}). Olden Forge implements this with a **Node.js transpiler** that converts game script files to JavaScript at import time.
@@ -47,6 +47,35 @@ python manage.py import_gamedata
 # E2E tests
 pytest tests/e2e/test_descriptions.py -v
 ```
+
+## Localization Storage
+
+All localization data is stored in the database during import, eliminating runtime dependency on game files.
+
+### Model: `gamedata.Localization`
+- **loc_type='text'**: Localization strings (skill names, descriptions, etc.) - 7497 entries
+- **loc_type='args'**: Description argument mappings (function names for placeholders) - 1193 entries
+
+### Categories (for args)
+- `skills`: From `Lang/args/heroSkills.json`
+- `items`: From `Lang/args/artifacts.json`
+- `spells`: From `Lang/args/magic.json`
+- `abilities`: From `Lang/args/unitsAbility.json`
+- `specs`: From `Lang/args/heroInfo.json`
+
+### Key Functions (in `core/localizations.py`)
+All functions read from database first, falling back to files for local dev:
+- `get_localizations()` → All text strings
+- `get_skill_args()` → Skill description args
+- `get_item_args()` → Item description args
+- `get_spell_args()` → Spell description args
+- `get_hero_spec_args()` → Hero specialization args
+- `get_unit_ability_args()` → Unit ability args
+
+### Adding New Localization Sources
+1. Add the args file mapping in `_import_localizations()` in `import_gamedata.py`
+2. Add a category to `Localization.CATEGORY_CHOICES` in `gamedata/models.py`
+3. Create a new `get_*_args()` function using `_get_args_from_db(category)`
 
 ## Implementation Notes
 - Transpiled functions use LRU memoization (5 cached values per function)

@@ -9,7 +9,7 @@ import re
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils.text import slugify
-from gamedata.models import GameVersion, Faction, Unit, Hero, Skill, Item, ItemSet, Spell, MagicSchool, UnitAbility, CombatModifier, AdvancedClass
+from gamedata.models import GameVersion, Faction, Unit, Hero, Skill, Item, ItemSet, Spell, MagicSchool, UnitAbility, CombatModifier, AdvancedClass, Localization
 from core.data_reader import GameDataReader
 from core.asset_extractor import AssetExtractor
 from core.skill_value_extractor import SkillValueExtractor
@@ -69,6 +69,7 @@ class Command(BaseCommand):
             version.spells.all().delete()
             version.magic_schools.all().delete()
             version.advanced_classes.all().delete()
+            version.localizations.all().delete()
 
         # Extract game data
         self.stdout.write("Extracting Core.zip...")
@@ -82,6 +83,7 @@ class Command(BaseCommand):
         # Import data within a transaction (must specify the gamedata database)
         try:
             with transaction.atomic(using='gamedata'):
+                self._import_localizations(reader, version, localizations)
                 self._import_factions(reader, version, localizations)
                 self._import_units(reader, version, localizations)
                 self._import_heroes(reader, version, localizations)
@@ -106,6 +108,73 @@ class Command(BaseCommand):
         except Exception as e:
             self.stdout.write(self.style.ERROR(f"Import failed: {e}"))
             raise
+
+    def _import_localizations(self, reader: GameDataReader, version: GameVersion, localizations: dict):
+        """Import all localization strings and description argument mappings."""
+        self.stdout.write("Importing localizations...")
+
+        from django.conf import settings
+        import json
+
+        loc_objects = []
+
+        # 1. Import all text localizations
+        for key, text in localizations.items():
+            loc_objects.append(Localization(
+                version=version,
+                loc_type='text',
+                category='general',
+                key=key,
+                text=text,
+            ))
+
+        text_count = len(loc_objects)
+        self.stdout.write(f"  Prepared {text_count} text localizations")
+
+        # 2. Import description argument mappings from Lang/args/*.json files
+        args_dir = settings.GAME_DATA_PATH / "StreamingAssets" / "Lang" / "args"
+
+        # Map args files to categories
+        args_files = {
+            'heroSkills.json': 'skills',
+            'artifacts.json': 'items',
+            'magic.json': 'spells',
+            'unitsAbility.json': 'abilities',
+            'heroInfo.json': 'specs',
+        }
+
+        args_count = 0
+        for filename, category in args_files.items():
+            args_file = args_dir / filename
+            if not args_file.exists():
+                self.stdout.write(f"  Warning: {filename} not found")
+                continue
+
+            try:
+                with open(args_file, 'r', encoding='utf-8-sig') as f:
+                    data = json.load(f)
+                    tokens_args = data.get("tokensArgs", [])
+
+                    for item in tokens_args:
+                        sid = item.get("sid")
+                        args = item.get("args", [])
+                        if sid and args:
+                            loc_objects.append(Localization(
+                                version=version,
+                                loc_type='args',
+                                category=category,
+                                key=sid,
+                                args=args,
+                            ))
+                            args_count += 1
+            except Exception as e:
+                self.stdout.write(f"  Warning: Failed to read {filename}: {e}")
+
+        self.stdout.write(f"  Prepared {args_count} arg mappings")
+
+        # Bulk create all localizations
+        Localization.objects.bulk_create(loc_objects)
+        self.stdout.write(f"  Created {len(loc_objects)} total localization entries")
 
     def _import_factions(self, reader: GameDataReader, version: GameVersion, localizations: dict):
         """Import faction data."""

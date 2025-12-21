@@ -209,9 +209,26 @@ def _extract_subskill_values(subskill_config: dict) -> list:
 @lru_cache(maxsize=1)
 def get_localizations(lang: str = "english") -> dict:
     """
-    Load localization strings from game files.
+    Load localization strings from database.
+    Falls back to game files if database is empty (for local development).
     Results are cached for performance.
     """
+    from gamedata.models import Localization, GameVersion
+    
+    # Try to load from database first
+    try:
+        version = GameVersion.objects.filter(is_active=True).first()
+        if version:
+            locs = Localization.objects.using('gamedata').filter(
+                version=version,
+                loc_type='text'
+            ).values_list('key', 'text')
+            if locs.exists():
+                return dict(locs)
+    except Exception:
+        pass  # Database not available, fall back to files
+    
+    # Fallback: read from game files (for local development)
     lang_dir = settings.GAME_DATA_PATH / "StreamingAssets" / "Lang" / lang / "texts"
 
     if not lang_dir.exists():
@@ -233,6 +250,29 @@ def get_localizations(lang: str = "english") -> dict:
             continue
 
     return localizations
+
+
+def _get_args_from_db(category: str) -> dict:
+    """
+    Helper to load description args from database for a specific category.
+    Returns a dict mapping sid -> list of function names.
+    """
+    from gamedata.models import Localization, GameVersion
+    
+    try:
+        version = GameVersion.objects.filter(is_active=True).first()
+        if version:
+            locs = Localization.objects.using('gamedata').filter(
+                version=version,
+                loc_type='args',
+                category=category
+            ).values_list('key', 'args')
+            if locs.exists():
+                return dict(locs)
+    except Exception:
+        pass
+    
+    return None  # Signal to use file fallback
 
 
 def get_localized_name(entity_id: str, entity_type: str, fallback: str = None) -> str:
@@ -491,9 +531,15 @@ def get_advanced_class_info(class_id: str) -> dict:
 @lru_cache(maxsize=1)
 def get_item_args(lang: str = "english") -> dict:
     """
-    Load item description args from game files.
+    Load item description args from database (or game files as fallback).
     Returns a dict mapping sid -> list of function names.
     """
+    # Try database first
+    db_result = _get_args_from_db('items')
+    if db_result is not None:
+        return db_result
+    
+    # Fallback to files
     args_file = settings.GAME_DATA_PATH / "StreamingAssets" / "Lang" / "args" / "artifacts.json"
 
     if not args_file.exists():
@@ -511,9 +557,15 @@ def get_item_args(lang: str = "english") -> dict:
 @lru_cache(maxsize=1)
 def get_hero_spec_args(lang: str = "english") -> dict:
     """
-    Load hero specialization description args from game files.
+    Load hero specialization description args from database (or game files as fallback).
     Returns a dict mapping sid -> list of function names.
     """
+    # Try database first
+    db_result = _get_args_from_db('specs')
+    if db_result is not None:
+        return db_result
+    
+    # Fallback to files
     args_file = settings.GAME_DATA_PATH / "StreamingAssets" / "Lang" / "args" / "heroInfo.json"
 
     if not args_file.exists():
@@ -531,9 +583,15 @@ def get_hero_spec_args(lang: str = "english") -> dict:
 @lru_cache(maxsize=1)
 def get_skill_args(lang: str = "english") -> dict:
     """
-    Load skill description args from game files.
+    Load skill description args from database (or game files as fallback).
     Returns a dict mapping sid -> list of function names.
     """
+    # Try database first
+    db_result = _get_args_from_db('skills')
+    if db_result is not None:
+        return db_result
+    
+    # Fallback to files
     args_file = settings.GAME_DATA_PATH / "StreamingAssets" / "Lang" / "args" / "heroSkills.json"
 
     if not args_file.exists():
@@ -701,9 +759,15 @@ def get_hero_specialization_info(hero_id: str) -> dict:
 @lru_cache(maxsize=1)
 def get_spell_args(lang: str = "english") -> dict:
     """
-    Load spell description args from game files.
+    Load spell description args from database (or game files as fallback).
     Returns a dict mapping sid -> list of function names.
     """
+    # Try database first
+    db_result = _get_args_from_db('spells')
+    if db_result is not None:
+        return db_result
+    
+    # Fallback to files
     args_file = settings.GAME_DATA_PATH / "StreamingAssets" / "Lang" / "args" / "magic.json"
 
     if not args_file.exists():
@@ -721,9 +785,15 @@ def get_spell_args(lang: str = "english") -> dict:
 @lru_cache(maxsize=1)
 def get_unit_ability_args(lang: str = "english") -> dict:
     """
-    Load unit ability description args from game files.
+    Load unit ability description args from database (or game files as fallback).
     Returns a dict mapping sid -> list of function names.
     """
+    # Try database first
+    db_result = _get_args_from_db('abilities')
+    if db_result is not None:
+        return db_result
+    
+    # Fallback to files
     args_file = settings.GAME_DATA_PATH / "StreamingAssets" / "Lang" / "args" / "unitsAbility.json"
 
     if not args_file.exists():

@@ -48,6 +48,18 @@ Key points:
 - Function definitions are in 42 `.script` files under `Core.zip/DB/info/`
 - Some items require hero stats (e.g., viewRadius) for dynamic calculations
 
+### Localization Storage
+All localization data is stored in the database (`gamedata.Localization` model) during import:
+- **Text strings**: 7497+ entries (skill names, descriptions, etc.)
+- **Arg mappings**: 1193+ entries (function names for description placeholders)
+
+This eliminates runtime dependency on game files for production deployment.
+
+Key files:
+- `gamedata/models.py` → `Localization` model
+- `core/localizations.py` → Functions that read from DB (with file fallback for local dev)
+- `gamedata/management/commands/import_gamedata.py` → `_import_localizations()` stores data
+
 ### Script Transpiler System
 A Node.js transpiler converts game script files to JavaScript at import time.
 
