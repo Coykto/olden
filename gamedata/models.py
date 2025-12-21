@@ -190,8 +190,23 @@ class Hero(models.Model):
     @property
     def specialization_info(self):
         """Get specialization info with description template and args for JS rendering."""
-        from core.localizations import get_hero_specialization_info
-        return get_hero_specialization_info(self.id_key)
+        from core.localizations import get_localizations, get_hero_spec_args
+        
+        localizations = get_localizations()
+        args_data = get_hero_spec_args()
+        
+        # Hero specialization localization keys follow pattern: {hero_id}_spec_{field}
+        desc_key = f"{self.id_key}_spec_description"
+        
+        description_template = localizations.get(desc_key, "")
+        description_args = args_data.get(desc_key, [])
+        
+        return {
+            "name": self.specialization_name,
+            "description_template": description_template,
+            "description_args": description_args,
+            "raw_data": self.specialization_data,  # Now from database field
+        }
 
     @property
     def advanced_classes_info(self):
@@ -457,6 +472,14 @@ class Hero(models.Model):
 
     # Raw JSON data for specialization, starting squad, etc.
     raw_data = models.JSONField(help_text="Complete raw hero data from game files")
+
+    # Specialization data with bonuses, read from specializations_*.json files
+    # Stored here to avoid runtime file reads (files don't exist on production)
+    specialization_data = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text="Hero's specialization data with bonuses from DB/heroes_specializations/"
+    )
 
     class Meta:
         ordering = ['version', 'faction', 'id_key']
@@ -782,3 +805,26 @@ class Localization(models.Model):
         if self.loc_type == 'text':
             return f"{self.key}: {self.text[:50]}..."
         return f"{self.key}: {self.args}"
+
+
+class SubskillConfig(models.Model):
+    """
+    Stores subskill configuration data from DB/heroes_skills/sub_skills/sub_skills.json.
+    
+    This data is needed for:
+    1. Extracting values for pre-computed descriptions (e.g., "-1" morale)
+    2. Providing raw_data context for dynamic JavaScript description formatting
+    """
+    version = models.ForeignKey(GameVersion, on_delete=models.CASCADE, related_name='subskill_configs')
+    id_key = models.CharField(max_length=100, help_text="Subskill ID (e.g., sub_skill_leadership_2)")
+    raw_data = models.JSONField(help_text="Full subskill config with bonuses")
+    
+    class Meta:
+        ordering = ['version', 'id_key']
+        unique_together = [['version', 'id_key']]
+        indexes = [
+            models.Index(fields=['version', 'id_key']),
+        ]
+    
+    def __str__(self):
+        return self.id_key

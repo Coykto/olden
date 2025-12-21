@@ -70,6 +70,7 @@ class Command(BaseCommand):
             version.magic_schools.all().delete()
             version.advanced_classes.all().delete()
             version.localizations.all().delete()
+            version.subskill_configs.all().delete()
 
         # Extract game data
         self.stdout.write("Extracting Core.zip...")
@@ -84,6 +85,7 @@ class Command(BaseCommand):
         try:
             with transaction.atomic(using='gamedata'):
                 self._import_localizations(reader, version, localizations)
+                self._import_subskill_configs(reader, version)
                 self._import_factions(reader, version, localizations)
                 self._import_units(reader, version, localizations)
                 self._import_heroes(reader, version, localizations)
@@ -175,6 +177,34 @@ class Command(BaseCommand):
         # Bulk create all localizations
         Localization.objects.bulk_create(loc_objects)
         self.stdout.write(f"  Created {len(loc_objects)} total localization entries")
+
+
+    def _import_subskill_configs(self, reader: GameDataReader, version: GameVersion):
+        """Import subskill configurations from Core.zip."""
+        from gamedata.models import SubskillConfig
+        
+        self.stdout.write("Importing subskill configs...")
+        
+        # Read subskill configs from Core.zip (path is relative to extracted DB folder)
+        try:
+            subskill_data = reader.read_json("heroes_skills/sub_skills/sub_skills.json")
+            subskill_array = subskill_data.get('array', [])
+        except Exception as e:
+            self.stdout.write(f"  Warning: Failed to read subskill configs: {e}")
+            return
+        
+        config_objects = []
+        for config in subskill_array:
+            subskill_id = config.get('id')
+            if subskill_id:
+                config_objects.append(SubskillConfig(
+                    version=version,
+                    id_key=subskill_id,
+                    raw_data=config,
+                ))
+        
+        SubskillConfig.objects.bulk_create(config_objects)
+        self.stdout.write(f"  Created {len(config_objects)} subskill configs")
 
     def _import_factions(self, reader: GameDataReader, version: GameVersion, localizations: dict):
         """Import faction data."""
@@ -430,6 +460,22 @@ class Command(BaseCommand):
         banned_heroes = set(game_data.get("bannedHeroes", []))
         excluded_heroes = campaign_heroes | banned_heroes
 
+        # Load all specialization data from Core.zip
+        # Maps specialization_id -> specialization data with bonuses
+        specializations = {}
+        spec_files = reader.list_files("heroes_specializations/*.json")
+        for spec_file in spec_files:
+            try:
+                spec_data = reader.read_json(spec_file)
+                for spec in spec_data.get('array', []):
+                    spec_id = spec.get('id')
+                    if spec_id:
+                        specializations[spec_id] = spec
+            except Exception as e:
+                self.stdout.write(f"  Warning: Failed to read {spec_file}: {e}")
+
+        self.stdout.write(f"  Loaded {len(specializations)} specializations")
+
         hero_objects = []
         skipped_count = 0
         for hero_data in heroes_data:
@@ -455,6 +501,10 @@ class Command(BaseCommand):
             # Get specialization name and description
             spec_name = localizations.get(f"{hero_id}_spec_name", "")
             spec_desc = localizations.get(f"{hero_id}_spec_description", "")
+
+            # Get specialization data with bonuses
+            spec_id = hero_data.get("specialization", f"{hero_id}_specialization")
+            specialization_data = specializations.get(spec_id, {})
 
             # Extract sort order from id_key (e.g., "human_hero_1" -> 1)
             sort_match = re.search(r'_(\d+)$', hero_id)
@@ -489,7 +539,8 @@ class Command(BaseCommand):
                 start_luck=stats.get("luck", 0),
                 start_moral=stats.get("moral", 0),
                 start_view_radius=hero_data.get("viewRadius", 6),
-                raw_data=hero_data
+                raw_data=hero_data,
+                specialization_data=specialization_data,
             ))
 
         Hero.objects.bulk_create(hero_objects)

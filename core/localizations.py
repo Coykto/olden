@@ -162,10 +162,22 @@ def get_skill_param_mappings() -> dict:
 @lru_cache(maxsize=1)
 def get_subskill_configs() -> dict:
     """
-    Load subskill configurations from game files.
+    Load subskill configurations from database (or game files as fallback for local dev).
     Returns a dict mapping subskill_id -> subskill config data.
     """
-    # Try multiple possible locations for subskill data
+    from gamedata.models import SubskillConfig, GameVersion
+    
+    # Try database first
+    try:
+        version = GameVersion.objects.filter(is_active=True).first()
+        if version:
+            configs = SubskillConfig.objects.using('gamedata').filter(version=version)
+            if configs.exists():
+                return {c.id_key: c.raw_data for c in configs}
+    except Exception:
+        pass
+    
+    # Fallback to files (for local development only)
     possible_paths = [
         Path("/tmp/DB/heroes_skills/sub_skills/sub_skills.json"),
         Path(settings.GAME_DATA_PATH) / "DB" / "heroes_skills" / "sub_skills" / "sub_skills.json",
@@ -203,7 +215,7 @@ def _extract_subskill_values(subskill_config: dict) -> list:
                 except ValueError:
                     pass
 
-    return values if values else [10]  # Fallback default
+    return values  # May be empty if no values found
 
 
 @lru_cache(maxsize=1)
@@ -400,7 +412,7 @@ def _extract_skill_values(skill_data: dict, skill_id: str, level: int = 1) -> li
     except (IndexError, KeyError, TypeError):
         pass
 
-    return values if values else [10, 5, 2]  # Fallback defaults
+    return values  # No fallback - missing data should be visible
 
 
 def get_skill_info(skill_id: str, level: int = 1) -> dict:
@@ -419,8 +431,8 @@ def get_skill_info(skill_id: str, level: int = 1) -> dict:
         subskill_configs = get_subskill_configs()
         subskill_config = subskill_configs.get(skill_id, {})
 
-        # Extract values from subskill bonuses
-        skill_values = _extract_subskill_values(subskill_config) if subskill_config else [10]
+        # Extract values from subskill bonuses (no fallback - missing data should be visible)
+        skill_values = _extract_subskill_values(subskill_config)
 
         # Get localized name and description
         name = (
@@ -463,9 +475,7 @@ def get_skill_info(skill_id: str, level: int = 1) -> dict:
     if not skill_values and skill_data:
         skill_values = _extract_skill_values(skill_data, skill_id, level)
 
-    # Final fallback
-    if not skill_values:
-        skill_values = [10, 5, 2]
+    # No fallback - missing data should be visible as unfilled placeholders
 
     # Get the actual desc key from skill data if available
     desc_key = None
