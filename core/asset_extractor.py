@@ -52,6 +52,30 @@ class AssetExtractor:
         'unit_init', 'unit_luck', 'unit_moral', 'unit_speed',
     ]
 
+    # Hero stat icons (40x40) - source name -> destination name (lowercase normalized)
+    HERO_STAT_ICONS = {
+        'Icon_Stats_Attack': 'stat_attack.png',
+        'Icon_Stats_Defence': 'stat_defence.png',
+        'Icon_Stats_Spellpower': 'stat_spellpower.png',
+        'Property 1=Icon_Stats_Luck': 'stat_luck.png',
+        'Property 1=Icon_Stats_Morale': 'stat_morale.png',
+    }
+
+    # Equipment slot icons (90x90) - game asset name -> output filename (lowercase normalized)
+    # These are the 10 slot icons that exist in the game's resources.assets
+    EQUIPMENT_SLOT_ICONS = {
+        'UNIQUE_SLOT': 'slot_unique.png',
+        'HEAD': 'slot_head.png',
+        'BACK': 'slot_cloak.png',  # Template uses 'cloak' not 'back'
+        'RING': 'slot_ring.png',
+        'ARMOR': 'slot_armor.png',
+        'RIGHT_HAND': 'slot_left_hand.png',  # Weapon (confusing naming in game)
+        'BELT': 'slot_belt.png',
+        'LEFT_HAND': 'slot_right_hand.png',  # Shield (confusing naming in game)
+        'ITEM_SLOT': 'slot_item.png',
+        'BOOTS': 'slot_boots.png',
+    }
+
     def extract_all(self, force: bool = False) -> Dict[str, int]:
         """
         Extract all game assets.
@@ -88,8 +112,11 @@ class AssetExtractor:
         # Extract spell icons
         results['spells'] = self._extract_spell_icons(force)
 
-        # Extract stat icons
+        # Extract stat icons (unit and hero)
         results['stat_icons'] = self._extract_stat_icons(force)
+
+        # Extract equipment slot icons
+        results['slot_icons'] = self._extract_equipment_slot_icons(force)
 
         # Extract passive/ability icons (creature types, attack types, unit abilities)
         results['passives'] = self._extract_passive_icons(force)
@@ -319,7 +346,12 @@ class AssetExtractor:
         return count
 
     def _extract_skill_icons(self, force: bool = False) -> int:
-        """Extract skill icons (256x256 skill_* textures)."""
+        """
+        Extract skill icons (256x256 skill_* textures) and subskill icons (80x80 sub_skill_* textures).
+
+        GENERAL SOLUTION: Extract both skill and subskill icons since they're both skill-related
+        and go in the same directory. Handles different sizes automatically.
+        """
         output_path = self.output_dir / "skills"
         output_path.mkdir(parents=True, exist_ok=True)
 
@@ -343,6 +375,20 @@ class AssetExtractor:
                 # Match skill icons (skill_* but not effects/abilities, and not sub_class_)
                 if name.startswith('skill_') and data.m_Width == 256:
                     if 'effect' not in name.lower() and 'ability' not in name.lower() and not name.startswith('sub_class_'):
+                        out_file = output_path / f"{name}.png"
+
+                        if not force and out_file.exists():
+                            continue
+
+                        image = data.image
+                        image.save(str(out_file))
+                        count += 1
+
+                # Match subskill icons (sub_skill_*_icon, typically 80x80 but accept any size)
+                # Only extract _icon suffix to match template expectations
+                elif name.startswith('sub_skill_') and '_icon' in name:
+                    # Skip ability/buff/debuff icons (these are larger and not for skill picker)
+                    if 'ability' not in name.lower() and 'buff' not in name.lower():
                         out_file = output_path / f"{name}.png"
 
                         if not force and out_file.exists():
@@ -589,12 +635,71 @@ class AssetExtractor:
         return count
 
     def _extract_stat_icons(self, force: bool = False) -> int:
-        """Extract unit stat icons (40x40 textures)."""
+        """Extract unit and hero stat icons (40x40 textures)."""
         output_path = self.output_dir / "ui"
         output_path.mkdir(parents=True, exist_ok=True)
 
         count = 0
-        # Stat icons are in resources.assets
+
+        # Stat icons can be in multiple asset files
+        for asset_file in self.game_data_path.glob("*.assets"):
+            try:
+                env = UnityPy.load(str(asset_file))
+
+                for obj in env.objects:
+                    if obj.type.name != 'Texture2D':
+                        continue
+
+                    try:
+                        data = obj.read()
+                        name = data.m_Name
+
+                        # Match unit stat icons by exact name
+                        if name in self.STAT_ICONS:
+                            out_file = output_path / f"{name}.png"
+
+                            if not force and out_file.exists():
+                                continue
+
+                            image = data.image
+                            image.save(str(out_file))
+                            count += 1
+
+                        # Match hero stat icons with name mapping
+                        elif name in self.HERO_STAT_ICONS:
+                            dest_name = self.HERO_STAT_ICONS[name]
+                            out_file = output_path / dest_name
+
+                            if not force and out_file.exists():
+                                continue
+
+                            image = data.image
+                            image.save(str(out_file))
+                            count += 1
+
+                    except Exception:
+                        pass
+
+            except Exception:
+                pass
+
+        return count
+
+    def _extract_equipment_slot_icons(self, force: bool = False) -> int:
+        """
+        Extract equipment slot icons (90x90 textures).
+
+        GENERAL SOLUTION: Extract slot icons with normalized lowercase names matching
+        the existing codebase pattern (slot_*.png) that templates expect.
+
+        Game assets are the source of truth, but we normalize names for consistency.
+        """
+        output_path = self.output_dir / "ui"
+        output_path.mkdir(parents=True, exist_ok=True)
+
+        count = 0
+
+        # Equipment slot icons are in resources.assets
         resources_path = self.game_data_path / "resources.assets"
 
         if not resources_path.exists():
@@ -602,6 +707,7 @@ class AssetExtractor:
 
         env = UnityPy.load(str(resources_path))
 
+        # Extract all 10 slot icons with normalized lowercase names
         for obj in env.objects:
             if obj.type.name != 'Texture2D':
                 continue
@@ -610,9 +716,10 @@ class AssetExtractor:
                 data = obj.read()
                 name = data.m_Name
 
-                # Match stat icons by exact name
-                if name in self.STAT_ICONS:
-                    out_file = output_path / f"{name}.png"
+                # Match equipment slot icons by game name and save with normalized name
+                if name in self.EQUIPMENT_SLOT_ICONS:
+                    dest_name = self.EQUIPMENT_SLOT_ICONS[name]
+                    out_file = output_path / dest_name
 
                     if not force and out_file.exists():
                         continue
