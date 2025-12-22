@@ -6,14 +6,14 @@
         <div class="portrait-column">
             <div class="hero-portrait-wrapper">
                 {% if hero.portrait_url %}
-                <img src="{{ hero.portrait_url }}" alt="{{ hero.display_name }}" class="single-hero-portrait">
+                <img src="{{ hero.portrait_url }}" alt="{{ hero.localized_name|default:hero.display_name }}" class="single-hero-portrait">
                 {% else %}
                 <div class="hero-portrait" style="background: linear-gradient(180deg, #333 0%, #222 100%);"></div>
                 {% endif %}
             </div>
             <div class="class-badge-wrapper has-tooltip"
                  data-tooltip-placement="right"
-                 data-spec-name="{{ hero.specialization_name }}"
+                 data-spec-name="{{ hero.localized_spec_name|default:hero.specialization_name }}"
                  data-spec-template="{{ hero.specialization_info.description_template|escapejs }}"
                  data-spec-args='{{ hero.specialization_info.description_args|to_json }}'
                  data-spec-raw='{{ hero.specialization_info.raw_data|to_json }}'>
@@ -27,8 +27,8 @@
             <div class="name-row">
                 <img src="{{ hero.faction.icon_url }}" alt="{{ hero.faction.name }}" class="faction-badge">
                 <div class="name-text">
-                    <span class="hero-name">{{ hero.display_name }}</span>
-                    <span class="hero-specialty">{{ hero.specialization_name }}</span>
+                    <span class="hero-name">{{ hero.localized_name|default:hero.display_name }}</span>
+                    <span class="hero-specialty">{{ hero.localized_spec_name|default:hero.specialization_name }}</span>
                 </div>
             </div>
 

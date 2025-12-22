@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -52,6 +54,12 @@
             border-bottom: 3px solid #d4af37;
         }
 
+        header .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
         header h1 {
             color: #d4af37;
             font-size: 1.6rem;
@@ -59,6 +67,109 @@
 
         nav {
             margin-top: 8px;
+        }
+
+        /* Language Switcher Styles */
+        .language-switcher {
+            position: relative;
+            display: inline-block;
+        }
+
+        .language-switcher-button {
+            background: #333;
+            color: #d4af37;
+            border: 1px solid #555;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .language-switcher-button:hover {
+            background: #3a3a3a;
+            border-color: #d4af37;
+        }
+
+        .language-switcher-button .globe-icon {
+            font-size: 1.1rem;
+        }
+
+        .language-switcher-button .arrow {
+            font-size: 0.7rem;
+            transition: transform 0.2s;
+        }
+
+        .language-switcher.open .language-switcher-button .arrow {
+            transform: rotate(180deg);
+        }
+
+        .language-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: #2a2a2a;
+            border: 1px solid #555;
+            border-radius: 4px;
+            margin-top: 4px;
+            min-width: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .language-switcher.open .language-dropdown {
+            display: block;
+        }
+
+        .language-option {
+            display: block;
+            padding: 10px 16px;
+            color: #e0e0e0;
+            text-decoration: none;
+            transition: background 0.2s;
+            border-bottom: 1px solid #333;
+        }
+
+        .language-option:last-child {
+            border-bottom: none;
+        }
+
+        .language-option:hover {
+            background: #333;
+        }
+
+        .language-option.active {
+            background: #333;
+            color: #d4af37;
+            font-weight: bold;
+        }
+
+        .language-option-code {
+            color: #888;
+            font-size: 0.85rem;
+            margin-right: 8px;
+            display: inline-block;
+            min-width: 60px;
+        }
+
+        @media (max-width: 768px) {
+            header .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .language-dropdown {
+                left: 0;
+                right: auto;
+            }
         }
 
         footer {
@@ -261,9 +372,30 @@
 <body>
     <header>
         <div class="container">
-            <nav>
-                <a href="{% url 'hero_builder:index' %}">Hero Builder</a>
-            </nav>
+            <div class="header-content">
+                <nav>
+                    <a href="{% url 'hero_builder:index' %}">Hero Builder</a>
+                </nav>
+                <div class="language-switcher" id="languageSwitcher">
+                    <button class="language-switcher-button" onclick="toggleLanguageSwitcher()" type="button">
+                        <span class="globe-icon">🌐</span>
+                        <span class="current-lang">{{ LANGUAGE_CODE|upper }}</span>
+                        <span class="arrow">▼</span>
+                    </button>
+                    <div class="language-dropdown">
+                        {% load static %}
+                        {% for lang_code, lang_name in available_languages %}
+                        <a href="#"
+                           class="language-option {% if lang_code == LANGUAGE_CODE %}active{% endif %}"
+                           data-lang-code="{{ lang_code }}"
+                           onclick="switchLanguage('{{ lang_code }}'); return false;">
+                            <span class="language-option-code">{{ lang_code|upper }}</span>
+                            <span class="language-option-name">{{ lang_name }}</span>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -274,17 +406,17 @@
     <footer>
         <div class="footer-content">
             <div class="footer-links">
-                <a href="https://github.com/Coykto/olden" target="_blank" rel="noopener">Contribute on GitHub</a>
-                <a href="https://github.com/Coykto/olden/issues" target="_blank" rel="noopener">Report Bug / Suggest Feature</a>
-                <a href="mailto:coykto@gmail.com">Contact: coykto@gmail.com</a>
-                <span class="footer-discord" onclick="copyDiscord(this)" title="Click to copy">Discord: coykto</span>
+                <a href="https://github.com/Coykto/olden" target="_blank" rel="noopener">{{ ui.contribute_github }}</a>
+                <a href="https://github.com/Coykto/olden/issues" target="_blank" rel="noopener">{{ ui.report_bug }}</a>
+                <a href="mailto:coykto@gmail.com">{{ ui.contact_email }}: coykto@gmail.com</a>
+                <span class="footer-discord" onclick="copyDiscord(this)" title="Click to copy">{{ ui.discord_label }}: coykto</span>
             </div>
             <div class="footer-disclaimer">
-                This is a fan-made tool. Not affiliated with Ubisoft, Unfrozen, Hooded Horse, or any official Heroes of Might & Magic rights holders.<br>
-                All game content and assets belong to their respective owners.
+                {{ ui.footer_disclaimer }}<br>
+                {{ ui.footer_disclaimer_2 }}
             </div>
             {% if version %}
-            <div class="footer-version">Game Version: Build {{ version.build_id }} ({{ version.game_updated_at|date:"Y-m-d" }})</div>
+            <div class="footer-version">{{ ui.game_version }}: {{ ui.build }} {{ version.build_id }} ({{ version.game_updated_at|date:"Y-m-d" }})</div>
             {% endif %}
         </div>
     </footer>
@@ -299,6 +431,64 @@
                 el.classList.remove('footer-discord-copied');
             }, 2000);
         });
+    }
+
+    // Language Switcher Functions
+    function toggleLanguageSwitcher() {
+        const switcher = document.getElementById('languageSwitcher');
+        switcher.classList.toggle('open');
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        const switcher = document.getElementById('languageSwitcher');
+        if (switcher && !switcher.contains(event.target)) {
+            switcher.classList.remove('open');
+        }
+    });
+
+    // Get current language prefix from URL
+    function getLanguagePrefix() {
+        const path = window.location.pathname;
+        const match = path.match(/^\/(en|cs|fr|de|hu|ja|ko|pl|ru|es|tr|uk|zh-hans|zh-hant)\//);
+        return match ? '/' + match[1] : '/en';
+    }
+
+    // Get current language code
+    function getCurrentLanguageCode() {
+        const path = window.location.pathname;
+        const match = path.match(/^\/(en|cs|fr|de|hu|ja|ko|pl|ru|es|tr|uk|zh-hans|zh-hant)\//);
+        return match ? match[1] : 'en';
+    }
+
+    // Switch to a different language
+    function switchLanguage(newLangCode) {
+        const currentPath = window.location.pathname;
+        const currentLangCode = getCurrentLanguageCode();
+
+        // Replace the language prefix in the URL
+        let newPath;
+        if (currentPath.startsWith('/' + currentLangCode + '/')) {
+            newPath = currentPath.replace('/' + currentLangCode + '/', '/' + newLangCode + '/');
+        } else {
+            // Fallback: prepend new language prefix
+            newPath = '/' + newLangCode + currentPath;
+        }
+
+        // Preserve query string if any
+        const queryString = window.location.search;
+        window.location.href = newPath + queryString;
+    }
+
+    // Helper function to build language-aware URLs from JavaScript
+    function buildUrl(path) {
+        const langPrefix = getLanguagePrefix();
+        // If path already starts with language prefix, return as is
+        if (path.match(/^\/(en|cs|fr|de|hu|ja|ko|pl|ru|es|tr|uk|zh-hans|zh-hant)\//)) {
+            return path;
+        }
+        // Add language prefix
+        return langPrefix + (path.startsWith('/') ? path : '/' + path);
     }
     </script>
 

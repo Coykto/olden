@@ -16,13 +16,21 @@ Including another URLconf
 """
 from django.conf import settings
 from django.conf.urls.static import static
+from django.conf.urls.i18n import i18n_patterns
 from django.contrib import admin
 from django.urls import path, include
 
+# Admin URLs (not translated)
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('hero_builder.urls')),
 ]
+
+# Main application URLs with language prefix support
+# This enables URLs like /en/hero/, /ru/hero/, /fr/hero/, etc.
+urlpatterns += i18n_patterns(
+    path('', include('hero_builder.urls')),
+    prefix_default_language=True,  # Include /en/ prefix even for default language
+)
 
 # Serve media files in development
 if settings.DEBUG:

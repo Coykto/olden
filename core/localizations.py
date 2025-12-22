@@ -8,6 +8,58 @@ from pathlib import Path
 from django.conf import settings
 
 
+def get_ui_strings(lang: str = None) -> dict:
+    """
+    Load UI-specific strings (not from game files) for the given language.
+
+    Args:
+        lang: Language code (e.g., 'en', 'ru', 'zh-hans'). If None, detects from current request.
+
+    Returns:
+        Dictionary of UI string key -> translated value
+    """
+    from django.utils.translation import get_language
+
+    # Detect language BEFORE cache lookup
+    if lang is None:
+        current_lang = get_language()
+        if current_lang:
+            lang = current_lang.lower().split('-')[0]
+            # Handle special cases
+            if current_lang.lower().startswith('zh-hans'):
+                lang = 'zh-hans'
+            elif current_lang.lower().startswith('zh-hant'):
+                lang = 'zh-hant'
+        else:
+            lang = 'en'
+
+    return _get_ui_strings_cached(lang)
+
+
+@lru_cache(maxsize=14)
+def _get_ui_strings_cached(lang: str) -> dict:
+    """
+    Internal cached version of get_ui_strings.
+
+    Args:
+        lang: Language code (must not be None)
+
+    Returns:
+        Dictionary of UI string key -> translated value
+    """
+    # Load UI strings from JSON file
+    ui_strings_path = Path(__file__).parent / 'ui_strings.json'
+    try:
+        with open(ui_strings_path, 'r', encoding='utf-8') as f:
+            all_ui_strings = json.load(f)
+
+        # Return strings for the requested language, fallback to English
+        return all_ui_strings.get(lang, all_ui_strings.get('en', {}))
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        print(f"Warning: Could not load UI strings: {e}")
+        return {}
+
+
 def _parse_script_files() -> dict:
     """
     Parse game .script files to extract skill parameter mappings.
@@ -162,12 +214,11 @@ def get_skill_param_mappings() -> dict:
 @lru_cache(maxsize=1)
 def get_subskill_configs() -> dict:
     """
-    Load subskill configurations from database (or game files as fallback for local dev).
+    Load subskill configurations from database.
     Returns a dict mapping subskill_id -> subskill config data.
     """
     from gamedata.models import SubskillConfig, GameVersion
-    
-    # Try database first
+
     try:
         version = GameVersion.objects.filter(is_active=True).first()
         if version:
@@ -176,22 +227,6 @@ def get_subskill_configs() -> dict:
                 return {c.id_key: c.raw_data for c in configs}
     except Exception:
         pass
-    
-    # Fallback to files (for local development only)
-    possible_paths = [
-        Path("/tmp/DB/heroes_skills/sub_skills/sub_skills.json"),
-        Path(settings.GAME_DATA_PATH) / "DB" / "heroes_skills" / "sub_skills" / "sub_skills.json",
-    ]
-
-    for path in possible_paths:
-        if path.exists():
-            try:
-                with open(path, 'r', encoding='utf-8-sig') as f:
-                    data = json.load(f)
-                    # Convert array to dict keyed by id
-                    return {item['id']: item for item in data.get('array', [])}
-            except Exception:
-                continue
 
     return {}
 
@@ -218,73 +253,116 @@ def _extract_subskill_values(subskill_config: dict) -> list:
     return values  # May be empty if no values found
 
 
-@lru_cache(maxsize=1)
-def get_localizations(lang: str = "english") -> dict:
+def _map_lang_code(lang_code: str) -> str:
     """
-    Load localization strings from database.
-    Falls back to game files if database is empty (for local development).
-    Results are cached for performance.
+    Map Django language code to game directory name.
+
+    Args:
+        lang_code: Django language code (e.g., 'en', 'ru', 'zh-hans')
+
+    Returns:
+        Game directory name (e.g., 'english', 'russian', 'zhCN')
+    """
+    mapping = {
+        'en': 'english',
+        'cs': 'czech',
+        'fr': 'french',
+        'de': 'german',
+        'hu': 'hungarian',
+        'ja': 'japanese',
+        'ko': 'korean',
+        'pl': 'polish',
+        'ru': 'russian',
+        'es': 'spanish',
+        'tr': 'turkish',
+        'uk': 'ukrainian',
+        'zh-hans': 'zhCN',
+        'zh-hant': 'zhTW',
+    }
+    return mapping.get(lang_code, 'english')
+
+
+def get_localizations(lang: str = None) -> dict:
+    """
+    Load localization strings from database for a specific language.
+    Results are cached per language for performance.
+
+    Args:
+        lang: Django language code (e.g., 'en', 'ru', 'fr', 'zh-hans').
+              If None, auto-detects from current request context.
+
+    Returns:
+        Dict mapping localization key -> localized text
+    """
+    from django.utils.translation import get_language
+
+    # Detect language BEFORE cache lookup
+    if lang is None:
+        current_lang = get_language()
+        if current_lang:
+            # Convert 'en-us' to 'en', 'zh-cn' to 'zh-hans', etc.
+            lang = current_lang.lower().split('-')[0]
+            if current_lang.lower().startswith('zh-hans') or current_lang.lower() == 'zh-cn':
+                lang = 'zh-hans'
+            elif current_lang.lower().startswith('zh-hant') or current_lang.lower() == 'zh-tw':
+                lang = 'zh-hant'
+        else:
+            lang = 'en'  # Fallback to English if no language detected
+
+    # Now call the cached version with the detected language
+    return _get_localizations_cached(lang)
+
+
+@lru_cache(maxsize=14)
+def _get_localizations_cached(lang: str) -> dict:
+    """
+    Internal cached version of get_localizations.
+    Do not call directly - use get_localizations() instead.
     """
     from gamedata.models import Localization, GameVersion
-    
-    # Try to load from database first
+
     try:
         version = GameVersion.objects.filter(is_active=True).first()
         if version:
             locs = Localization.objects.using('gamedata').filter(
                 version=version,
-                loc_type='text'
+                loc_type='text',
+                language=lang
             ).values_list('key', 'text')
             if locs.exists():
                 return dict(locs)
     except Exception:
-        pass  # Database not available, fall back to files
-    
-    # Fallback: read from game files (for local development)
-    lang_dir = settings.GAME_DATA_PATH / "StreamingAssets" / "Lang" / lang / "texts"
+        pass
 
-    if not lang_dir.exists():
-        return {}
-
-    localizations = {}
-
-    for json_file in lang_dir.glob("*.json"):
-        try:
-            with open(json_file, 'r', encoding='utf-8-sig') as f:
-                data = json.load(f)
-                tokens = data.get("tokens", [])
-                for token in tokens:
-                    sid = token.get("sid")
-                    text = token.get("text", "")
-                    if sid:
-                        localizations[sid] = text
-        except Exception:
-            continue
-
-    return localizations
+    return {}
 
 
-def _get_args_from_db(category: str) -> dict:
+def _get_args_from_db(category: str, lang: str = "en") -> dict:
     """
     Helper to load description args from database for a specific category.
     Returns a dict mapping sid -> list of function names.
+
+    Note: Args are language-independent (function names are the same across languages).
+    They are stored only once with language='en' as the canonical language.
+    The 'lang' parameter is ignored for args queries.
     """
     from gamedata.models import Localization, GameVersion
-    
+
     try:
         version = GameVersion.objects.filter(is_active=True).first()
         if version:
             locs = Localization.objects.using('gamedata').filter(
                 version=version,
                 loc_type='args',
-                category=category
+                category=category,
+                language='en'  # Always query with 'en' - args are language-independent
             ).values_list('key', 'args')
             if locs.exists():
                 return dict(locs)
     except Exception:
         pass
-    
-    return None  # Signal to use file fallback
+
+    return {}
 
 
 def get_localized_name(entity_id: str, entity_type: str, fallback: str = None) -> str:
@@ -486,11 +564,12 @@ def get_skill_info(skill_id: str, level: int = 1) -> dict:
         except (IndexError, KeyError):
             pass
 
-    # Skill names - try generic name, then level-specific, then fallback
+    # Skill names - try level-specific first (e.g., "skill_scouting_name_1": "Basic Scouting"),
+    # then fall back to generic name
     name = (
-        localizations.get(skill_id) or
-        localizations.get(f"{skill_id}_name") or
         localizations.get(f"{skill_id}_name_{level}") or
+        localizations.get(f"{skill_id}_name") or
+        localizations.get(skill_id) or
         skill_id.replace("skill_", "").replace("_", " ").title()
     )
 
@@ -538,82 +617,37 @@ def get_advanced_class_info(class_id: str) -> dict:
     }
 
 
-@lru_cache(maxsize=1)
-def get_item_args(lang: str = "english") -> dict:
+@lru_cache(maxsize=14)
+def get_item_args(lang: str = "en") -> dict:
     """
-    Load item description args from database (or game files as fallback).
+    Load item description args from database.
     Returns a dict mapping sid -> list of function names.
+
+    Note: Args are language-independent (same function names across languages).
     """
-    # Try database first
-    db_result = _get_args_from_db('items')
-    if db_result is not None:
-        return db_result
-    
-    # Fallback to files
-    args_file = settings.GAME_DATA_PATH / "StreamingAssets" / "Lang" / "args" / "artifacts.json"
-
-    if not args_file.exists():
-        return {}
-
-    try:
-        with open(args_file, 'r', encoding='utf-8-sig') as f:
-            data = json.load(f)
-            tokens_args = data.get("tokensArgs", [])
-            return {item["sid"]: item.get("args", []) for item in tokens_args}
-    except Exception:
-        return {}
+    return _get_args_from_db('items', lang)
 
 
-@lru_cache(maxsize=1)
-def get_hero_spec_args(lang: str = "english") -> dict:
+def get_hero_spec_args(lang: str = "en") -> dict:
     """
-    Load hero specialization description args from database (or game files as fallback).
+    Load hero specialization description args from database.
     Returns a dict mapping sid -> list of function names.
+
+    Note: Args are language-independent (same function names across languages).
+    The lang parameter is ignored; args are always queried with 'en'.
     """
-    # Try database first
-    db_result = _get_args_from_db('specs')
-    if db_result is not None:
-        return db_result
-    
-    # Fallback to files
-    args_file = settings.GAME_DATA_PATH / "StreamingAssets" / "Lang" / "args" / "heroInfo.json"
-
-    if not args_file.exists():
-        return {}
-
-    try:
-        with open(args_file, 'r', encoding='utf-8-sig') as f:
-            data = json.load(f)
-            tokens_args = data.get("tokensArgs", [])
-            return {item["sid"]: item.get("args", []) for item in tokens_args}
-    except Exception:
-        return {}
+    return _get_args_from_db('specs', 'en')
 
 
-@lru_cache(maxsize=1)
-def get_skill_args(lang: str = "english") -> dict:
+def get_skill_args(lang: str = "en") -> dict:
     """
-    Load skill description args from database (or game files as fallback).
+    Load skill description args from database.
     Returns a dict mapping sid -> list of function names.
+
+    Note: Args are language-independent (same function names across languages).
+    The lang parameter is ignored; args are always queried with 'en'.
     """
-    # Try database first
-    db_result = _get_args_from_db('skills')
-    if db_result is not None:
-        return db_result
-    
-    # Fallback to files
-    args_file = settings.GAME_DATA_PATH / "StreamingAssets" / "Lang" / "args" / "heroSkills.json"
-
-    if not args_file.exists():
-        return {}
-
-    try:
-        with open(args_file, 'r', encoding='utf-8-sig') as f:
-            data = json.load(f)
-            tokens_args = data.get("tokensArgs", [])
-            return {item["sid"]: item.get("args", []) for item in tokens_args}
-    except Exception:
-        return {}
+    return _get_args_from_db('skills', 'en')
 
 
 def get_item_info(item_id: str) -> dict:
@@ -638,7 +672,29 @@ def get_item_info(item_id: str) -> dict:
     upgrade_desc_key = f"{item_id}_upgradeDescription"
     narrative_key = f"{item_id}_narrativeDescription"
 
-    name = localizations.get(name_key, item_id.replace("_", " ").title())
+    # Handle scroll names specially - they don't have specific _name entries in localizations
+    # Pattern: {scroll_type}_scroll_artifact_{spell_id} -> "Scroll: {spell_name}"
+    if "_scroll_artifact_" in item_id and name_key not in localizations:
+        # Extract scroll type (magic, enchanted_magic, mythic_magic)
+        scroll_prefix = item_id.split("_scroll_artifact_")[0]
+        scroll_type_key = f"{scroll_prefix}_scroll_artifact_name"
+        scroll_type_name = localizations.get(scroll_type_key, "Magic Scroll")
+
+        # Extract spell ID (everything after "_scroll_artifact_")
+        spell_id = item_id.split("_scroll_artifact_", 1)[1]
+
+        # Get spell name from localizations
+        spell_name_key = f"{spell_id}_name"
+        spell_name = localizations.get(spell_name_key, spell_id.replace("_", " ").title())
+
+        # Format as "Scroll: Spell Name" or use scroll type if no spell name
+        if spell_name and spell_name != spell_id.replace("_", " ").title():
+            name = f"{scroll_type_name}: {spell_name}"
+        else:
+            name = scroll_type_name
+    else:
+        name = localizations.get(name_key, item_id.replace("_", " ").title())
+
     description_template = localizations.get(desc_key, "")
     upgrade_description_template = localizations.get(upgrade_desc_key, "")
     narrative_description = localizations.get(narrative_key, "")
@@ -698,36 +754,30 @@ def get_item_set_info(set_id: str, bonuses: list) -> dict:
 @lru_cache(maxsize=1)
 def get_specialization_data() -> dict:
     """
-    Load all hero specialization data from game files.
+    Load all hero specialization data from database.
     Returns a dict mapping specialization_id -> specialization data (with bonuses).
+
+    Note: This is kept for backwards compatibility, but hero specialization data
+    is now stored directly in the Hero.specialization_data field in the database.
+    Most code should access it via Hero model instead of this function.
     """
-    possible_paths = [
-        Path("/tmp/DB/heroes_specializations"),
-        Path(settings.GAME_DATA_PATH) / "DB" / "heroes_specializations",
-    ]
+    from gamedata.models import Hero, GameVersion
 
-    spec_dir = None
-    for path in possible_paths:
-        if path.exists():
-            spec_dir = path
-            break
+    try:
+        version = GameVersion.objects.filter(is_active=True).first()
+        if version:
+            heroes = Hero.objects.using('gamedata').filter(version=version)
+            specializations = {}
+            for hero in heroes:
+                # Hero specialization_id pattern: {hero_id}_specialization
+                spec_id = f"{hero.id_key}_specialization"
+                if hero.specialization_data:
+                    specializations[spec_id] = hero.specialization_data
+            return specializations
+    except Exception:
+        pass
 
-    if spec_dir is None:
-        return {}
-
-    specializations = {}
-    for json_file in spec_dir.glob("specializations_*.json"):
-        try:
-            with open(json_file, 'r', encoding='utf-8-sig') as f:
-                data = json.load(f)
-                for spec in data.get('array', []):
-                    spec_id = spec.get('id')
-                    if spec_id:
-                        specializations[spec_id] = spec
-        except Exception:
-            continue
-
-    return specializations
+    return {}
 
 
 def get_hero_specialization_info(hero_id: str) -> dict:
@@ -766,56 +816,26 @@ def get_hero_specialization_info(hero_id: str) -> dict:
     }
 
 
-@lru_cache(maxsize=1)
-def get_spell_args(lang: str = "english") -> dict:
+@lru_cache(maxsize=14)
+def get_spell_args(lang: str = "en") -> dict:
     """
-    Load spell description args from database (or game files as fallback).
+    Load spell description args from database.
     Returns a dict mapping sid -> list of function names.
+
+    Note: Args are language-independent (same function names across languages).
     """
-    # Try database first
-    db_result = _get_args_from_db('spells')
-    if db_result is not None:
-        return db_result
-    
-    # Fallback to files
-    args_file = settings.GAME_DATA_PATH / "StreamingAssets" / "Lang" / "args" / "magic.json"
-
-    if not args_file.exists():
-        return {}
-
-    try:
-        with open(args_file, 'r', encoding='utf-8-sig') as f:
-            data = json.load(f)
-            tokens_args = data.get("tokensArgs", [])
-            return {item["sid"]: item.get("args", []) for item in tokens_args}
-    except Exception:
-        return {}
+    return _get_args_from_db('spells', lang)
 
 
-@lru_cache(maxsize=1)
-def get_unit_ability_args(lang: str = "english") -> dict:
+@lru_cache(maxsize=14)
+def get_unit_ability_args(lang: str = "en") -> dict:
     """
-    Load unit ability description args from database (or game files as fallback).
+    Load unit ability description args from database.
     Returns a dict mapping sid -> list of function names.
+
+    Note: Args are language-independent (same function names across languages).
     """
-    # Try database first
-    db_result = _get_args_from_db('abilities')
-    if db_result is not None:
-        return db_result
-    
-    # Fallback to files
-    args_file = settings.GAME_DATA_PATH / "StreamingAssets" / "Lang" / "args" / "unitsAbility.json"
-
-    if not args_file.exists():
-        return {}
-
-    try:
-        with open(args_file, 'r', encoding='utf-8-sig') as f:
-            data = json.load(f)
-            tokens_args = data.get("tokensArgs", [])
-            return {item["sid"]: item.get("args", []) for item in tokens_args}
-    except Exception:
-        return {}
+    return _get_args_from_db('abilities', lang)
 
 
 def get_spell_info(spell_id: str, raw_data: dict | None = None) -> dict:

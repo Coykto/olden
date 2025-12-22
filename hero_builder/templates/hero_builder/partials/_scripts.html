@@ -143,7 +143,7 @@ const SkillManager = {
         });
 
         // Fetch full skill data and enrich starting skills with template/args/raw_data
-        fetch(`/api/skills/available/?hero_slug=${heroBuild.heroId}`)
+        fetch(buildUrl(`/api/skills/available/?hero_slug=${heroBuild.heroId}`))
             .then(response => response.json())
             .then(data => {
                 const skillsMap = {};
@@ -259,7 +259,7 @@ const SkillManager = {
 
         // Can't remove starting skills
         if (heroBuild.startingSkillIds.includes(skill.skillId)) {
-            alert('Cannot remove starting skills');
+            alert(window.i18n?.ui?.cannot_remove_starting_skills || 'Cannot remove starting skills');
             return;
         }
 
@@ -301,7 +301,6 @@ const SkillManager = {
             } else {
                 // Filled slot - show skill icon with tooltip
                 const iconSuffix = skill.level > 1 ? `_${skill.level}` : '';
-                const levelPrefix = skill.level === 1 ? 'Basic ' : skill.level === 2 ? 'Advanced ' : 'Expert ';
 
                 skillMain.className = 'skill-main has-tooltip';
                 skillMain.dataset.tooltipPlacement = 'bottom';
@@ -309,7 +308,7 @@ const SkillManager = {
                     <img src="/media/gamedata/skills/${skill.skillId}${iconSuffix}.png" alt="${skill.name || skill.skillId}">
                     ${typeof AdvancedClassManager !== 'undefined' ? AdvancedClassManager.renderSkillIndicators(skill.skillId) : ''}
                     <div class="tooltip tooltip-skill">
-                        <div class="tooltip-title">${levelPrefix}${skill.name || skill.skillId}</div>
+                        <div class="tooltip-title">${skill.name || skill.skillId}</div>
                         ${(() => { const desc = EquipmentManager.formatSkillDescription(skill, skill.level); return desc ? `<div class="tooltip-text">${desc}</div>` : ''; })()}
                     </div>
                 `;
@@ -414,7 +413,7 @@ const SkillSelectionModal = {
 
         // Fetch skills from API
         try {
-            const response = await fetch(`/api/skills/available/?faction=${heroFaction}&exclude=${excludeIds}`);
+            const response = await fetch(buildUrl(`/api/skills/available/?faction=${heroFaction}&exclude=${excludeIds}`));
             const data = await response.json();
             // Cache descriptions for search (computed once for performance)
             this.allSkills = (data.skills || []).map(skill => {
@@ -435,8 +434,8 @@ const SkillSelectionModal = {
                 <div class="modal-overlay" onclick="SkillSelectionModal.close()">
                     <div class="skill-modal" onclick="event.stopPropagation()">
                         <div class="modal-header">
-                            <h2>Select Skill</h2>
-                            <p style="color: #ff6666;">Error loading skills. Please try again.</p>
+                            <h2>${window.i18n?.ui?.select_skill || 'Select Skill'}</h2>
+                            <p style="color: #ff6666;">${window.i18n?.ui?.error_loading_skills || 'Error loading skills. Please try again.'}</p>
                         </div>
                     </div>
                 </div>
@@ -450,10 +449,10 @@ const SkillSelectionModal = {
             <div class="modal-overlay" onclick="SkillSelectionModal.close()">
                 <div class="skill-modal" onclick="event.stopPropagation()">
                     <div class="modal-header">
-                        <h2>Select Skill</h2>
+                        <h2>${window.i18n?.ui?.select_skill || 'Select Skill'}</h2>
                         <input type="text"
                                class="skill-search"
-                               placeholder="Search skills..."
+                               placeholder="${window.i18n?.ui?.search_skills_placeholder || 'Search skills...'}"
                                oninput="SkillSelectionModal.filter(this.value)">
                     </div>
                     <div class="skill-list" id="skill-list">
@@ -475,7 +474,7 @@ const SkillSelectionModal = {
                     ${typeof AdvancedClassManager !== 'undefined' ? AdvancedClassManager.renderSkillIndicators(skill.id) : ''}
                 </div>
                 <div class="skill-info">
-                    <div class="skill-name">BASIC ${skill.name.toUpperCase()}</div>
+                    <div class="skill-name">${skill.name.toUpperCase()}</div>
                     <div class="skill-desc">${displayDescription}</div>
                 </div>
                 <div class="subskill-previews">
@@ -533,7 +532,7 @@ const SubskillSelectionModal = {
         if (nextLevel > 3) return;  // Already at max level
 
         try {
-            const response = await fetch(`/api/skills/${skill.skillId}/level/${nextLevel}/subskills/`);
+            const response = await fetch(buildUrl(`/api/skills/${skill.skillId}/level/${nextLevel}/subskills/`));
             if (!response.ok) throw new Error('Failed to fetch subskills');
             const data = await response.json();
             this.render(data);
@@ -553,7 +552,7 @@ const SubskillSelectionModal = {
         const level = subskillSlot + 2;
 
         try {
-            const response = await fetch(`/api/skills/${skill.skillId}/level/${level}/subskills/`);
+            const response = await fetch(buildUrl(`/api/skills/${skill.skillId}/level/${level}/subskills/`));
             if (!response.ok) throw new Error('Failed to fetch subskills');
             const data = await response.json();
             this.render(data);
@@ -666,7 +665,7 @@ const ItemSelectionModal = {
 
         // Fetch items from API
         try {
-            const response = await fetch(`/api/items/available/?slot=${apiSlotType}`);
+            const response = await fetch(buildUrl(`/api/items/available/?slot=${apiSlotType}`));
             if (!response.ok) throw new Error('Failed to fetch items');
             const data = await response.json();
             // Cache descriptions and set names for search (computed once for performance)
@@ -687,8 +686,8 @@ const ItemSelectionModal = {
                 <div class="modal-overlay" onclick="ItemSelectionModal.close()">
                     <div class="skill-modal" onclick="event.stopPropagation()">
                         <div class="modal-header">
-                            <h2>Select Item</h2>
-                            <p style="color: #ff6666;">Error loading items. Please try again.</p>
+                            <h2>${window.i18n?.ui?.select_item || 'Select Item'}</h2>
+                            <p style="color: #ff6666;">${window.i18n?.ui?.error_loading_items || 'Error loading items. Please try again.'}</p>
                         </div>
                     </div>
                 </div>
@@ -768,11 +767,11 @@ const ItemSelectionModal = {
             <div class="modal-overlay" onclick="ItemSelectionModal.close()">
                 <div class="skill-modal" onclick="event.stopPropagation()">
                     <div class="modal-header">
-                        <h2>Select Item - ${this.currentSlotType}</h2>
+                        <h2>${window.i18n?.ui?.select_item || 'Select Item'} - ${window.i18n?.slotNames?.[this.currentSlotType] || this.currentSlotType}</h2>
                         <div class="modal-controls">
                             <input type="text"
                                    class="skill-search"
-                                   placeholder="Search items..."
+                                   placeholder="${window.i18n?.ui?.search_items_placeholder || 'Search items...'}"
                                    oninput="ItemSelectionModal.filter(this.value)">
                             ${scrollToggleHtml}
                         </div>
@@ -820,7 +819,7 @@ const ItemSelectionModal = {
                         ${setHTML}
                     </div>
                     <div class="skill-desc" style="color: ${rarityColor}; opacity: 0.7; font-size: 0.8rem; margin-bottom: 5px;">
-                        ${item.rarity.charAt(0).toUpperCase() + item.rarity.slice(1)}
+                        ${window.i18n?.rarityLabels?.[item.rarity] || item.rarity.charAt(0).toUpperCase() + item.rarity.slice(1)}
                     </div>
                     <div class="skill-desc">${displayText}</div>
                 </div>
@@ -863,7 +862,7 @@ const AdvancedClassManager = {
 
         // Fetch advanced classes (includes base class info)
         try {
-            const response = await fetch(`/api/advanced-classes/?faction=${heroFaction}&class_type=${heroClassType}`);
+            const response = await fetch(buildUrl(`/api/advanced-classes/?faction=${heroFaction}&class_type=${heroClassType}`));
             const data = await response.json();
             this.advancedClasses = data.advanced_classes || [];
             this.baseClassName = data.base_class_name || heroClassType;
@@ -875,7 +874,7 @@ const AdvancedClassManager = {
 
         // Fetch skill indicators
         try {
-            const indicatorResponse = await fetch(`/api/advanced-classes/skill-indicators/?faction=${heroFaction}&class_type=${heroClassType}`);
+            const indicatorResponse = await fetch(buildUrl(`/api/advanced-classes/skill-indicators/?faction=${heroFaction}&class_type=${heroClassType}`));
             const indicatorData = await indicatorResponse.json();
             this.skillIndicators = indicatorData.skill_indicators || {};
         } catch (e) {
@@ -1935,7 +1934,7 @@ const EquipmentManager = {
                 const downgradeSavings = canLevelDown ? this.calculateDustCost(itemData, currentLevel) - this.calculateDustCost(itemData, currentLevel - 1) : 0;
 
                 const upgradeControlsHTML = `
-                    <div class="tooltip-level">Level ${currentLevel}/${maxLevel}</div>
+                    <div class="tooltip-level">${window.i18n?.ui?.level || 'Level'} ${currentLevel}/${maxLevel}</div>
                     <div class="tooltip-upgrade-row">
                         <button class="tooltip-upgrade-btn ${!canLevelUp ? 'disabled' : ''}"
                                 onclick="event.stopPropagation(); if (${canLevelUp}) EquipmentManager.setItemLevel('${slotId}', ${currentLevel + 1});">
@@ -1947,7 +1946,7 @@ const EquipmentManager = {
                         </button>
                     </div>
                     <button class="tooltip-remove-btn" onclick="event.stopPropagation(); EquipmentManager.unequipItem('${slotId}');">
-                        Remove Item
+                        ${window.i18n?.ui?.remove_item || 'Remove Item'}
                     </button>
                 `;
 
@@ -2000,7 +1999,7 @@ const EquipmentManager = {
                     <div class="tooltip tooltip-item">
                         <div class="tooltip-header">
                             <span class="item-name" style="color: ${rarityColor}">${itemData.name}</span>
-                            <span class="item-rarity">${itemData.rarity}</span>
+                            <span class="item-rarity">${window.i18n?.rarityLabels?.[itemData.rarity] || itemData.rarity}</span>
                         </div>
                         <div class="tooltip-bonuses">
                             ${bonusesHTML}
@@ -2055,7 +2054,7 @@ const ItemSetManager = {
 
     async init() {
         try {
-            const response = await fetch('/api/item-sets/');
+            const response = await fetch(buildUrl('/api/item-sets/'));
             const data = await response.json();
             this.itemSets = data.item_sets || [];
 
@@ -2212,7 +2211,7 @@ const SpellBookManager = {
     // Initialize - fetch spells from API
     async init() {
         try {
-            const response = await fetch('/api/spells/available/');
+            const response = await fetch(buildUrl('/api/spells/available/'));
             const data = await response.json();
             this.availableSpells = data.spells || [];
             this.bonusSpells = data.bonus_spells || [];
@@ -2445,24 +2444,24 @@ const SpellBookManager = {
             <div class="modal-overlay" onclick="SpellBookManager.closeSpellPicker()">
                 <div class="skill-modal" onclick="event.stopPropagation()">
                     <div class="modal-header">
-                        <h2>Select Spell</h2>
+                        <h2>${window.i18n?.ui?.select_spell || 'Select Spell'}</h2>
                         <div class="modal-controls">
                             <input type="text"
                                    id="spell-search-input"
                                    class="skill-search"
-                                   placeholder="Search spells..."
+                                   placeholder="${window.i18n?.ui?.search_spells_placeholder || 'Search spells...'}"
                                    oninput="SpellBookManager.filterSpells(this.value)">
                             <label class="scroll-toggle">
                                 <input type="checkbox"
                                        id="show-equipped-toggle"
                                        ${this.showEquippedInPicker ? 'checked' : ''}
                                        onchange="SpellBookManager.toggleShowEquipped(this.checked)">
-                                Show in book
+                                ${window.i18n?.ui?.show_in_book || 'Show in book'}
                             </label>
                         </div>
                     </div>
                     <div class="spell-school-tabs-modal">
-                        <button class="spell-school-tab-modal ${this.currentSchoolFilter === 'all' ? 'active' : ''}" data-school="all" onclick="SpellBookManager.filterBySchool('all')">All</button>
+                        <button class="spell-school-tab-modal ${this.currentSchoolFilter === 'all' ? 'active' : ''}" data-school="all" onclick="SpellBookManager.filterBySchool('all')">${window.i18n?.ui?.all || 'All'}</button>
                         ${this.schools.map(school => `
                             <button class="spell-school-tab-modal ${this.currentSchoolFilter === school.id ? 'active' : ''}" data-school="${school.id}" onclick="SpellBookManager.filterBySchool('${school.id}')">
                                 ${school.name.replace(' Magic', '')}
@@ -2470,9 +2469,9 @@ const SpellBookManager = {
                         `).join('')}
                     </div>
                     <div class="spell-type-tabs-modal">
-                        <button class="spell-type-tab-modal ${this.currentModalTypeFilter === 'all' ? 'active' : ''}" data-type="all" onclick="SpellBookManager.filterModalByType('all')">All</button>
-                        <button class="spell-type-tab-modal ${this.currentModalTypeFilter === 'combat' ? 'active' : ''}" data-type="combat" onclick="SpellBookManager.filterModalByType('combat')">Combat</button>
-                        <button class="spell-type-tab-modal ${this.currentModalTypeFilter === 'global' ? 'active' : ''}" data-type="global" onclick="SpellBookManager.filterModalByType('global')">Global Map</button>
+                        <button class="spell-type-tab-modal ${this.currentModalTypeFilter === 'all' ? 'active' : ''}" data-type="all" onclick="SpellBookManager.filterModalByType('all')">${window.i18n?.ui?.all || 'All'}</button>
+                        <button class="spell-type-tab-modal ${this.currentModalTypeFilter === 'combat' ? 'active' : ''}" data-type="combat" onclick="SpellBookManager.filterModalByType('combat')">${window.i18n?.ui?.combat || 'Combat'}</button>
+                        <button class="spell-type-tab-modal ${this.currentModalTypeFilter === 'global' ? 'active' : ''}" data-type="global" onclick="SpellBookManager.filterModalByType('global')">${window.i18n?.ui?.global || 'Global'}</button>
                     </div>
                     <div class="skill-list" id="spell-picker-list">
                         ${this.renderSpellList(this.getFilteredSpells())}
@@ -2507,12 +2506,12 @@ const SpellBookManager = {
                              class="skill-icon"
                              alt="${spell.id}"
                              onerror="SpellBookManager.handleSpellIconError(this, '${spell.icon || spell.id}')">
-                        ${isEquipped ? '<div class="spell-equipped-badge">In Book</div>' : ''}
+                        ${isEquipped ? `<div class="spell-equipped-badge">${window.i18n?.ui?.in_book_badge || 'In Book'}</div>` : ''}
                     </div>
                     <div class="skill-info">
-                        <div class="skill-name">${this.formatSpellName(spell.id_key || spell.id)}</div>
+                        <div class="skill-name">${spell.name || this.formatSpellName(spell.id_key || spell.id)}</div>
                         <div class="skill-meta" style="color: #7ec8e3; font-size: 0.8rem; margin-bottom: 6px;">
-                            ${spell.school_display} • Tier ${spell.level} • ${spell.spell_type === 'global' ? 'Global Map' : 'Combat'}
+                            ${spell.school_display} • ${window.i18n?.unitTypes?.tier || 'Tier'} ${spell.level} • ${spell.spell_type === 'global' ? (window.i18n?.ui?.global_spell || 'Global Spell') : (window.i18n?.ui?.combat_spell || 'Combat Spell')}
                         </div>
                         <div class="skill-desc spell-description">${description}</div>
                     </div>
@@ -2752,14 +2751,14 @@ const SpellBookManager = {
                  class="spell-icon"
                  onerror="SpellBookManager.handleSpellIconError(this, '${spell.icon || spell.id_key || spell.id}')">
             <button class="spell-slot-remove" onclick="event.stopPropagation(); SpellBookManager.removeSpell(${index})" ${isStarting ? 'disabled' : ''}>×</button>
-            ${isStarting ? '<div class="spell-starting-badge">Starting</div>' : ''}
+            ${isStarting ? `<div class="spell-starting-badge">${window.i18n?.ui?.starting_badge || 'Starting'}</div>` : ''}
             <div class="spell-level-badge">${currentLevel}</div>
             <div class="tooltip tooltip-spell">
                 <div class="tooltip-title tooltip-title--blue">${spell.name || this.formatSpellName(spell.id_key || spell.id)}</div>
                 <div class="tooltip-subtitle">${spell.school_display}</div>
-                <div class="tooltip-meta">${spell.spell_type === 'global' ? 'Global Map' : 'Combat'} Spell</div>
-                <div class="tooltip-meta">Tier ${spell.level}</div>
-                <div class="tooltip-highlight tooltip-level">Level ${currentLevel}/${maxLevel}</div>
+                <div class="tooltip-meta">${spell.spell_type === 'global' ? (window.i18n?.ui?.global_spell || 'Global Spell') : (window.i18n?.ui?.combat_spell || 'Combat Spell')}</div>
+                <div class="tooltip-meta">${window.i18n?.ui?.tier || 'Tier'} ${spell.level}</div>
+                <div class="tooltip-highlight tooltip-level">${window.i18n?.ui?.level || 'Level'} ${currentLevel}/${maxLevel}</div>
                 <div class="tooltip-section">
                     <div class="tooltip-text">${description}</div>
                 </div>
@@ -2767,17 +2766,17 @@ const SpellBookManager = {
                     <button class="tooltip-action-btn"
                             onclick="event.stopPropagation(); SpellBookManager.upgradeSpell(${index})"
                             ${currentLevel >= maxLevel ? 'disabled' : ''}>
-                        Upgrade
+                        ${window.i18n?.ui?.upgrade || 'Upgrade'}
                     </button>
                     <button class="tooltip-action-btn"
                             onclick="event.stopPropagation(); SpellBookManager.downgradeSpell(${index})"
                             ${currentLevel <= 1 ? 'disabled' : ''}>
-                        Downgrade
+                        ${window.i18n?.ui?.downgrade || 'Downgrade'}
                     </button>
                     <button class="tooltip-action-btn tooltip-remove-btn"
                             onclick="event.stopPropagation(); SpellBookManager.removeSpell(${index})"
                             ${isStarting ? 'disabled' : ''}>
-                        Remove
+                        ${window.i18n?.ui?.remove || 'Remove'}
                     </button>
                 </div>
             </div>
@@ -2822,14 +2821,14 @@ const SpellBookManager = {
                      class="spell-icon"
                      onerror="SpellBookManager.handleSpellIconError(this, '${spell.icon || spell.id_key || spell.id}')">
                 <button class="spell-slot-remove" onclick="event.stopPropagation(); SpellBookManager.removeSpell(${index})" ${isStarting ? 'disabled' : ''}>×</button>
-                ${isStarting ? '<div class="spell-starting-badge">Starting</div>' : ''}
+                ${isStarting ? `<div class="spell-starting-badge">${window.i18n?.ui?.starting_badge || 'Starting'}</div>` : ''}
                 <div class="spell-level-badge">${currentLevel}</div>
                 <div class="tooltip tooltip-spell">
                     <div class="tooltip-title tooltip-title--blue">${spell.name || this.formatSpellName(spell.id_key || spell.id)}</div>
                     <div class="tooltip-subtitle">${spell.school_display}</div>
-                    <div class="tooltip-meta">${spell.spell_type === 'global' ? 'Global Map' : 'Combat'} Spell</div>
-                    <div class="tooltip-meta">Tier ${spell.level}</div>
-                    <div class="tooltip-highlight tooltip-level">Level ${currentLevel}/${maxLevel}</div>
+                    <div class="tooltip-meta">${spell.spell_type === 'global' ? (window.i18n?.ui?.global_spell || 'Global Spell') : (window.i18n?.ui?.combat_spell || 'Combat Spell')}</div>
+                    <div class="tooltip-meta">${window.i18n?.unitTypes?.tier || 'Tier'} ${spell.level}</div>
+                    <div class="tooltip-highlight tooltip-level">${window.i18n?.ui?.level || 'Level'} ${currentLevel}/${maxLevel}</div>
                     <div class="tooltip-section">
                         <div class="tooltip-text">${description}</div>
                     </div>
@@ -2837,17 +2836,17 @@ const SpellBookManager = {
                         <button class="tooltip-action-btn"
                                 onclick="event.stopPropagation(); SpellBookManager.upgradeSpell(${index})"
                                 ${currentLevel >= maxLevel ? 'disabled' : ''}>
-                            Upgrade
+                            ${window.i18n?.ui?.upgrade || 'Upgrade'}
                         </button>
                         <button class="tooltip-action-btn"
                                 onclick="event.stopPropagation(); SpellBookManager.downgradeSpell(${index})"
                                 ${currentLevel <= 1 ? 'disabled' : ''}>
-                            Downgrade
+                            ${window.i18n?.ui?.downgrade || 'Downgrade'}
                         </button>
                         <button class="tooltip-action-btn tooltip-remove-btn"
                                 onclick="event.stopPropagation(); SpellBookManager.removeSpell(${index})"
                                 ${isStarting ? 'disabled' : ''}>
-                            Remove
+                            ${window.i18n?.ui?.remove || 'Remove'}
                         </button>
                     </div>
                 </div>
@@ -3018,11 +3017,11 @@ const SpellBookManager = {
             // Badge text based on spell source
             let badgeHtml = '';
             if (isStarting) {
-                badgeHtml = '<div class="spell-starting-badge">Starting</div>';
+                badgeHtml = `<div class="spell-starting-badge">${window.i18n?.ui?.starting_badge || 'Starting'}</div>`;
             } else if (isSkillGranted) {
-                let source = 'Skill';
-                if (equipped.grantingSource === 'item') source = 'Scroll';
-                else if (equipped.grantingSource === 'subskill') source = 'Subskill';
+                let source = window.i18n?.ui?.skill_badge || 'Skill';
+                if (equipped.grantingSource === 'item') source = window.i18n?.ui?.scroll_badge || 'Scroll';
+                else if (equipped.grantingSource === 'subskill') source = window.i18n?.ui?.subskill_badge || 'Subskill';
                 badgeHtml = `<div class="spell-skill-badge">${source}</div>`;
             }
 
@@ -3037,21 +3036,21 @@ const SpellBookManager = {
                 <div class="tooltip tooltip-spell">
                     <div class="tooltip-title tooltip-title--blue">${spell.name || this.formatSpellName(spell.id_key || spell.id)}</div>
                     <div class="tooltip-subtitle">${spell.school_display}</div>
-                    <div class="tooltip-meta">${spell.spell_type === 'global' ? 'Global Map' : 'Combat'} Spell</div>
-                    <div class="tooltip-meta">Tier ${spell.level}</div>
-                    <div class="tooltip-highlight tooltip-level">Level ${currentLevel}/${maxLevel}</div>
+                    <div class="tooltip-meta">${spell.spell_type === 'global' ? (window.i18n?.ui?.global_spell || 'Global Spell') : (window.i18n?.ui?.combat_spell || 'Combat Spell')}</div>
+                    <div class="tooltip-meta">${window.i18n?.unitTypes?.tier || 'Tier'} ${spell.level}</div>
+                    <div class="tooltip-highlight tooltip-level">${window.i18n?.ui?.level || 'Level'} ${currentLevel}/${maxLevel}</div>
                     <div class="tooltip-section">
                         <div class="tooltip-text">${description}</div>
                     </div>
                     <div class="tooltip-actions">
                         <button class="tooltip-action-btn"
                                 onclick="event.stopPropagation(); SpellBookManager.upgradeSpell(${index}, ${isSkillGranted})"
-                                ${currentLevel >= maxLevel ? 'disabled' : ''}>Upgrade</button>
+                                ${currentLevel >= maxLevel ? 'disabled' : ''}>${window.i18n?.ui?.upgrade || 'Upgrade'}</button>
                         <button class="tooltip-action-btn"
                                 onclick="event.stopPropagation(); SpellBookManager.downgradeSpell(${index}, ${isSkillGranted})"
-                                ${currentLevel <= 1 ? 'disabled' : ''}>Downgrade</button>
+                                ${currentLevel <= 1 ? 'disabled' : ''}>${window.i18n?.ui?.downgrade || 'Downgrade'}</button>
                         ${!isLocked ? `<button class="tooltip-action-btn tooltip-remove-btn"
-                                onclick="event.stopPropagation(); SpellBookManager.removeSpell(${index})">Remove</button>` : ''}
+                                onclick="event.stopPropagation(); SpellBookManager.removeSpell(${index})">${window.i18n?.ui?.remove || 'Remove'}</button>` : ''}
                     </div>
                 </div>
             `;
@@ -3245,7 +3244,7 @@ const ArmyManager = {
     // Fetch all units from all factions
     async loadAllUnits() {
         try {
-            const response = await fetch('/api/units/all/');
+            const response = await fetch(buildUrl('/api/units/all/'));
             const data = await response.json();
             this.allFactions = data.factions || [];
 
@@ -3347,7 +3346,7 @@ const ArmyManager = {
                             <span class="tooltip-title">${unit.name}</span>
                             <input type="number" class="unit-stack-input" value="${armySlot.count}" min="1" step="1" title="Stack size">
                         </div>
-                        <div class="tooltip-tier">Tier ${unit.tier} · ${this.formatUnitType(unit)}</div>
+                        <div class="tooltip-tier">${window.i18n?.unitTypes?.tier || 'Tier'} ${unit.tier} · ${this.formatUnitType(unit)}</div>
                         <div class="unit-stat-bar tooltip-stat-bar">${this.buildStatBar(unit.stats)}</div>
                         ${this.buildTooltipAbilitiesHtml(unit, armySlot.count)}
                         <div class="tooltip-value">${unit.squad_value} gold</div>
@@ -3368,11 +3367,11 @@ const ArmyManager = {
     // Format unit type display
     formatUnitType(unit) {
         const types = [];
-        if (unit.attack_type === 'ranged') types.push('Ranged');
-        else if (unit.attack_type === 'long_reach') types.push('Long Reach');
-        else if (unit.attack_type === 'magic') types.push('Magic');
-        else types.push('Melee');
-        if (unit.move_type === 'fly') types.push('Flying');
+        if (unit.attack_type === 'ranged') types.push(window.i18n?.unitTypes?.ranged || 'Ranged');
+        else if (unit.attack_type === 'long_reach') types.push(window.i18n?.unitTypes?.long_reach || 'Long Reach');
+        else if (unit.attack_type === 'magic') types.push(window.i18n?.unitTypes?.magic || 'Magic');
+        else types.push(window.i18n?.unitTypes?.melee || 'Melee');
+        if (unit.move_type === 'fly') types.push(window.i18n?.unitTypes?.flying || 'Flying');
         return types.join(', ');
     },
 
@@ -3397,24 +3396,24 @@ const ArmyManager = {
     buildStatBar(stats) {
         const statOrder = ['hp', 'damage', 'offence', 'defence', 'luck', 'morale', 'speed', 'initiative'];
         const statLabels = {
-            hp: 'Health',
-            damage: 'Damage',
-            offence: 'Attack',
-            defence: 'Defence',
-            luck: 'Luck',
-            morale: 'Morale',
-            speed: 'Speed',
-            initiative: 'Initiative',
+            hp: window.i18n?.unitStats?.hp || 'Health',
+            damage: window.i18n?.unitStats?.damage || 'Damage',
+            offence: window.i18n?.unitStats?.offence || 'Attack',
+            defence: window.i18n?.unitStats?.defence || 'Defence',
+            luck: window.i18n?.unitStats?.luck || 'Luck',
+            morale: window.i18n?.unitStats?.morale || 'Morale',
+            speed: window.i18n?.unitStats?.speed || 'Speed',
+            initiative: window.i18n?.unitStats?.initiative || 'Initiative',
         };
         const statDescriptions = {
-            hp: 'Hit points per creature',
-            damage: 'Base damage dealt per attack',
-            offence: 'Increases damage dealt',
-            defence: 'Reduces damage taken',
-            luck: 'Chance for critical hits',
-            morale: 'Chance for extra actions',
-            speed: 'Movement range in combat',
-            initiative: 'Determines turn order',
+            hp: window.i18n?.unitStats?.hp_desc || 'Hit points per creature',
+            damage: window.i18n?.unitStats?.damage_desc || 'Base damage dealt per attack',
+            offence: window.i18n?.unitStats?.offence_desc || 'Increases damage dealt',
+            defence: window.i18n?.unitStats?.defence_desc || 'Reduces damage taken',
+            luck: window.i18n?.unitStats?.luck_desc || 'Chance for critical hits',
+            morale: window.i18n?.unitStats?.morale_desc || 'Chance for extra actions',
+            speed: window.i18n?.unitStats?.speed_desc || 'Movement range in combat',
+            initiative: window.i18n?.unitStats?.initiative_desc || 'Determines turn order',
         };
 
         // Format damage as range
@@ -3817,7 +3816,7 @@ const ArmyManager = {
         const totalValue = this.getTotalArmyValue();
         const valueElement = document.getElementById('army-value');
         if (valueElement) {
-            valueElement.textContent = `Value: ${totalValue}`;
+            valueElement.textContent = `${window.i18n?.ui?.value || 'Value:'} ${totalValue}`;
         }
     },
 
@@ -3866,7 +3865,7 @@ const ArmyManager = {
         // Build units grid HTML with game-style card layout
         const unitsGridHtml = Object.keys(unitsByTier).sort((a, b) => a - b).map(tier => `
             <div class="unit-tier-group">
-                <h3 class="unit-tier-header">Tier ${tier}</h3>
+                <h3 class="unit-tier-header">${window.i18n?.unitTypes?.tier || 'Tier'} ${tier}</h3>
                 <div class="unit-picker-grid">
                     ${unitsByTier[tier].map(unit => {
                         const statBarHtml = this.buildStatBar(unit.stats);

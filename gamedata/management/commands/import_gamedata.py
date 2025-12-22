@@ -112,29 +112,80 @@ class Command(BaseCommand):
             raise
 
     def _import_localizations(self, reader: GameDataReader, version: GameVersion, localizations: dict):
-        """Import all localization strings and description argument mappings."""
-        self.stdout.write("Importing localizations...")
+        """Import all localization strings and description argument mappings for ALL languages."""
+        self.stdout.write("Importing localizations for all languages...")
 
         from django.conf import settings
         import json
+        from pathlib import Path
 
-        loc_objects = []
+        # Map game language directories to Django language codes
+        LANGUAGE_MAPPING = {
+            'english': 'en',
+            'czech': 'cs',
+            'french': 'fr',
+            'german': 'de',
+            'hungarian': 'hu',
+            'japanese': 'ja',
+            'korean': 'ko',
+            'polish': 'pl',
+            'russian': 'ru',
+            'spanish': 'es',
+            'turkish': 'tr',
+            'ukrainian': 'uk',
+            'zhCN': 'zh-hans',
+            'zhTW': 'zh-hant',
+        }
 
-        # 1. Import all text localizations
-        for key, text in localizations.items():
-            loc_objects.append(Localization(
-                version=version,
-                loc_type='text',
-                category='general',
-                key=key,
-                text=text,
-            ))
+        # Use a dict to deduplicate entries before bulk_create
+        # Key format: (loc_type, category, language, key) -> Localization object
+        loc_dict = {}
+        lang_dir_base = settings.GAME_DATA_PATH / "StreamingAssets" / "Lang"
 
-        text_count = len(loc_objects)
-        self.stdout.write(f"  Prepared {text_count} text localizations")
+        # 1. Import text localizations for ALL languages
+        total_text_count = 0
+        for game_lang_dir, django_lang_code in LANGUAGE_MAPPING.items():
+            lang_texts_dir = lang_dir_base / game_lang_dir / "texts"
+
+            if not lang_texts_dir.exists():
+                self.stdout.write(f"  Warning: {game_lang_dir}/texts not found, skipping")
+                continue
+
+            lang_text_count = 0
+            for json_file in lang_texts_dir.glob("*.json"):
+                try:
+                    with open(json_file, 'r', encoding='utf-8-sig') as f:
+                        data = json.load(f)
+                        tokens = data.get("tokens", [])
+                        for token in tokens:
+                            sid = token.get("sid")
+                            text = token.get("text", "")
+                            if sid:
+                                # Use dict to deduplicate (last value wins)
+                                key = ('text', 'general', django_lang_code, sid)
+                                loc_dict[key] = Localization(
+                                    version=version,
+                                    loc_type='text',
+                                    category='general',
+                                    language=django_lang_code,
+                                    key=sid,
+                                    text=text,
+                                )
+                                lang_text_count += 1
+                except Exception as e:
+                    self.stdout.write(f"  Warning: Failed to read {json_file.name} for {game_lang_dir}: {e}")
+
+            # Count unique entries for this language
+            unique_count = sum(1 for k in loc_dict.keys() if k[2] == django_lang_code)
+            self.stdout.write(f"  {game_lang_dir}: {lang_text_count} text strings ({unique_count} unique)")
+            total_text_count += lang_text_count
+
+        self.stdout.write(f"  Total: {total_text_count} text localizations, {len(loc_dict)} unique entries across {len(LANGUAGE_MAPPING)} languages")
 
         # 2. Import description argument mappings from Lang/args/*.json files
-        args_dir = settings.GAME_DATA_PATH / "StreamingAssets" / "Lang" / "args"
+        # Note: Args are language-independent (function names are the same across languages).
+        # We store them ONLY ONCE with language='en' as the canonical language.
+        args_dir = lang_dir_base / "args"
 
         # Map args files to categories
         args_files = {
@@ -157,26 +208,34 @@ class Command(BaseCommand):
                     data = json.load(f)
                     tokens_args = data.get("tokensArgs", [])
 
+                    # Import args ONLY ONCE with language='en' (canonical language)
+                    # Args are language-independent, so no need to duplicate
                     for item in tokens_args:
                         sid = item.get("sid")
                         args = item.get("args", [])
                         if sid and args:
-                            loc_objects.append(Localization(
+                            # Use dict to ensure uniqueness
+                            key = ('args', category, 'en', sid)
+                            loc_dict[key] = Localization(
                                 version=version,
                                 loc_type='args',
                                 category=category,
+                                language='en',  # Canonical language for args
                                 key=sid,
                                 args=args,
-                            ))
+                            )
                             args_count += 1
             except Exception as e:
                 self.stdout.write(f"  Warning: Failed to read {filename}: {e}")
 
-        self.stdout.write(f"  Prepared {args_count} arg mappings")
+        # Count unique args entries
+        unique_args = sum(1 for k in loc_dict.keys() if k[0] == 'args')
+        self.stdout.write(f"  Prepared {args_count} arg mappings ({unique_args} unique, stored with language='en')")
 
-        # Bulk create all localizations
+        # Bulk create all localizations (convert dict values to list)
+        loc_objects = list(loc_dict.values())
         Localization.objects.bulk_create(loc_objects)
-        self.stdout.write(f"  Created {len(loc_objects)} total localization entries")
+        self.stdout.write(f"  Created {len(loc_objects)} total unique localization entries")
 
 
     def _import_subskill_configs(self, reader: GameDataReader, version: GameVersion):

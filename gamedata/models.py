@@ -300,8 +300,8 @@ class Hero(models.Model):
             info['level'] = level
             # Icon suffix: level 1 = no suffix, level 2 = _2, level 3 = _3
             info['icon_suffix'] = '' if level == 1 else f'_{level}'
-            # Level prefix for display: Basic (1), Advanced (2), Expert (3)
-            info['level_prefix'] = {1: '', 2: 'Advanced ', 3: 'Expert '}.get(level, '')
+            # Level prefix removed - localized skill names already include level prefix
+            info['level_prefix'] = ''
             
             # Add description pipeline fields for dynamic descriptions
             skill_obj = Skill.objects.filter(id_key=skill_id).first()
@@ -443,7 +443,8 @@ class Hero(models.Model):
                 info = get_skill_info(skill_id, level=level)
                 info['level'] = level
                 info['icon_suffix'] = f'_{level}'
-                info['level_prefix'] = {2: 'Advanced ', 3: 'Expert '}.get(level, '')
+                # Level prefix removed - localized skill names already include level prefix
+                info['level_prefix'] = ''
                 return add_description_fields(info, skill_id, level)
 
         # Otherwise, return first non-faction skill
@@ -454,7 +455,8 @@ class Hero(models.Model):
                 info = get_skill_info(skill_id, level=level)
                 info['level'] = level
                 info['icon_suffix'] = '' if level == 1 else f'_{level}'
-                info['level_prefix'] = {1: '', 2: 'Advanced ', 3: 'Expert '}.get(level, '')
+                # Level prefix removed - localized skill names already include level prefix
+                info['level_prefix'] = ''
                 return add_description_fields(info, skill_id, level)
 
         return None
@@ -753,26 +755,30 @@ class AdvancedClass(models.Model):
 class Localization(models.Model):
     """
     Stores localization strings and description argument mappings from game files.
-    
+
     This model centralizes all localization data needed for runtime display,
     eliminating the need to read from game files at runtime.
-    
+
     Types:
     - 'text': Localization string (e.g., skill_logistics_name -> "Logistics")
     - 'args': Description argument mapping (e.g., skill_logistics_description -> ["logistics_bonus"])
-    
+
     Categories map to the game's Lang/args/*.json files:
     - 'skills': heroSkills.json
     - 'items': artifacts.json
     - 'spells': magic.json
     - 'abilities': unitsAbility.json
     - 'specs': heroInfo.json
+
+    Languages:
+    - Supports 14 languages from the game files
+    - Uses Django language codes (e.g., 'en', 'ru', 'fr', 'zh-hans', 'zh-hant')
     """
     TYPE_CHOICES = [
         ('text', 'Localization Text'),
         ('args', 'Description Arguments'),
     ]
-    
+
     CATEGORY_CHOICES = [
         ('general', 'General'),
         ('skills', 'Skills'),
@@ -781,30 +787,35 @@ class Localization(models.Model):
         ('abilities', 'Unit Abilities'),
         ('specs', 'Hero Specializations'),
     ]
-    
+
     version = models.ForeignKey(GameVersion, on_delete=models.CASCADE, related_name='localizations')
     loc_type = models.CharField(max_length=10, choices=TYPE_CHOICES)
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='general')
+    language = models.CharField(
+        max_length=10,
+        default='en',
+        help_text="Language code (e.g., 'en', 'ru', 'fr', 'zh-hans', 'zh-hant')"
+    )
     key = models.CharField(max_length=255, help_text="Localization key (e.g., skill_logistics_name)")
-    
+
     # For 'text' type: the localized string
     text = models.TextField(blank=True, default='')
-    
+
     # For 'args' type: list of function names for description placeholders
     args = models.JSONField(default=list, blank=True)
-    
+
     class Meta:
-        ordering = ['version', 'category', 'key']
-        unique_together = [['version', 'loc_type', 'category', 'key']]
+        ordering = ['version', 'language', 'category', 'key']
+        unique_together = [['version', 'loc_type', 'category', 'language', 'key']]
         indexes = [
-            models.Index(fields=['version', 'loc_type', 'key']),
-            models.Index(fields=['version', 'category']),
+            models.Index(fields=['version', 'loc_type', 'language', 'key']),
+            models.Index(fields=['version', 'category', 'language']),
         ]
-    
+
     def __str__(self):
         if self.loc_type == 'text':
-            return f"{self.key}: {self.text[:50]}..."
-        return f"{self.key}: {self.args}"
+            return f"[{self.language}] {self.key}: {self.text[:50]}..."
+        return f"[{self.language}] {self.key}: {self.args}"
 
 
 class SubskillConfig(models.Model):

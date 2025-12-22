@@ -37,8 +37,8 @@
         {% endwith %}
     </div>
 
-    <div class="hero-name">{{ hero.display_name }}</div>
-    <div class="hero-specialty">{{ hero.specialization_name }}</div>
+    <div class="hero-name">{{ hero.localized_name|default:hero.display_name }}</div>
+    <div class="hero-specialty">{{ hero.localized_spec_name|default:hero.specialization_name }}</div>
 </a>
 {% empty %}
 <p style="color: #666; grid-column: 1/-1; text-align: center;">No heroes available for this faction.</p>

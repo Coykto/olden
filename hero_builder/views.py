@@ -6,7 +6,8 @@ from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
 from gamedata.models import GameVersion, Hero, Faction, Item, ItemSet, Skill, Unit, Spell, MagicSchool
-from core.localizations import get_skill_info, get_localizations, get_item_info, get_item_set_info, get_skill_args, get_subskill_configs, get_spell_info, get_spell_descriptions_by_level, get_unit_ability_args
+from core.localizations import get_skill_info, get_localizations, get_item_info, get_item_set_info, get_skill_args, get_subskill_configs, get_spell_info, get_spell_descriptions_by_level, get_unit_ability_args, get_ui_strings
+from core.unit_type_mapping import ATTACK_TYPE_LOCALIZATION_KEYS, MOVE_TYPE_LOCALIZATION_KEYS
 import re
 
 
@@ -502,11 +503,32 @@ def index(request):
 
     heroes = Hero.objects.filter(version=version, faction=selected_faction).order_by('sort_order') if selected_faction else []
 
+    # Get localizations
+    localizations = get_localizations()
+
+    # Add localized names to factions
+    for faction in factions:
+        # Faction names use pattern: {id_key}_name (e.g., human_name, undead_name)
+        faction_key = f"{faction.id_key}_name"
+        faction.localized_name = localizations.get(faction_key)
+
+    # Add localized names to heroes
+    for hero in heroes:
+        # Hero names use the hero's id_key as localization key
+        hero.localized_name = localizations.get(hero.id_key, hero.display_name)
+        # Specialization names use pattern: {hero_id}_spec_name
+        spec_key = f"{hero.id_key}_spec_name"
+        hero.localized_spec_name = localizations.get(spec_key, hero.specialization_name)
+
+    # Get UI strings (non-game strings like button labels, modal titles, etc.)
+    ui_strings = get_ui_strings()
+
     context = {
         'version': version,
         'factions': factions,
         'selected_faction': selected_faction,
         'heroes': heroes,
+        'ui': ui_strings,
     }
     return render(request, 'hero_builder/index.html', context)
 
@@ -521,10 +543,29 @@ def faction_heroes(request, faction_slug):
     faction = get_object_or_404(Faction, version=version, slug=faction_slug)
     heroes = Hero.objects.filter(version=version, faction=faction).order_by('sort_order')
 
+    # Get localizations
+    localizations = get_localizations()
+
+    # Add localized name to faction
+    faction_key = f"{faction.id_key}_name"
+    faction.localized_name = localizations.get(faction_key)
+
+    # Add localized names to heroes
+    for hero in heroes:
+        # Hero names use the hero's id_key as localization key
+        hero.localized_name = localizations.get(hero.id_key, hero.display_name)
+        # Specialization names use pattern: {hero_id}_spec_name
+        spec_key = f"{hero.id_key}_spec_name"
+        hero.localized_spec_name = localizations.get(spec_key, hero.specialization_name)
+
+    # Get UI strings (non-game strings like button labels, modal titles, etc.)
+    ui_strings = get_ui_strings()
+
     context = {
         'version': version,
         'faction': faction,
         'heroes': heroes,
+        'ui': ui_strings,
     }
     # Return partial template for HTMX requests
     return render(request, 'hero_builder/partials/_heroes_grid.html', context)
@@ -541,6 +582,14 @@ def builder(request, hero_slug):
     # Get the hero
     hero = get_object_or_404(Hero, version=version, slug=hero_slug)
 
+    # Add localized hero name and specialization
+    localizations = get_localizations()
+    hero.localized_name = localizations.get(hero.id_key, hero.display_name)
+    spec_key = f"{hero.id_key}_spec_name"
+    hero.localized_spec_name = localizations.get(spec_key, hero.specialization_name)
+    spec_desc_key = f"{hero.id_key}_spec_description"
+    hero.localized_spec_desc = localizations.get(spec_desc_key, hero.specialization_desc)
+
     # Get all available items grouped by slot
     items_by_slot = {}
     for item in Item.objects.filter(version=version).order_by('slot', '-rarity', 'id_key'):
@@ -555,12 +604,85 @@ def builder(request, hero_slug):
     # Get all units for starting army
     units = Unit.objects.filter(version=version, faction=hero.faction).order_by('tier', 'id_key')
 
+    # Get rarity translations for JavaScript
+    rarity_translations = {
+        'common': localizations.get('world_cheat_dropdown_common', 'Common'),
+        'uncommon': localizations.get('world_cheat_dropdown_uncommon', 'Uncommon'),
+        'rare': localizations.get('world_cheat_dropdown_rare', 'Rare'),
+        'epic': localizations.get('world_cheat_dropdown_epic', 'Epic'),
+        'legendary': localizations.get('world_cheat_dropdown_legendary', 'Legendary'),
+        'mythic': localizations.get('world_cheat_dropdown_mythic', 'Mythic'),
+    }
+
+    # Get UI strings (non-game strings like button labels, modal titles, etc.)
+    ui_strings = get_ui_strings()
+
+    # Get slot name translations from game files
+    slot_name_translations = {
+        'armor': localizations.get('armor'),
+        'back': localizations.get('back'),
+        'belt': localizations.get('belt'),
+        'boots': localizations.get('boots'),
+        'head': localizations.get('head'),
+        'item_slot': localizations.get('item_slot'),
+        'left_hand': localizations.get('left_hand'),
+        'right_hand': localizations.get('right_hand'),
+        'ring': localizations.get('ring'),
+        'unic_slot': localizations.get('unic_slot'),
+    }
+
+    # Get unit type translations from game files
+    # Mappings are defined in core.unit_type_mapping
+    # To add new types: update ATTACK_TYPE_LOCALIZATION_KEYS or MOVE_TYPE_LOCALIZATION_KEYS
+    attack_type_translations = {
+        attack_type: localizations.get(key)
+        for attack_type, key in ATTACK_TYPE_LOCALIZATION_KEYS.items()
+    }
+
+    move_type_translations = {
+        move_type: localizations.get(key) if key else None
+        for move_type, key in MOVE_TYPE_LOCALIZATION_KEYS.items()
+    }
+
+    # Combine all unit-related translations
+    unit_type_translations = {
+        'tier': localizations.get('tier'),
+        **attack_type_translations,
+        **move_type_translations,
+    }
+
+    # Get unit stat translations from game files
+    unit_stat_translations = {
+        'hp': localizations.get('unit_health', 'Health'),
+        'damage': localizations.get('unitStat_damage', 'Damage'),
+        'offence': localizations.get('unitStat_offence', 'Attack'),
+        'defence': localizations.get('unitStat_defence', 'Defence'),
+        'luck': localizations.get('unitStat_luck', 'Luck'),
+        'morale': localizations.get('unitStat_moral', 'Morale'),  # Note: game uses "moral" not "morale"
+        'speed': localizations.get('unitStat_speed', 'Speed'),
+        'initiative': localizations.get('unitStat_initiative', 'Initiative'),
+        # Descriptions
+        'hp_desc': ui_strings.get('unit_hp_desc', 'Hit points per creature'),
+        'damage_desc': localizations.get('unitStat_damage_description', 'Base damage dealt per attack'),
+        'offence_desc': localizations.get('unitStat_offence_description', 'Increases damage dealt'),
+        'defence_desc': localizations.get('unitStat_defence_description', 'Reduces damage taken'),
+        'luck_desc': localizations.get('unitStat_luck_description', 'Chance for critical hits'),
+        'morale_desc': localizations.get('unitStat_moral_description', 'Chance for extra actions'),
+        'speed_desc': ui_strings.get('unit_speed_desc', 'Movement range in combat'),
+        'initiative_desc': ui_strings.get('unit_initiative_desc', 'Determines turn order'),
+    }
+
     context = {
         'version': version,
         'hero': hero,
         'items_by_slot': items_by_slot,
         'skills': skills,
         'units': units,
+        'rarity_translations': rarity_translations,
+        'slot_names': slot_name_translations,
+        'unit_types': unit_type_translations,
+        'unit_stats': unit_stat_translations,
+        'ui': ui_strings,
     }
     return render(request, 'hero_builder/builder.html', context)
 
@@ -636,11 +758,18 @@ def api_units(request):
     if faction_filter:
         units_qs = units_qs.filter(faction__id_key=faction_filter)
 
+    # Get localizations for unit names
+    localizations = get_localizations()
+
     units_data = []
     for unit in units_qs.order_by('faction', 'tier', 'id_key'):
+        # Unit names use pattern: {unit_id}_name
+        unit_name_key = f"{unit.id_key}_name"
+        localized_name = localizations.get(unit_name_key, unit.display_name)
+
         units_data.append({
             'id': unit.id_key,
-            'name': unit.display_name,
+            'name': localized_name,
             'faction': unit.faction.id_key if unit.faction else None,
             'faction_name': unit.faction.name if unit.faction else None,
             'tier': unit.tier,
@@ -812,6 +941,9 @@ def api_all_units(request):
     # Get all units
     units = Unit.objects.filter(version=version).select_related('faction').order_by('faction__sort_order', 'tier', 'id_key')
 
+    # Get localizations for unit names and descriptions
+    localizations = get_localizations()
+
     # Group units by faction, then by tier
     factions_data = []
     for faction in factions:
@@ -857,10 +989,16 @@ def api_all_units(request):
                     else:
                         actives.append(ability_data)
 
+            # Get localized unit name and description
+            unit_name_key = f"{unit.id_key}_name"
+            localized_name = localizations.get(unit_name_key, unit.display_name)
+            unit_desc_key = f"{unit.id_key}_narrativeDescription"
+            localized_desc = localizations.get(unit_desc_key, unit.description)
+
             units_by_tier[tier].append({
                 'id': unit.id_key,
-                'name': unit.display_name,
-                'description': unit.description,
+                'name': localized_name,
+                'description': localized_desc,
                 'tier': unit.tier,
                 'icon_url': unit.icon_url,
                 'stats': {
@@ -1307,8 +1445,17 @@ def api_available_spells(request):
     spells = Spell.objects.filter(version=version).select_related('version')
     schools = MagicSchool.objects.filter(version=version)
 
-    # Build school lookup
-    school_names = {s.id_key: s.display_name for s in schools}
+    # Build school lookup with localized names
+    localizations = get_localizations()
+    school_names = {}
+    for s in schools:
+        # Magic school names use pattern: skill_magic_{school}_name
+        # Exception: Neutral Magic uses world_cheat_dropdown_neutral
+        if s.id_key == 'neutral':
+            school_name_key = 'world_cheat_dropdown_neutral'
+        else:
+            school_name_key = f"skill_magic_{s.id_key}_name"
+        school_names[s.id_key] = localizations.get(school_name_key, s.display_name)
 
     spell_list = []
     bonus_spell_list = []  # Skill-granted spells (not learnable, but shown when skill acquired)
@@ -1369,7 +1516,8 @@ def api_available_spells(request):
         else:
             spell_list.append(spell_data)
 
-    schools_list = [{'id': s.id_key, 'name': s.display_name} for s in schools]
+    # Use localized school names
+    schools_list = [{'id': s.id_key, 'name': school_names[s.id_key]} for s in schools]
 
     return JsonResponse({
         'spells': spell_list,

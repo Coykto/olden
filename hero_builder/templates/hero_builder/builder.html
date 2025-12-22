@@ -1,7 +1,7 @@
 {% extends "hero_builder/base.html" %}
 {% load static json_filters %}
 
-{% block title %}{{ hero.display_name }} - Hero Builder{% endblock %}
+{% block title %}{{ hero.localized_name|default:hero.display_name }} - Hero Builder{% endblock %}
 
 {% block extra_styles %}
 <link rel="stylesheet" href="{% static 'hero_builder/css/builder.css' %}">
@@ -10,7 +10,7 @@
 {% block content %}
 <div class="builder-container">
     <div class="builder-header">
-        <a href="{% url 'hero_builder:index' %}?faction={{ hero.faction.slug }}" class="pick-hero-btn">Pick another Hero</a>
+        <a href="{% url 'hero_builder:index' %}?faction={{ hero.faction.slug }}" class="pick-hero-btn">{{ ui.pick_another_hero }}</a>
     </div>
 
     <div class="main-with-sidebar">
@@ -23,5 +23,15 @@
 {% endblock %}
 
 {% block extra_scripts %}
+<script>
+// Localized strings for JavaScript
+window.i18n = {
+    rarityLabels: {{ rarity_translations|to_json|safe }},
+    slotNames: {{ slot_names|to_json|safe }},
+    unitTypes: {{ unit_types|to_json|safe }},
+    unitStats: {{ unit_stats|to_json|safe }},
+    ui: {{ ui|to_json|safe }}
+};
+</script>
 {% include "hero_builder/partials/_scripts.html" %}
 {% endblock %}
