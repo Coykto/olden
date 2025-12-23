@@ -422,6 +422,43 @@ class Hero(models.Model):
         return spells
 
     @property
+    def starting_army_info(self):
+        """Get starting army info for hero picker display.
+
+        Returns a list of dicts with unit info for the starting squad.
+        Each dict contains: id, name, icon_url, min_count, max_count
+        """
+        from core.localizations import get_localizations
+        localizations = get_localizations()
+
+        start_squad = self.raw_data.get('startSquad', []) if self.raw_data else []
+        army_info = []
+
+        for entry in start_squad:
+            unit_id = entry.get('sid', '')
+            if not unit_id:
+                continue
+
+            unit = Unit.objects.filter(id_key=unit_id).first()
+            if not unit:
+                continue
+
+            # Get localized unit name (pattern: {unit_id}_name)
+            unit_name_key = f"{unit_id}_name"
+            unit_name = localizations.get(unit_name_key, unit.display_name)
+
+            army_info.append({
+                'id': unit_id,
+                'name': unit_name,
+                'icon_url': unit.icon_url,
+                'min_count': entry.get('min', 1),
+                'max_count': entry.get('max', 1),
+                'tier': unit.tier,
+            })
+
+        return army_info
+
+    @property
     def hero_card_skill(self):
         """Get the skill to display on hero card - specialty faction skill OR first non-faction skill."""
         from core.localizations import get_skill_info, get_localizations, get_skill_args
