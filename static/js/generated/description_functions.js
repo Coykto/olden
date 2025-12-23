@@ -1,6 +1,6 @@
 /**
  * Auto-generated description functions from Olden Era .script files
- * Generated at: 2025-12-23T12:10:28.787Z
+ * Generated at: 2025-12-23T14:08:26.128Z
  * DO NOT EDIT - This file is regenerated during import_gamedata
  */
 

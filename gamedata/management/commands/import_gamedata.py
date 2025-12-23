@@ -771,7 +771,13 @@ class Command(BaseCommand):
         spells_data = reader.get_all_spells()
 
         spell_objects = []
+        skipped_special = 0
         for spell_data in spells_data:
+            # Skip special magic (internal game mechanics like "kara_" debuffs, not for players)
+            if spell_data.get("isSpecialMagic"):
+                skipped_special += 1
+                continue
+
             # Try to determine school from various fields
             school = ""
             spell_id = spell_data.get("id", "")
@@ -796,4 +802,4 @@ class Command(BaseCommand):
             ))
 
         Spell.objects.bulk_create(spell_objects)
-        self.stdout.write(f"  Created {len(spell_objects)} spells")
+        self.stdout.write(f"  Created {len(spell_objects)} spells (skipped {skipped_special} special)")
