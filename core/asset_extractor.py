@@ -106,8 +106,8 @@ class AssetExtractor:
         # Extract resource icons (256x256 clean icons)
         results['resources'] = self._extract_resource_icons(force)
 
-        # Extract UI icons (factions, classes)
-        results['ui_icons'] = self._extract_ui_icons(force)
+        # Extract faction icons (faction icons, class type icons)
+        results['factions'] = self._extract_faction_icons(force)
 
         # Extract spell icons
         results['spells'] = self._extract_spell_icons(force)
@@ -530,9 +530,9 @@ class AssetExtractor:
 
         return count
 
-    def _extract_ui_icons(self, force: bool = False) -> int:
-        """Extract UI icons (faction icons, class icons, generic class type icons)."""
-        output_path = self.output_dir / "ui"
+    def _extract_faction_icons(self, force: bool = False) -> int:
+        """Extract faction icons (faction icons, class icons, generic class type icons)."""
+        output_path = self.output_dir / "factions"
         output_path.mkdir(parents=True, exist_ok=True)
 
         icons_to_find = set(self.FACTION_ICONS + self.CLASS_ICONS)

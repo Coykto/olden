@@ -1,6 +1,6 @@
 /**
  * Auto-generated game data lookups for description functions
- * Generated at: 2025-12-23T14:08:26.194Z
+ * Generated at: 2025-12-23T17:29:54.323Z
  * DO NOT EDIT - This file is regenerated during import_gamedata
  */
 

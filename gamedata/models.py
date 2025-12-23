@@ -42,13 +42,13 @@ class Faction(models.Model):
     @property
     def icon_url(self):
         """Get the URL to this faction's icon."""
-        return f"/media/gamedata/ui/{self.id_key}_icon.png"
+        return f"/media/gamedata/factions/{self.id_key}_icon.webp"
 
     @property
     def skill_icon_url(self):
         """Get the URL to this faction's skill icon."""
         if self.faction_skill:
-            return f"/media/gamedata/skills/{self.faction_skill}.png"
+            return f"/media/gamedata/skills/{self.faction_skill}.webp"
         return ""
 
     @property
@@ -140,12 +140,12 @@ class Unit(models.Model):
         import os
         from django.conf import settings
 
-        icon_path = f"/media/gamedata/units/{self.id_key}.png"
-        full_path = os.path.join(settings.MEDIA_ROOT, 'gamedata', 'units', f'{self.id_key}.png')
+        icon_path = f"/media/gamedata/units/{self.id_key}.webp"
+        full_path = os.path.join(settings.MEDIA_ROOT, 'gamedata', 'units', f'{self.id_key}.webp')
 
         if os.path.exists(full_path):
             return icon_path
-        return "/media/gamedata/ui/unit_placeholder.png"
+        return "/media/gamedata/ui/unit_placeholder.webp"
 
 
 class Hero(models.Model):
@@ -168,20 +168,20 @@ class Hero(models.Model):
     def portrait_url(self):
         """Get the URL to this hero's portrait image."""
         if self.icon:
-            return f"/media/gamedata/heroes/{self.icon}.png"
+            return f"/media/gamedata/heroes/{self.icon}.webp"
         return ""
 
     @property
     def portrait_large_url(self):
         """Get the URL to this hero's large portrait image."""
         if self.icon:
-            return f"/media/gamedata/heroes/{self.icon}_large.png"
+            return f"/media/gamedata/heroes/{self.icon}_large.webp"
         return ""
 
     @property
     def class_icon_url(self):
         """Get the URL to this hero's generic class icon (might/magic)."""
-        return f"/media/gamedata/ui/{self.class_type}_icon.png"
+        return f"/media/gamedata/factions/{self.class_type}_icon.webp"
 
     # Specialization
     specialization_name = models.CharField(max_length=200, default="", blank=True)
@@ -217,7 +217,7 @@ class Hero(models.Model):
         # Get base class name and icon
         base_class_name_key = f"{self.class_type}_{self.faction.id_key}_name"
         base_class_name = localizations.get(base_class_name_key, self.class_type.title())
-        base_class_icon_url = f"/media/gamedata/ui/{self.class_type}_icon.png"
+        base_class_icon_url = f"/media/gamedata/factions/{self.class_type}_icon.webp"
 
         # Get advanced classes for this faction and class type
         advanced_classes = AdvancedClass.objects.filter(
@@ -494,7 +494,7 @@ class Hero(models.Model):
             return {
                 'id': spell_id,
                 'name': spell_name,
-                'icon_url': f"/media/gamedata/spells/{icon_name}.png",
+                'icon_url': f"/media/gamedata/spells/{icon_name}.webp",
                 'school': spell.school,
             }
 
@@ -863,7 +863,7 @@ class AdvancedClass(models.Model):
     @property
     def icon_url(self):
         if self.icon:
-            return f"/media/gamedata/advanced_classes/{self.icon}.png"
+            return f"/media/gamedata/advanced_classes/{self.icon}.webp"
         return ""
 
     @property

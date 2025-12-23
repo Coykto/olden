@@ -22,7 +22,7 @@
         {% with hero.hero_card_skill as skill %}
         {% if skill %}
         <div class="skill-wrapper has-tooltip" data-tooltip-placement="right">
-            <img src="/media/gamedata/skills/{{ skill.id }}{{ skill.icon_suffix }}.png" alt="{{ skill.name }}" class="skill-icon">
+            <img src="/media/gamedata/skills/{{ skill.id }}{{ skill.icon_suffix }}.webp" alt="{{ skill.name }}" class="skill-icon">
             <div class="tooltip tooltip-skill">
                 <div class="tooltip-title">{{ skill.level_prefix }}{{ skill.name }}</div>
                 <div class="tooltip-text"
@@ -40,12 +40,14 @@
         {% if army %}
         <div class="starting-army" data-count="{{ army|length }}">
             {% for unit in army %}
-            <div class="starting-army-unit has-tooltip" data-tooltip-placement="top">
+            <div class="starting-army-unit"><!-- has-tooltip" data-tooltip-placement="top" -->
                 <img src="{{ unit.icon_url }}" alt="{{ unit.name }}" class="starting-army-icon">
+                <!-- Tooltip commented out - uncomment to restore
                 <div class="tooltip tooltip-starting-unit">
                     <div class="tooltip-title">{{ unit.name }}</div>
                     <div class="tooltip-text">{{ unit.min_count }}-{{ unit.max_count }} {{ ui.units }}</div>
                 </div>
+                -->
             </div>
             {% endfor %}
         </div>

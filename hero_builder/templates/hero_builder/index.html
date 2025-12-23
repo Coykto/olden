@@ -31,6 +31,9 @@
         text-align: center;
         cursor: pointer;
         transition: all 0.3s ease;
+        text-decoration: none;
+        color: inherit;
+        display: block;
     }
 
     .faction-card:hover {
@@ -420,23 +423,6 @@
         letter-spacing: 1px;
     }
 
-    /* Loading indicator - positioned absolutely so it doesn't take up space */
-    .loading-spinner {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        text-align: center;
-        color: #888;
-        padding: 40px;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 200ms ease-in;
-    }
-    .htmx-request .loading-spinner {
-        opacity: 1;
-    }
-
     /* Faction emblem in first grid slot */
     .faction-emblem-slot {
         display: flex;
@@ -460,13 +446,7 @@
 <!-- Faction Selection Row -->
 <div class="faction-row">
     {% for faction in factions %}
-    <div class="faction-card{% if faction.id == selected_faction.id %} selected{% endif %}"
-         data-faction-slug="{{ faction.slug }}"
-         hx-get="{% url 'hero_builder:faction_heroes' faction.slug %}"
-         hx-target="#heroes-grid"
-         hx-swap="innerHTML"
-         hx-indicator="#loading-spinner"
-         onclick="selectFaction(this)">
+    <a href="?faction={{ faction.slug }}" class="faction-card{% if faction.id == selected_faction.id %} selected{% endif %}">
         <div class="faction-icon">
             <img src="{{ faction.icon_url }}" alt="{{ faction.localized_name }}">
         </div>
@@ -491,7 +471,7 @@
             </div>
         </div>
         {% endif %}
-    </div>
+    </a>
     {% empty %}
     <p style="color: #666;">No factions available. Please import game data.</p>
     {% endfor %}
@@ -499,7 +479,6 @@
 
 <!-- Heroes Section -->
 <div class="heroes-section">
-    <div id="loading-spinner" class="loading-spinner htmx-indicator">Loading heroes...</div>
     <div class="heroes-grid" id="heroes-grid">
         {% include "hero_builder/partials/_heroes_grid.html" with faction=selected_faction %}
     </div>
@@ -508,42 +487,10 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script src="https://unpkg.com/htmx.org@1.9.10"></script>
 <script src="{% static 'js/description-runtime.js' %}?v=8"></script>
 <script src="{% static 'js/generated/game_data.js' %}?v=7"></script>
 <script src="{% static 'js/generated/description_functions.js' %}?v=7"></script>
 <script>
-function selectFaction(card, updateUrl = true) {
-    // Remove selected class from all faction cards
-    document.querySelectorAll('.faction-card').forEach(c => c.classList.remove('selected'));
-    // Add selected class to clicked card
-    card.classList.add('selected');
-
-    // Update URL with faction slug
-    if (updateUrl) {
-        const slug = card.dataset.factionSlug;
-        if (slug) {
-            const url = new URL(window.location);
-            url.searchParams.set('faction', slug);
-            history.replaceState(null, '', url);
-        }
-    }
-}
-
-// On page load, check if there's a faction in the URL
-document.addEventListener('DOMContentLoaded', function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const factionSlug = urlParams.get('faction');
-
-    if (factionSlug) {
-        const factionCard = document.querySelector(`.faction-card[data-faction-slug="${factionSlug}"]`);
-        if (factionCard && !factionCard.classList.contains('selected')) {
-            // Trigger HTMX request and select the faction
-            factionCard.click();
-        }
-    }
-});
-
 function formatSkillDescriptions() {
     // Format all dynamic skill descriptions
     document.querySelectorAll('[data-skill-template]').forEach(el => {

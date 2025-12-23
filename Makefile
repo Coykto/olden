@@ -27,7 +27,7 @@ TS_NODE := $(NPX) ts-node
 all: help
 
 # Full import pipeline
-import: import-db transpile
+import: import-db transpile optimize-images
 	@echo ""
 	@echo "=========================================="
 	@echo "Import complete!"
@@ -86,6 +86,9 @@ install:
 	@echo ""
 	@echo "Done."
 
+optimize-images:
+	$(MANAGE) optimize_images --format webp --force
+
 # Help
 help:
 	@echo "Olden Forge - Build Commands"
@@ -93,7 +96,7 @@ help:
 	@echo "Usage: make <target>"
 	@echo ""
 	@echo "Targets:"
-	@echo "  import      Full import: database + transpiler"
+	@echo "  import      Full import: database + transpiler + images "
 	@echo "  import-db   Import game data to database only"
 	@echo "  transpile   Run script transpiler only"
 	@echo "  dev         Start development server"

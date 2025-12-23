@@ -158,8 +158,8 @@ def get_ability_info(ability_id: str, unit_raw_data: dict = None) -> dict:
                 icon_key = f"{base_unit_id}_passive_{idx}"
                 break
 
-    # Generate icon URL - icons are named {unit}_{passive|ability}_{n}_name.png
-    icon_filename = f"{icon_key}_name.png"
+    # Generate icon URL - icons are named {unit}_{passive|ability}_{n}_name.webp
+    icon_filename = f"{icon_key}_name.webp"
     icon_path = os.path.join(settings.MEDIA_ROOT, 'gamedata', 'passives', icon_filename)
     icon_url = f"/media/gamedata/passives/{icon_filename}" if os.path.exists(icon_path) else None
 
@@ -328,7 +328,7 @@ def get_base_passives(unit_raw_data: dict, attack_type: str) -> list:
         'name': creature_name,
         'description_template': creature_desc,
         'description_args': args_data.get(creature_desc_key, []),
-        'icon_url': f'/media/gamedata/passives/{creature_key}.png',
+        'icon_url': f'/media/gamedata/passives/{creature_key}.webp',
         'is_base_passive': True,
     })
 
@@ -348,7 +348,7 @@ def get_base_passives(unit_raw_data: dict, attack_type: str) -> list:
         'name': attack_name,
         'description_template': attack_desc,
         'description_args': args_data.get(attack_desc_key, []),
-        'icon_url': f'/media/gamedata/passives/{attack_key}_name.png',
+        'icon_url': f'/media/gamedata/passives/{attack_key}_name.webp',
         'is_base_passive': True,
     })
 
@@ -389,8 +389,8 @@ def get_passives_from_view(unit_raw_data: dict) -> tuple[dict | None, list]:
         creature_name = localizations.get(creature_key, '')
         creature_desc = localizations.get(creature_desc_key, '')
 
-        icon_path = os.path.join(settings.MEDIA_ROOT, 'gamedata', 'passives', f'{creature_key}.png')
-        icon_url = f'/media/gamedata/passives/{creature_key}.png' if os.path.exists(icon_path) else None
+        icon_path = os.path.join(settings.MEDIA_ROOT, 'gamedata', 'passives', f'{creature_key}.webp')
+        icon_url = f'/media/gamedata/passives/{creature_key}.webp' if os.path.exists(icon_path) else None
 
         creature_type_passive = {
             'id': creature_key,
@@ -412,8 +412,8 @@ def get_passives_from_view(unit_raw_data: dict) -> tuple[dict | None, list]:
         description_template = localizations.get(desc_key, '')
         description_args = args_data.get(desc_key, [])
 
-        # Generate icon URL - icons use the name key (e.g., base_passive_melee_attack_name.png)
-        icon_filename = f"{name_key}.png"
+        # Generate icon URL - icons use the name key (e.g., base_passive_melee_attack_name.webp)
+        icon_filename = f"{name_key}.webp"
         icon_path = os.path.join(settings.MEDIA_ROOT, 'gamedata', 'passives', icon_filename)
         icon_url = f"/media/gamedata/passives/{icon_filename}" if os.path.exists(icon_path) else None
 
@@ -464,7 +464,7 @@ def get_abilities_from_view(unit_raw_data: dict) -> list:
         description_args = args_data.get(desc_key, [])
 
         # Generate icon URL - icons use the name key
-        icon_filename = f"{name_key}.png"
+        icon_filename = f"{name_key}.webp"
         icon_path = os.path.join(settings.MEDIA_ROOT, 'gamedata', 'passives', icon_filename)
         icon_url = f"/media/gamedata/passives/{icon_filename}" if os.path.exists(icon_path) else None
 
@@ -1274,7 +1274,7 @@ def api_advanced_classes(request):
     base_class_name = localizations.get(base_class_name_key, class_type.title())
     base_class_desc = localizations.get(base_class_desc_key, '')
     # Use generic might/magic icon (not faction-specific)
-    base_class_icon_url = f"/media/gamedata/ui/{class_type}_icon.png"
+    base_class_icon_url = f"/media/gamedata/factions/{class_type}_icon.webp"
 
     classes_qs = AdvancedClass.objects.filter(
         version=version,

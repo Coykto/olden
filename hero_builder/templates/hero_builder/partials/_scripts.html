@@ -305,7 +305,7 @@ const SkillManager = {
                 skillMain.className = 'skill-main has-tooltip';
                 skillMain.dataset.tooltipPlacement = 'bottom';
                 skillMain.innerHTML = `
-                    <img src="/media/gamedata/skills/${skill.skillId}${iconSuffix}.png" alt="${skill.name || skill.skillId}">
+                    <img src="/media/gamedata/skills/${skill.skillId}${iconSuffix}.webp" alt="${skill.name || skill.skillId}">
                     ${typeof AdvancedClassManager !== 'undefined' ? AdvancedClassManager.renderSkillIndicators(skill.skillId) : ''}
                     <div class="tooltip tooltip-skill">
                         <div class="tooltip-title">${skill.name || skill.skillId}</div>
@@ -344,7 +344,7 @@ const SkillManager = {
                     subskillBtns[0].className = 'subskill-btn filled has-tooltip';
                     subskillBtns[0].dataset.tooltipPlacement = 'bottom';
                     subskillBtns[0].innerHTML = `
-                        <img src="/media/gamedata/skills/${skill.subskills[0]}_icon.png">
+                        <img src="/media/gamedata/skills/${skill.subskills[0]}_icon.webp">
                         <div class="tooltip tooltip-skill">
                             <div class="tooltip-title">${skill.subskillNames[0] || skill.subskills[0]}</div>
                             ${skill.subskillDescs[0] ? `<div class="tooltip-text">${skill.subskillDescs[0]}</div>` : ''}
@@ -380,7 +380,7 @@ const SkillManager = {
                     subskillBtns[1].className = 'subskill-btn filled has-tooltip';
                     subskillBtns[1].dataset.tooltipPlacement = 'bottom';
                     subskillBtns[1].innerHTML = `
-                        <img src="/media/gamedata/skills/${skill.subskills[1]}_icon.png">
+                        <img src="/media/gamedata/skills/${skill.subskills[1]}_icon.webp">
                         <div class="tooltip tooltip-skill">
                             <div class="tooltip-title">${skill.subskillNames[1] || skill.subskills[1]}</div>
                             ${skill.subskillDescs[1] ? `<div class="tooltip-text">${skill.subskillDescs[1]}</div>` : ''}
@@ -470,7 +470,7 @@ const SkillSelectionModal = {
             <div class="skill-option" data-skill-id="${skill.id}"
                  onclick="SkillSelectionModal.select('${skill.id}')">
                 <div class="skill-icon-wrapper">
-                    <img src="/media/gamedata/skills/${skill.icon}.png" class="skill-icon" alt="${skill.name}">
+                    <img src="/media/gamedata/skills/${skill.icon}.webp" class="skill-icon" alt="${skill.name}">
                     ${typeof AdvancedClassManager !== 'undefined' ? AdvancedClassManager.renderSkillIndicators(skill.id) : ''}
                 </div>
                 <div class="skill-info">
@@ -480,7 +480,7 @@ const SkillSelectionModal = {
                 <div class="subskill-previews">
                     ${(skill.subskill_preview || []).map(sub =>
                         `<div class="subskill-preview-wrapper has-tooltip" data-tooltip-placement="bottom">
-                            <img src="/media/gamedata/skills/${sub.icon}.png" class="subskill-preview-icon" alt="${sub.name}">
+                            <img src="/media/gamedata/skills/${sub.icon}.webp" class="subskill-preview-icon" alt="${sub.name}">
                             <div class="tooltip tooltip-skill">
                                 <div class="tooltip-title">${sub.name}</div>
                                 <div class="tooltip-text">${sub.description}</div>
@@ -577,7 +577,7 @@ const SubskillSelectionModal = {
             <div class="modal-overlay" onclick="SubskillSelectionModal.close()">
                 <div class="subskill-modal" onclick="event.stopPropagation()">
                     <div class="upgraded-skill">
-                        <img src="/media/gamedata/skills/${data.skill.icon}.png" class="skill-icon-large">
+                        <img src="/media/gamedata/skills/${data.skill.icon}.webp" class="skill-icon-large">
                         <div class="skill-info">
                             <div class="skill-name">${data.skill.name.toUpperCase()}</div>
                             <div class="skill-desc">${skillDesc}</div>
@@ -597,7 +597,7 @@ const SubskillSelectionModal = {
 
         return `
             <div class="subskill-option" onclick="SubskillSelectionModal.select('${subskill.id}')">
-                <img src="/media/gamedata/skills/${subskill.icon}.png" class="subskill-icon">
+                <img src="/media/gamedata/skills/${subskill.icon}.webp" class="subskill-icon">
                 <div class="subskill-info">
                     <div class="subskill-name">${subskill.name}</div>
                     <div class="subskill-desc">${subskillDesc}</div>
@@ -811,7 +811,7 @@ const ItemSelectionModal = {
             <div class="skill-option" data-item-id="${item.id}"
                  onclick="ItemSelectionModal.select('${item.id}')">
                 <div class="skill-icon-wrapper">
-                    <img src="/media/gamedata/items/${item.icon}.png" class="skill-icon" alt="${item.name}">
+                    <img src="/media/gamedata/items/${item.icon}.webp" class="skill-icon" alt="${item.name}">
                 </div>
                 <div class="skill-info">
                     <div class="skill-name-row">
@@ -1938,11 +1938,11 @@ const EquipmentManager = {
                     <div class="tooltip-upgrade-row">
                         <button class="tooltip-upgrade-btn ${!canLevelUp ? 'disabled' : ''}"
                                 onclick="event.stopPropagation(); if (${canLevelUp}) EquipmentManager.setItemLevel('${slotId}', ${currentLevel + 1});">
-                            ⏫ ${upgradeCost} <img src="/media/gamedata/resources/dust.png" class="dust-icon-small" alt="dust">
+                            ⏫ ${upgradeCost} <img src="/media/gamedata/resources/dust.webp" class="dust-icon-small" alt="dust">
                         </button>
                         <button class="tooltip-upgrade-btn ${!canLevelDown ? 'disabled' : ''}"
                                 onclick="event.stopPropagation(); if (${canLevelDown}) EquipmentManager.setItemLevel('${slotId}', ${currentLevel - 1});">
-                            ⏬ ${downgradeSavings} <img src="/media/gamedata/resources/dust.png" class="dust-icon-small" alt="dust">
+                            ⏬ ${downgradeSavings} <img src="/media/gamedata/resources/dust.webp" class="dust-icon-small" alt="dust">
                         </button>
                     </div>
                     <button class="tooltip-remove-btn" onclick="event.stopPropagation(); EquipmentManager.unequipItem('${slotId}');">
@@ -1993,7 +1993,7 @@ const EquipmentManager = {
                 slotElement.classList.add('has-tooltip');
                 slotElement.dataset.tooltipPlacement = 'right';
                 slotElement.innerHTML = `
-                    <img src="/media/gamedata/items/${itemData.icon}.png"
+                    <img src="/media/gamedata/items/${itemData.icon}.webp"
                          alt="${itemData.name}"
                          style="opacity: 1; width: 90%; height: 90%;">
                     <div class="tooltip tooltip-item">
@@ -2023,19 +2023,19 @@ const EquipmentManager = {
                 delete slotElement.dataset.tooltipPlacement;
                 const slotType = slotElement.dataset.slotType;
                 const defaultIcons = {
-                    'unique': 'slot_unique.png',
-                    'head': 'slot_head.png',
-                    'back': 'slot_cloak.png',
-                    'armor': 'slot_armor.png',
-                    'weapon': 'slot_right_hand.png',
-                    'shield': 'slot_left_hand.png',
-                    'belt': 'slot_belt.png',
-                    'boots': 'slot_boots.png',
-                    'ring': 'slot_ring.png',
-                    'accessory': 'slot_item.png'
+                    'unique': 'slot_unique.webp',
+                    'head': 'slot_head.webp',
+                    'back': 'slot_cloak.webp',
+                    'armor': 'slot_armor.webp',
+                    'weapon': 'slot_right_hand.webp',
+                    'shield': 'slot_left_hand.webp',
+                    'belt': 'slot_belt.webp',
+                    'boots': 'slot_boots.webp',
+                    'ring': 'slot_ring.webp',
+                    'accessory': 'slot_item.webp'
                 };
 
-                const defaultIcon = defaultIcons[slotType] || 'slot_item.png';
+                const defaultIcon = defaultIcons[slotType] || 'slot_item.webp';
 
                 slotElement.innerHTML = `
                     <img src="/media/gamedata/ui/${defaultIcon}" alt="${slotType}">
@@ -2502,7 +2502,7 @@ const SpellBookManager = {
             return `
                 <div class="skill-option spell-option${disabledClass}" ${clickHandler}>
                     <div class="skill-icon-wrapper spell-icon-round">
-                        <img src="/media/gamedata/spells/${spell.icon || spell.id}.png"
+                        <img src="/media/gamedata/spells/${spell.icon || spell.id}.webp"
                              class="skill-icon"
                              alt="${spell.id}"
                              onerror="SpellBookManager.handleSpellIconError(this, '${spell.icon || spell.id}')">
@@ -2650,10 +2650,10 @@ const SpellBookManager = {
     getFallbackIconPath(spellId) {
         // Strip _special suffix to get base spell icon
         if (spellId.endsWith('_special')) {
-            return `/media/gamedata/spells/${spellId.replace(/_special$/, '')}.png`;
+            return `/media/gamedata/spells/${spellId.replace(/_special$/, '')}.webp`;
         }
         // For other cases, try a generic fallback
-        return '/media/gamedata/ui/magic_icon.png';
+        return '/media/gamedata/factions/magic_icon.webp';
     },
 
     // Handle spell icon load error - try fallback
@@ -2746,7 +2746,7 @@ const SpellBookManager = {
         slotDiv.dataset.tooltipPlacement = 'left';
         const isStarting = equipped.isStartingSpell;
         slotDiv.innerHTML = `
-            <img src="/media/gamedata/spells/${spell.icon || spell.id_key || spell.id}.png"
+            <img src="/media/gamedata/spells/${spell.icon || spell.id_key || spell.id}.webp"
                  alt="${spell.id_key || spell.id}"
                  class="spell-icon"
                  onerror="SpellBookManager.handleSpellIconError(this, '${spell.icon || spell.id_key || spell.id}')">
@@ -2816,7 +2816,7 @@ const SpellBookManager = {
             slotElement.classList.add('has-tooltip');
             slotElement.dataset.tooltipPlacement = 'left';
             slotElement.innerHTML = `
-                <img src="/media/gamedata/spells/${spell.icon || spell.id_key || spell.id}.png"
+                <img src="/media/gamedata/spells/${spell.icon || spell.id_key || spell.id}.webp"
                      alt="${spell.id_key || spell.id}"
                      class="spell-icon"
                      onerror="SpellBookManager.handleSpellIconError(this, '${spell.icon || spell.id_key || spell.id}')">
@@ -3026,7 +3026,7 @@ const SpellBookManager = {
             }
 
             slotDiv.innerHTML = `
-                <img src="/media/gamedata/spells/${spell.icon || spell.id_key || spell.id}.png"
+                <img src="/media/gamedata/spells/${spell.icon || spell.id_key || spell.id}.webp"
                      alt="${spell.id_key || spell.id}"
                      class="spell-icon"
                      onerror="SpellBookManager.handleSpellIconError(this, '${spell.icon || spell.id_key || spell.id}')">
@@ -3338,7 +3338,7 @@ const ArmyManager = {
                 const unit = armySlot.unitData;
 
                 slot.innerHTML = `
-                    <img src="${unit.icon_url}" alt="${unit.name}" class="unit-icon" onerror="this.src='/media/gamedata/ui/unit_placeholder.png'">
+                    <img src="${unit.icon_url}" alt="${unit.name}" class="unit-icon" onerror="this.src='/media/gamedata/ui/unit_placeholder.webp'">
                     <span class="unit-count">${armySlot.count}</span>
                     <button class="unit-remove-btn" onclick="event.stopPropagation(); ArmyManager.removeUnitFromSlot(${slot.dataset.slotIndex});" title="Remove unit">&times;</button>
                     <div class="tooltip tooltip-unit" data-unit-slot-index="${index}">
@@ -3377,14 +3377,14 @@ const ArmyManager = {
 
     // Stat icons SVGs (inline for reliability)
     statIcons: {
-        hp: `<img src="/media/gamedata/ui/unit_health.png" alt="HP" style="width: 18px; height: 18px; vertical-align: middle;">`,
-        damage: `<img src="/media/gamedata/ui/unit_damage.png" alt="Damage" style="width: 18px; height: 18px; vertical-align: middle;">`,
-        offence: `<img src="/media/gamedata/ui/unit_attack.png" alt="Attack" style="width: 18px; height: 18px; vertical-align: middle;">`,
-        defence: `<img src="/media/gamedata/ui/unit_defence.png" alt="Defence" style="width: 18px; height: 18px; vertical-align: middle;">`,
-        luck: `<img src="/media/gamedata/ui/unit_luck.png" alt="Luck" style="width: 18px; height: 18px; vertical-align: middle;">`,
-        morale: `<img src="/media/gamedata/ui/unit_moral.png" alt="Morale" style="width: 18px; height: 18px; vertical-align: middle;">`,
-        speed: `<img src="/media/gamedata/ui/unit_speed.png" alt="Speed" style="width: 18px; height: 18px; vertical-align: middle;">`,
-        initiative: `<img src="/media/gamedata/ui/unit_init.png" alt="Initiative" style="width: 18px; height: 18px; vertical-align: middle;">`,
+        hp: `<img src="/media/gamedata/ui/unit_health.webp" alt="HP" style="width: 18px; height: 18px; vertical-align: middle;">`,
+        damage: `<img src="/media/gamedata/ui/unit_damage.webp" alt="Damage" style="width: 18px; height: 18px; vertical-align: middle;">`,
+        offence: `<img src="/media/gamedata/ui/unit_attack.webp" alt="Attack" style="width: 18px; height: 18px; vertical-align: middle;">`,
+        defence: `<img src="/media/gamedata/ui/unit_defence.webp" alt="Defence" style="width: 18px; height: 18px; vertical-align: middle;">`,
+        luck: `<img src="/media/gamedata/ui/unit_luck.webp" alt="Luck" style="width: 18px; height: 18px; vertical-align: middle;">`,
+        morale: `<img src="/media/gamedata/ui/unit_moral.webp" alt="Morale" style="width: 18px; height: 18px; vertical-align: middle;">`,
+        speed: `<img src="/media/gamedata/ui/unit_speed.webp" alt="Speed" style="width: 18px; height: 18px; vertical-align: middle;">`,
+        initiative: `<img src="/media/gamedata/ui/unit_init.webp" alt="Initiative" style="width: 18px; height: 18px; vertical-align: middle;">`,
     },
 
     // Get stat icon HTML
@@ -3881,7 +3881,7 @@ const ArmyManager = {
                             <div class="unit-card-portrait-section">
                                 <div class="unit-abilities-side left">${passivesHtml}</div>
                                 <img src="${unit.icon_url}" alt="${unit.name}" class="unit-card-portrait"
-                                     onerror="this.src='/media/gamedata/ui/unit_placeholder.png'">
+                                     onerror="this.src='/media/gamedata/ui/unit_placeholder.webp'">
                                 <div class="unit-abilities-side right">${activesHtml}</div>
                             </div>
                             <div class="unit-card-footer">${unit.squad_value} gold</div>
@@ -3963,9 +3963,9 @@ const ArmyManager = {
                     <div class="modal-body">
                         <div class="unit-editor-content">
                             <div class="unit-editor-header">
-                                <img src="${unit.icon_url || '/media/gamedata/units/' + (unit.icon || unit.id) + '.png'}"
+                                <img src="${unit.icon_url || '/media/gamedata/units/' + (unit.icon || unit.id) + '.webp'}"
                                      alt="${unit.name}" class="unit-editor-icon"
-                                     onerror="this.src='/media/gamedata/ui/unit_placeholder.png'">
+                                     onerror="this.src='/media/gamedata/ui/unit_placeholder.webp'">
                                 <div class="unit-editor-info">
                                     <span class="unit-editor-tier">Tier ${unit.tier || unit.level}</span>
                                     <span class="unit-editor-type">${this.formatUnitType(unit)}</span>

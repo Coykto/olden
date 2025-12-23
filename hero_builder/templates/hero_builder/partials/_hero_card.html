@@ -37,27 +37,27 @@
                 <!-- Stats Grid -->
                 <div class="stats-grid">
                     <div class="stat-item" data-stat="offence">
-                        <img src="/media/gamedata/ui/stat_attack.png" alt="ATK" class="stat-icon">
+                        <img src="/media/gamedata/ui/stat_attack.webp" alt="ATK" class="stat-icon">
                         <span class="stat-value">{{ hero.start_offence }}</span>
                     </div>
                     <div class="stat-item" data-stat="defence">
-                        <img src="/media/gamedata/ui/stat_defence.png" alt="DEF" class="stat-icon">
+                        <img src="/media/gamedata/ui/stat_defence.webp" alt="DEF" class="stat-icon">
                         <span class="stat-value">{{ hero.start_defence }}</span>
                     </div>
                     <div class="stat-item" data-stat="spell-power">
-                        <img src="/media/gamedata/ui/stat_spellpower.png" alt="PWR" class="stat-icon">
+                        <img src="/media/gamedata/ui/stat_spellpower.webp" alt="PWR" class="stat-icon">
                         <span class="stat-value">{{ hero.start_spell_power }}</span>
                     </div>
                     <div class="stat-item" data-stat="intelligence">
-                        <img src="/media/gamedata/ui/stat_spellpower.png" alt="KNW" class="stat-icon" style="filter: hue-rotate(180deg);">
+                        <img src="/media/gamedata/ui/stat_spellpower.webp" alt="KNW" class="stat-icon" style="filter: hue-rotate(180deg);">
                         <span class="stat-value">{{ hero.start_intelligence }}</span>
                     </div>
                     <div class="stat-item" data-stat="luck">
-                        <img src="/media/gamedata/ui/stat_luck.png" alt="LCK" class="stat-icon">
+                        <img src="/media/gamedata/ui/stat_luck.webp" alt="LCK" class="stat-icon">
                         <span class="stat-value">{{ hero.start_luck }}</span>
                     </div>
                     <div class="stat-item" data-stat="moral">
-                        <img src="/media/gamedata/ui/stat_morale.png" alt="MRL" class="stat-icon">
+                        <img src="/media/gamedata/ui/stat_morale.webp" alt="MRL" class="stat-icon">
                         <span class="stat-value">{{ hero.start_moral }}</span>
                     </div>
                 </div>
@@ -68,7 +68,7 @@
                     <!-- Skill with 2 stacked subskill slots -->
                     <div class="skill-with-subs">
                         <div class="skill-main has-tooltip" id="skill-{{ forloop.counter }}" data-skill-id="{{ skill.id }}" data-skill-level="{{ skill.level }}" data-tooltip-placement="bottom">
-                            <img src="/media/gamedata/skills/{{ skill.id }}{{ skill.icon_suffix }}.png" alt="{{ skill.level_prefix }}{{ skill.name }}">
+                            <img src="/media/gamedata/skills/{{ skill.id }}{{ skill.icon_suffix }}.webp" alt="{{ skill.level_prefix }}{{ skill.name }}">
                             <div class="tooltip tooltip-skill">
                                 <div class="tooltip-title">{{ skill.level_prefix }}{{ skill.name }}</div>
                                 <div class="tooltip-text"
