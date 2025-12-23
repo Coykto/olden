@@ -259,9 +259,9 @@
          hx-indicator="#loading-spinner"
          onclick="selectFaction(this)">
         <div class="faction-icon">
-            <img src="{{ faction.icon_url }}" alt="{{ faction.name }}">
+            <img src="{{ faction.icon_url }}" alt="{{ faction.localized_name }}">
         </div>
-        <div class="faction-name">{{ faction.name }}</div>
+        <div class="faction-name">{{ faction.localized_name }}</div>
         {% if faction.skill_icon_url %}
         <div class="faction-skill">
             <div class="faction-skill-wrapper has-tooltip" data-tooltip-placement="top">

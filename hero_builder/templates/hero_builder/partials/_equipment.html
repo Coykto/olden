@@ -45,7 +45,7 @@
             <div class="equip-row">
                 <div class="equip-col-left">
                     <div class="equip-slot" id="slot-weapon" data-slot-type="weapon">
-                        <img src="/media/gamedata/ui/slot_left_hand.png" alt="Weapon">
+                        <img src="/media/gamedata/ui/slot_right_hand.png" alt="Weapon">
                     </div>
                 </div>
                 <div class="equip-col-center">
@@ -55,7 +55,7 @@
                 </div>
                 <div class="equip-col-right">
                     <div class="equip-slot" id="slot-shield" data-slot-type="shield">
-                        <img src="/media/gamedata/ui/slot_right_hand.png" alt="Shield">
+                        <img src="/media/gamedata/ui/slot_left_hand.png" alt="Shield">
                     </div>
                 </div>
             </div>
@@ -100,13 +100,13 @@
         <!-- Total Dust Cost Summary -->
         <div class="equipment-dust-summary">
             <div class="dust-total" id="total-equipment-dust">
-                <span>Total: </span>
+                <span>{{ ui.total }} </span>
                 <img src="/media/gamedata/resources/dust.png" alt="Dust" class="dust-icon">
                 <span class="dust-value">0</span>
             </div>
             <div class="bulk-upgrade-controls">
-                <button class="bulk-upgrade-btn" onclick="EquipmentManager.maxAllUpgrades()">Max All</button>
-                <button class="bulk-upgrade-btn" onclick="EquipmentManager.resetAllUpgrades()">Reset All</button>
+                <button class="bulk-upgrade-btn" onclick="EquipmentManager.maxAllUpgrades()">{{ ui.max_all }}</button>
+                <button class="bulk-upgrade-btn" onclick="EquipmentManager.resetAllUpgrades()">{{ ui.reset_all }}</button>
             </div>
         </div>
     </div>
@@ -115,7 +115,7 @@
     <div class="spell-army-section">
         <div class="spell-book-section">
             <div class="spell-book-header">
-                <span class="spell-book-title">Spell Book</span>
+                <span class="spell-book-title">{{ ui.spell_book }}</span>
             </div>
             <div class="spell-book-content">
                 <div class="spell-book-left">
@@ -131,12 +131,12 @@
             </div>
             <div class="spell-book-footer">
                 <div class="spell-book-controls">
-                    <button class="spell-control-btn" onclick="SpellBookManager.maxAllSpells()">Max All</button>
-                    <button class="spell-control-btn" onclick="SpellBookManager.resetAllSpells()">Reset All</button>
+                    <button class="spell-control-btn" onclick="SpellBookManager.maxAllSpells()">{{ ui.max_all }}</button>
+                    <button class="spell-control-btn" onclick="SpellBookManager.resetAllSpells()">{{ ui.reset_all }}</button>
                 </div>
                 <div class="spell-type-filters">
-                    <button class="spell-type-btn" data-type="combat" onclick="SpellBookManager.toggleBookTypeFilter('combat')">Combat</button>
-                    <button class="spell-type-btn" data-type="global" onclick="SpellBookManager.toggleBookTypeFilter('global')">Global</button>
+                    <button class="spell-type-btn" data-type="combat" onclick="SpellBookManager.toggleBookTypeFilter('combat')">{{ ui.combat }}</button>
+                    <button class="spell-type-btn" data-type="global" onclick="SpellBookManager.toggleBookTypeFilter('global')">{{ ui.global }}</button>
                 </div>
             </div>
         </div>
@@ -144,8 +144,8 @@
         <!-- Army Units -->
         <div class="units-section" id="army-panel">
             <div class="units-section-header">
-                <span class="army-title">Army</span>
-                <span class="army-value" id="army-value">Value: 0</span>
+                <span class="army-title">{{ ui.army }}</span>
+                <span class="army-value" id="army-value">{{ ui.value }} 0</span>
             </div>
             <div class="units-grid">
                 {% for i in "1234567"|make_list %}

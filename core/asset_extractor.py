@@ -767,13 +767,14 @@ class AssetExtractor:
                 # - base_passive_* (base passive icons like attack types)
                 # - *_passive_*_name (unit-specific passive icons)
                 # - *_ability_*_name (unit-specific ability icons)
+                # - *_ability_*_name_upg, *_ability_*_name_upg_alt (upgrade variants)
                 is_passive_icon = (
                     name.startswith('base_class_') or
                     name.startswith('base_passive_') or
                     name.startswith('base_demon_') or
                     name.startswith('base_magical_') or
-                    ('_passive_' in name and name.endswith('_name')) or
-                    ('_ability_' in name and name.endswith('_name'))
+                    ('_passive_' in name and '_name' in name) or
+                    ('_ability_' in name and '_name' in name)
                 )
 
                 if is_passive_icon:

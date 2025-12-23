@@ -1,6 +1,6 @@
 /**
  * Auto-generated game data lookups for description functions
- * Generated at: 2025-12-21T19:39:35.626Z
+ * Generated at: 2025-12-23T14:08:26.194Z
  * DO NOT EDIT - This file is regenerated during import_gamedata
  */
 
@@ -11830,7 +11830,7 @@ GameData.sidebuffs = GameData.buffs;
 // Apply pre-computed buff aliases (discovered by analyzing skill references vs actual buffs)
 // This handles cases where skills reference buffs by a different ID than they are stored
 (function() {
-  const buffAliases = {"skill_formation_1_bonus":"skill_formation_1_unit_bonus","skill_formation_2_bonus":"skill_formation_2_unit_bonus","skill_formation_3_bonus":"skill_formation_3_unit_bonus","skill_faction_humans_1_bonus":"skill_faction_humans_1_unit_bonus","skill_faction_humans_2_bonus":"skill_faction_humans_2_unit_bonus","skill_faction_humans_3_bonus":"skill_faction_humans_3_unit_bonus","campaign_skill_formation_1_bonus":"campaign_skill_formation_1_unit_bonus","campaign_skill_formation_2_bonus":"campaign_skill_formation_2_unit_bonus","campaign_skill_formation_3_bonus":"campaign_skill_formation_3_unit_bonus","campaign_skill_formation_4_bonus":"campaign_skill_formation_4_unit_bonus","campaign_skill_formation_5_bonus":"campaign_skill_formation_5_unit_bonus"};
+  const buffAliases = {"skill_formation_1_bonus":"skill_formation_1_unit_bonus","skill_formation_2_bonus":"skill_formation_2_unit_bonus","skill_formation_3_bonus":"skill_formation_3_unit_bonus","skill_faction_humans_1_bonus":"skill_faction_humans_1_unit_bonus","skill_faction_humans_2_bonus":"skill_faction_humans_2_unit_bonus","skill_faction_humans_3_bonus":"skill_faction_humans_3_unit_bonus","campaign_skill_formation_1_bonus":"campaign_skill_formation_1_unit_bonus","campaign_skill_formation_2_bonus":"campaign_skill_formation_2_unit_bonus","campaign_skill_formation_3_bonus":"campaign_skill_formation_3_unit_bonus","campaign_skill_formation_4_bonus":"campaign_skill_formation_4_unit_bonus","campaign_skill_formation_5_bonus":"campaign_skill_formation_5_unit_bonus","sub_skill_assault_3_bonus":"sub_skill_assault_3_unit_bonus","sub_skill_protection_3_bonus":"sub_skill_protection_3_unit_bonus","sub_skill_leadership_3_bonus":"sub_skill_leadership_3_unit_bonus","sub_skill_formation_4_overwatch_bonus":"sub_skill_formation_4_overwatch_unit_bonus","sub_skill_formation_5_preparation_bonus":"sub_skill_formation_5_preparation_unit_bonus","sub_skill_siege_2_bonus":"sub_skill_siege_2_unit_bonus","sub_skill_tactics_2_bonus":"sub_skill_tactics_2_unit_bonus","sub_skill_tactics_3_bonus":"sub_skill_tactics_3_unit_bonus","sub_skill_tactics_5_bonus":"sub_skill_tactics_5_unit_bonus","sub_skill_faction_humans_2_bonus":"sub_skill_faction_humans_2_unit_bonus","sub_skill_faction_humans_4_bonus":"sub_skill_faction_humans_4_unit_bonus","sub_skill_faction_humans_5_bonus":"sub_skill_faction_humans_5_unit_bonus"};
   for (const [aliasId, actualId] of Object.entries(buffAliases)) {
     if (GameData.buffs[actualId] && !GameData.buffs[aliasId]) {
       GameData.buffs[aliasId] = GameData.buffs[actualId];

@@ -53,6 +53,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',  # Language detection and URL prefix handling
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -72,6 +73,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'hero_builder.context_processors.available_languages',
             ],
         },
     },
@@ -123,13 +125,37 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en'
+
+# All 14 languages available in Heroes of Might & Magic: Olden Era
+LANGUAGES = [
+    ('en', 'English'),
+    ('cs', 'Čeština'),  # Czech
+    ('fr', 'Français'),  # French
+    ('de', 'Deutsch'),  # German
+    ('hu', 'Magyar'),  # Hungarian
+    ('ja', '日本語'),  # Japanese
+    ('ko', '한국어'),  # Korean
+    ('pl', 'Polski'),  # Polish
+    ('ru', 'Русский'),  # Russian
+    ('es', 'Español'),  # Spanish
+    ('tr', 'Türkçe'),  # Turkish
+    ('uk', 'Українська'),  # Ukrainian
+    ('zh-hans', '简体中文'),  # Simplified Chinese
+    ('zh-hant', '繁體中文'),  # Traditional Chinese
+]
 
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
 USE_TZ = True
+
+# Optional: Specify where Django should look for translation files
+# (Not needed if only using database-backed localizations)
+# LOCALE_PATHS = [
+#     BASE_DIR / 'locale',
+# ]
 
 
 # Static files (CSS, JavaScript, Images)
@@ -155,6 +181,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Runtime reads from database. Set to non-existent path for production.
 GAME_DATA_PATH = Path(os.environ.get(
     "GAME_DATA_PATH",
+    # "/Volumes/BOOTCAMP/Program Files (x86)/Steam/steamapps/common/Heroes of Might & Magic Olden Era Demo/HeroesOE_Data"
     "/Users/eb/Downloads/gamedata/steamapps/common/Heroes of Might & Magic Olden Era Demo/HeroesOE_Data"
 ))
 GAME_DATA_CORE_ZIP = GAME_DATA_PATH / "StreamingAssets" / "Core.zip"

@@ -6,7 +6,7 @@
 {% with hero.advanced_classes_info as adv_info %}
 <div class="tooltip tooltip-class">
     <div class="tooltip-header">
-        <div class="tooltip-title tooltip-title--gold">{{ hero.specialization_name }}</div>
+        <div class="tooltip-title tooltip-title--gold">{{ hero.localized_spec_name|default:hero.specialization_name }}</div>
         <div class="tooltip-text"
              data-spec-template="{{ spec.description_template|escapejs }}"
              data-spec-args='{{ spec.description_args|to_json }}'
