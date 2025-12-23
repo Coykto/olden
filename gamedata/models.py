@@ -319,8 +319,17 @@ class Hero(models.Model):
     @property
     def starting_spells_info(self):
         """Get starting spells with full info for the hero builder spellbook."""
-        from core.localizations import get_spell_info, get_spell_descriptions_by_level
+        from core.localizations import get_spell_info, get_spell_descriptions_by_level, get_localizations
         spells = []
+
+        # Build school name lookup for localized display names
+        localizations = get_localizations()
+        def get_school_display(school_id):
+            if school_id == 'neutral':
+                key = 'world_cheat_dropdown_neutral'
+            else:
+                key = f'skill_magic_{school_id}_name'
+            return localizations.get(key, school_id.title() + ' Magic')
 
         # Build spell replacement mapping from specialization bonuses
         # heroMagicReplace bonuses have parameters: [base_spell_id, special_spell_id]
@@ -398,7 +407,7 @@ class Hero(models.Model):
                 'name': spell_name,
                 'icon': raw.get('icon', actual_spell_id.replace('_special', '')),  # Use base icon
                 'school': school,
-                'school_display': school.title() + ' Magic',
+                'school_display': get_school_display(school),
                 'level': rank,  # tier
                 'upgrade_level': level,  # starting upgrade level
                 'spell_type': spell_type,

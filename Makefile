@@ -8,7 +8,8 @@
 #   make clean       - Clean generated files
 
 # Paths
-CORE_ZIP := /Volumes/BOOTCAMP/Program Files (x86)/Steam/steamapps/common/Heroes of Might & Magic Olden Era Demo/HeroesOE_Data/StreamingAssets/Core.zip
+# CORE_ZIP := /Volumes/BOOTCAMP/Program Files (x86)/Steam/steamapps/common/Heroes of Might & Magic Olden Era Demo/HeroesOE_Data/StreamingAssets/Core.zip
+CORE_ZIP := /Users/eb/Downloads/gamedata/steamapps/common/Heroes of Might & Magic Olden Era Demo/HeroesOE_Data/StreamingAssets/Core.zip
 OUTPUT_DIR := static/js/generated
 TRANSPILER_DIR := transpiler
 
@@ -38,6 +39,7 @@ import-db:
 	@echo "=========================================="
 	@echo "Importing game data to database..."
 	@echo "=========================================="
+	$(MANAGE) migrate --database=gamedata
 	$(MANAGE) import_gamedata --force
 
 # Run script transpiler

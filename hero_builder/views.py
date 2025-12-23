@@ -661,15 +661,17 @@ def builder(request, hero_slug):
         'morale': localizations.get('unitStat_moral', 'Morale'),  # Note: game uses "moral" not "morale"
         'speed': localizations.get('unitStat_speed', 'Speed'),
         'initiative': localizations.get('unitStat_initiative', 'Initiative'),
-        # Descriptions
-        'hp_desc': ui_strings.get('unit_hp_desc', 'Hit points per creature'),
-        'damage_desc': localizations.get('unitStat_damage_description', 'Base damage dealt per attack'),
-        'offence_desc': localizations.get('unitStat_offence_description', 'Increases damage dealt'),
-        'defence_desc': localizations.get('unitStat_defence_description', 'Reduces damage taken'),
-        'luck_desc': localizations.get('unitStat_luck_description', 'Chance for critical hits'),
-        'morale_desc': localizations.get('unitStat_moral_description', 'Chance for extra actions'),
-        'speed_desc': ui_strings.get('unit_speed_desc', 'Movement range in combat'),
-        'initiative_desc': ui_strings.get('unit_initiative_desc', 'Determines turn order'),
+        # Descriptions - use _description_detailed keys where available (game convention)
+        # HP: try unitStat_health_description_detailed first, then unitStat_health_description
+        # (no fallback - will be empty until game adds the localization)
+        'hp_desc': localizations.get('unitStat_health_description_detailed') or localizations.get('unitStat_health_description', ''),
+        'damage_desc': localizations.get('unitStat_damage_description_detailed', ''),
+        'offence_desc': localizations.get('unitStat_offence_description', ''),
+        'defence_desc': localizations.get('unitStat_defence_description', ''),
+        'luck_desc': localizations.get('unitStat_luck_description', ''),
+        'morale_desc': localizations.get('unitStat_moral_description', ''),
+        'speed_desc': localizations.get('unitStat_speed_description_detailed', ''),
+        'initiative_desc': localizations.get('unitStat_initiative_description_detailed', ''),
     }
 
     context = {

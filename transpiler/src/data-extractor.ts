@@ -13,6 +13,7 @@ export interface GameDataLookups {
   obstacles: Record<string, any>;
   traps: Record<string, any>;
   skills: Record<string, any>;
+  subskillConfigs: Record<string, any>;  // Subskill configs from sub_skills.json
   buffAliases: Record<string, string>;  // Maps referenced ID -> actual buff ID
   passiveBuffLinks: Record<string, any>;  // Maps passive/ability name keys to their linked buff data
   unitAbilityData: Record<string, any>;  // Maps buff.sid -> ability data (duration, etc.) from unit files
@@ -32,6 +33,7 @@ export class DataExtractor {
       obstacles: {},
       traps: {},
       skills: {},
+      subskillConfigs: {},
       buffAliases: {},
       passiveBuffLinks: {},
       unitAbilityData: {},
@@ -52,7 +54,10 @@ export class DataExtractor {
     // Extract skills from DB/heroes_skills/skills/
     this.extractSkills(data);
 
-    // Build buff aliases by comparing skill references to actual buffs
+    // Extract subskill configs from DB/heroes_skills/sub_skills/
+    this.extractSubskillConfigs(data);
+
+    // Build buff aliases by comparing skill/subskill references to actual buffs
     this.buildBuffAliases(data);
 
     // Extract unit ability data (duration, etc.) from unit logic files
@@ -253,6 +258,28 @@ export class DataExtractor {
     console.log(`[DataExtractor] Extracted ${Object.keys(data.skills).length} skills`);
   }
 
+  private extractSubskillConfigs(data: GameDataLookups): void {
+    const subskillsPath = 'DB/heroes_skills/sub_skills/sub_skills.json';
+
+    try {
+      const entry = this.zip.getEntry(subskillsPath);
+      if (entry) {
+        const content = entry.getData().toString('utf-8');
+        const items = this.extractArrayItems(content);
+
+        for (const item of items) {
+          if (item.id) {
+            data.subskillConfigs[item.id] = item;
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Error extracting subskill configs:', e);
+    }
+
+    console.log(`[DataExtractor] Extracted ${Object.keys(data.subskillConfigs).length} subskill configs`);
+  }
+
   /**
    * Extract unit ability data from unit logic files.
    * This captures ability-specific data (like duration) that's not in the buff definitions.
@@ -352,13 +379,30 @@ export class DataExtractor {
           if (bonus.type === 'battleSubskillBonus') {
             const params = bonus.parameters || [];
             if (params.length >= 2) {
-              const buffType = params[0];  // e.g., "unit_buff", "hero_ability"
               const buffRef = params[1];   // e.g., "skill_formation_1_bonus"
 
               // If the reference doesn't exist directly, we need to find it
               if (!existingBuffIds.has(buffRef)) {
                 buffRefs.add(buffRef);
               }
+            }
+          }
+        }
+      }
+    }
+
+    // Collect buff references from subskill configs
+    // Subskills have bonuses directly at top level, not inside parametersPerLevel
+    for (const subskill of Object.values(data.subskillConfigs)) {
+      for (const bonus of (subskill as any).bonuses || []) {
+        if (bonus.type === 'battleSubskillBonus') {
+          const params = bonus.parameters || [];
+          if (params.length >= 2) {
+            const buffRef = params[1];   // e.g., "sub_skill_faction_humans_2_bonus"
+
+            // If the reference doesn't exist directly, we need to find it
+            if (!existingBuffIds.has(buffRef)) {
+              buffRefs.add(buffRef);
             }
           }
         }

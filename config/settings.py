@@ -181,7 +181,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Runtime reads from database. Set to non-existent path for production.
 GAME_DATA_PATH = Path(os.environ.get(
     "GAME_DATA_PATH",
-    "/Volumes/BOOTCAMP/Program Files (x86)/Steam/steamapps/common/Heroes of Might & Magic Olden Era Demo/HeroesOE_Data"
-    # "/Users/eb/Downloads/gamedata/steamapps/common/Heroes of Might & Magic Olden Era Demo/HeroesOE_Data"
+    # "/Volumes/BOOTCAMP/Program Files (x86)/Steam/steamapps/common/Heroes of Might & Magic Olden Era Demo/HeroesOE_Data"
+    "/Users/eb/Downloads/gamedata/steamapps/common/Heroes of Might & Magic Olden Era Demo/HeroesOE_Data"
 ))
 GAME_DATA_CORE_ZIP = GAME_DATA_PATH / "StreamingAssets" / "Core.zip"
