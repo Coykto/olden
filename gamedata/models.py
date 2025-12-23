@@ -459,6 +459,80 @@ class Hero(models.Model):
         return army_info
 
     @property
+    def starting_spells_display(self):
+        """Get starting spells info for hero picker display.
+
+        Returns a list of dicts with spell info, including:
+        - Spells from startMagics
+        - Spells granted by starting skills (heroMagicAddition bonus type)
+
+        Each dict contains: id, name, icon_url, school
+        """
+        from core.localizations import get_localizations
+        localizations = get_localizations()
+        spells_display = []
+        seen_spell_ids = set()
+
+        def get_spell_display(spell_id):
+            """Helper to get spell display info."""
+            if spell_id in seen_spell_ids:
+                return None
+            seen_spell_ids.add(spell_id)
+
+            spell = Spell.objects.filter(id_key=spell_id).first()
+            if not spell:
+                return None
+
+            # Get localized spell name - use the 'name' field from raw_data as the localization key
+            raw = spell.raw_data or {}
+            spell_name_key = raw.get('name', f"{spell_id}_name")
+            spell_name = localizations.get(spell_name_key, spell.id_key)
+
+            # Get icon URL
+            icon_name = raw.get('icon', spell_id)
+
+            return {
+                'id': spell_id,
+                'name': spell_name,
+                'icon_url': f"/media/gamedata/spells/{icon_name}.png",
+                'school': spell.school,
+            }
+
+        # 1. Get spells from startMagics
+        start_magics = self.raw_data.get('startMagics', []) if self.raw_data else []
+        for spell_data in start_magics:
+            spell_id = spell_data.get('sidConfig', '') if isinstance(spell_data, dict) else spell_data
+            if spell_id:
+                spell_info = get_spell_display(spell_id)
+                if spell_info:
+                    spells_display.append(spell_info)
+
+        # 2. Get spells from starting skills (heroMagicAddition bonus type)
+        for skill_entry in self.starting_skills_with_levels:
+            skill_id = skill_entry['id']
+            skill_level = skill_entry['level']
+
+            skill = Skill.objects.filter(id_key=skill_id).first()
+            if not skill or not skill.raw_data:
+                continue
+
+            params_per_level = skill.raw_data.get('parametersPerLevel', [])
+            if skill_level <= 0 or skill_level > len(params_per_level):
+                continue
+
+            level_params = params_per_level[skill_level - 1]
+            for bonus in level_params.get('bonuses', []):
+                if bonus.get('type') == 'heroMagicAddition':
+                    params = bonus.get('parameters', [])
+                    if params:
+                        spell_id = params[0]
+                        spell_info = get_spell_display(spell_id)
+                        if spell_info:
+                            spells_display.append(spell_info)
+
+        return spells_display
+
+    @property
     def hero_card_skill(self):
         """Get the skill to display on hero card - specialty faction skill OR first non-faction skill."""
         from core.localizations import get_skill_info, get_localizations, get_skill_args

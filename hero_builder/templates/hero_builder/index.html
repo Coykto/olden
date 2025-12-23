@@ -208,7 +208,7 @@
         --arc-radius: 72px;  /* Distance from center - sits on border */
         --icon-size: 36px;
         --center: 225;       /* Center angle in degrees (bottom-left = 225) */
-        --spread: 35;        /* Degrees between each unit */
+        --spread: 35;        /* Degrees between each unit (army) */
         position: absolute;
         top: 50%;
         left: 50%;
@@ -310,6 +310,107 @@
         font-size: 0.8rem;
     }
 
+    /* Starting Spells Display - Circular Arc Positioning (mirrors army on opposite corner) */
+    .starting-spells {
+        --arc-radius: 72px;  /* Distance from center - sits on border */
+        --icon-size: 32px;
+        --center: 45;        /* Center angle in degrees (top-right = 45) */
+        --spread: 35;        /* Degrees between each spell */
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        pointer-events: none;
+    }
+
+    .starting-spell-unit {
+        position: absolute;
+        width: var(--icon-size);
+        height: var(--icon-size);
+        margin-left: calc(var(--icon-size) / -2);
+        margin-top: calc(var(--icon-size) / -2);
+        pointer-events: auto;
+    }
+
+    .starting-spell-icon {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 2px solid #444;
+        background: #222;
+        transition: all 0.2s ease;
+        object-fit: cover;
+    }
+
+    .hero-card:hover .starting-spell-icon {
+        border-color: #666;
+    }
+
+    .starting-spell-unit:hover .starting-spell-icon {
+        border-color: #d4af37;
+        transform: scale(1.15);
+    }
+
+    /* Arc positioning for spells (same pattern as army, reversed direction) */
+    /* 1 spell: at center */
+    .starting-spells[data-count="1"] .starting-spell-unit:nth-child(1) {
+        --angle: var(--center);
+        transform: rotate(calc(var(--angle) * 1deg)) translateY(calc(var(--arc-radius) * -1)) rotate(calc(var(--angle) * -1deg));
+    }
+
+    /* 2 spells: center ± spread/2 (reversed: 1st at top, 2nd at right) */
+    .starting-spells[data-count="2"] .starting-spell-unit:nth-child(1) {
+        --angle: calc(var(--center) - var(--spread) / 2);
+        transform: rotate(calc(var(--angle) * 1deg)) translateY(calc(var(--arc-radius) * -1)) rotate(calc(var(--angle) * -1deg));
+    }
+    .starting-spells[data-count="2"] .starting-spell-unit:nth-child(2) {
+        --angle: calc(var(--center) + var(--spread) / 2);
+        transform: rotate(calc(var(--angle) * 1deg)) translateY(calc(var(--arc-radius) * -1)) rotate(calc(var(--angle) * -1deg));
+    }
+
+    /* 3 spells: spread around center */
+    .starting-spells[data-count="3"] .starting-spell-unit:nth-child(1) {
+        --angle: calc(var(--center) - var(--spread));
+        transform: rotate(calc(var(--angle) * 1deg)) translateY(calc(var(--arc-radius) * -1)) rotate(calc(var(--angle) * -1deg));
+    }
+    .starting-spells[data-count="3"] .starting-spell-unit:nth-child(2) {
+        --angle: var(--center);
+        transform: rotate(calc(var(--angle) * 1deg)) translateY(calc(var(--arc-radius) * -1)) rotate(calc(var(--angle) * -1deg));
+    }
+    .starting-spells[data-count="3"] .starting-spell-unit:nth-child(3) {
+        --angle: calc(var(--center) + var(--spread));
+        transform: rotate(calc(var(--angle) * 1deg)) translateY(calc(var(--arc-radius) * -1)) rotate(calc(var(--angle) * -1deg));
+    }
+
+    /* 4 spells: spread around center */
+    .starting-spells[data-count="4"] .starting-spell-unit:nth-child(1) {
+        --angle: calc(var(--center) - var(--spread) * 1.5);
+        transform: rotate(calc(var(--angle) * 1deg)) translateY(calc(var(--arc-radius) * -1)) rotate(calc(var(--angle) * -1deg));
+    }
+    .starting-spells[data-count="4"] .starting-spell-unit:nth-child(2) {
+        --angle: calc(var(--center) - var(--spread) * 0.5);
+        transform: rotate(calc(var(--angle) * 1deg)) translateY(calc(var(--arc-radius) * -1)) rotate(calc(var(--angle) * -1deg));
+    }
+    .starting-spells[data-count="4"] .starting-spell-unit:nth-child(3) {
+        --angle: calc(var(--center) + var(--spread) * 0.5);
+        transform: rotate(calc(var(--angle) * 1deg)) translateY(calc(var(--arc-radius) * -1)) rotate(calc(var(--angle) * -1deg));
+    }
+    .starting-spells[data-count="4"] .starting-spell-unit:nth-child(4) {
+        --angle: calc(var(--center) + var(--spread) * 1.5);
+        transform: rotate(calc(var(--angle) * 1deg)) translateY(calc(var(--arc-radius) * -1)) rotate(calc(var(--angle) * -1deg));
+    }
+
+    /* Tooltip styling for starting spells */
+    .tooltip-starting-spell {
+        min-width: 80px;
+        text-align: center;
+    }
+
+    .tooltip-starting-spell .tooltip-title {
+        font-size: 0.85rem;
+    }
+
     .click-hint {
         text-align: center;
         color: #666;
@@ -360,6 +461,7 @@
 <div class="faction-row">
     {% for faction in factions %}
     <div class="faction-card{% if faction.id == selected_faction.id %} selected{% endif %}"
+         data-faction-slug="{{ faction.slug }}"
          hx-get="{% url 'hero_builder:faction_heroes' faction.slug %}"
          hx-target="#heroes-grid"
          hx-swap="innerHTML"
@@ -411,12 +513,36 @@
 <script src="{% static 'js/generated/game_data.js' %}?v=7"></script>
 <script src="{% static 'js/generated/description_functions.js' %}?v=7"></script>
 <script>
-function selectFaction(card) {
+function selectFaction(card, updateUrl = true) {
     // Remove selected class from all faction cards
     document.querySelectorAll('.faction-card').forEach(c => c.classList.remove('selected'));
     // Add selected class to clicked card
     card.classList.add('selected');
+
+    // Update URL with faction slug
+    if (updateUrl) {
+        const slug = card.dataset.factionSlug;
+        if (slug) {
+            const url = new URL(window.location);
+            url.searchParams.set('faction', slug);
+            history.replaceState(null, '', url);
+        }
+    }
 }
+
+// On page load, check if there's a faction in the URL
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const factionSlug = urlParams.get('faction');
+
+    if (factionSlug) {
+        const factionCard = document.querySelector(`.faction-card[data-faction-slug="${factionSlug}"]`);
+        if (factionCard && !factionCard.classList.contains('selected')) {
+            // Trigger HTMX request and select the faction
+            factionCard.click();
+        }
+    }
+});
 
 function formatSkillDescriptions() {
     // Format all dynamic skill descriptions

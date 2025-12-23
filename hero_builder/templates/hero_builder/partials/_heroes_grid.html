@@ -51,6 +51,21 @@
         </div>
         {% endif %}
         {% endwith %}
+
+        {% with hero.starting_spells_display as spells %}
+        {% if spells %}
+        <div class="starting-spells" data-count="{{ spells|length }}">
+            {% for spell in spells %}
+            <div class="starting-spell-unit has-tooltip" data-tooltip-placement="top">
+                <img src="{{ spell.icon_url }}" alt="{{ spell.name }}" class="starting-spell-icon">
+                <div class="tooltip tooltip-starting-spell">
+                    <div class="tooltip-title">{{ spell.name }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
     </div>
 
     <div class="hero-name">{{ hero.localized_name|default:hero.display_name }}</div>
