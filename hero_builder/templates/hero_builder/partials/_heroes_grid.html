@@ -35,6 +35,37 @@
         </div>
         {% endif %}
         {% endwith %}
+
+        {% with hero.starting_army_info as army %}
+        {% if army %}
+        <div class="starting-army" data-count="{{ army|length }}">
+            {% for unit in army %}
+            <div class="starting-army-unit has-tooltip" data-tooltip-placement="top">
+                <img src="{{ unit.icon_url }}" alt="{{ unit.name }}" class="starting-army-icon">
+                <div class="tooltip tooltip-starting-unit">
+                    <div class="tooltip-title">{{ unit.name }}</div>
+                    <div class="tooltip-text">{{ unit.min_count }}-{{ unit.max_count }} {{ ui.units }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        {% with hero.starting_spells_display as spells %}
+        {% if spells %}
+        <div class="starting-spells" data-count="{{ spells|length }}">
+            {% for spell in spells %}
+            <div class="starting-spell-unit has-tooltip" data-tooltip-placement="top">
+                <img src="{{ spell.icon_url }}" alt="{{ spell.name }}" class="starting-spell-icon">
+                <div class="tooltip tooltip-starting-spell">
+                    <div class="tooltip-title">{{ spell.name }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
     </div>
 
     <div class="hero-name">{{ hero.localized_name|default:hero.display_name }}</div>
