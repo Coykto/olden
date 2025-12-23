@@ -169,8 +169,8 @@
         position: absolute;
         bottom: -1px;
         right: -12px;
-        width: 48px;
-        height: 48px;
+        width: 56px;
+        height: 56px;
         border-radius: 50%;
         border: 2px solid #444;
         background: #222;
@@ -203,24 +203,37 @@
         margin-bottom: 6px;
     }
 
-    /* Starting Army Display */
+    /* Starting Army Display - Circular Arc Positioning */
     .starting-army {
-        display: flex;
-        justify-content: center;
-        gap: 4px;
-        margin-top: 4px;
+        --arc-radius: 72px;  /* Distance from center - sits on border */
+        --icon-size: 36px;
+        --center: 225;       /* Center angle in degrees (bottom-left = 225) */
+        --spread: 35;        /* Degrees between each unit */
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        pointer-events: none;
     }
 
     .starting-army-unit {
-        position: relative;
+        position: absolute;
+        width: var(--icon-size);
+        height: var(--icon-size);
+        margin-left: calc(var(--icon-size) / -2);
+        margin-top: calc(var(--icon-size) / -2);
+        pointer-events: auto;
     }
 
     .starting-army-icon {
-        width: 28px;
-        height: 28px;
-        border-radius: 4px;
-        border: 1px solid #444;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 2px solid #444;
+        background: #222;
         transition: all 0.2s ease;
+        object-fit: cover;
     }
 
     .hero-card:hover .starting-army-icon {
@@ -229,7 +242,56 @@
 
     .starting-army-unit:hover .starting-army-icon {
         border-color: #d4af37;
-        transform: scale(1.1);
+        transform: scale(1.15);
+    }
+
+    /* Arc positioning: rotate to angle, translate out, rotate back to keep upright */
+    /* 1 unit: at center */
+    .starting-army[data-count="1"] .starting-army-unit:nth-child(1) {
+        --angle: var(--center);
+        transform: rotate(calc(var(--angle) * 1deg)) translateY(calc(var(--arc-radius) * -1)) rotate(calc(var(--angle) * -1deg));
+    }
+
+    /* 2 units: center ± spread/2 (reversed: 1st at bottom, 2nd at top) */
+    .starting-army[data-count="2"] .starting-army-unit:nth-child(1) {
+        --angle: calc(var(--center) + var(--spread) / 2);
+        transform: rotate(calc(var(--angle) * 1deg)) translateY(calc(var(--arc-radius) * -1)) rotate(calc(var(--angle) * -1deg));
+    }
+    .starting-army[data-count="2"] .starting-army-unit:nth-child(2) {
+        --angle: calc(var(--center) - var(--spread) / 2);
+        transform: rotate(calc(var(--angle) * 1deg)) translateY(calc(var(--arc-radius) * -1)) rotate(calc(var(--angle) * -1deg));
+    }
+
+    /* 3 units: reversed order (1st at bottom, 3rd at top) */
+    .starting-army[data-count="3"] .starting-army-unit:nth-child(1) {
+        --angle: calc(var(--center) + var(--spread));
+        transform: rotate(calc(var(--angle) * 1deg)) translateY(calc(var(--arc-radius) * -1)) rotate(calc(var(--angle) * -1deg));
+    }
+    .starting-army[data-count="3"] .starting-army-unit:nth-child(2) {
+        --angle: var(--center);
+        transform: rotate(calc(var(--angle) * 1deg)) translateY(calc(var(--arc-radius) * -1)) rotate(calc(var(--angle) * -1deg));
+    }
+    .starting-army[data-count="3"] .starting-army-unit:nth-child(3) {
+        --angle: calc(var(--center) - var(--spread));
+        transform: rotate(calc(var(--angle) * 1deg)) translateY(calc(var(--arc-radius) * -1)) rotate(calc(var(--angle) * -1deg));
+    }
+
+    /* 4 units: reversed order (1st at bottom, 4th at top) */
+    .starting-army[data-count="4"] .starting-army-unit:nth-child(1) {
+        --angle: calc(var(--center) + var(--spread) * 1.5);
+        transform: rotate(calc(var(--angle) * 1deg)) translateY(calc(var(--arc-radius) * -1)) rotate(calc(var(--angle) * -1deg));
+    }
+    .starting-army[data-count="4"] .starting-army-unit:nth-child(2) {
+        --angle: calc(var(--center) + var(--spread) * 0.5);
+        transform: rotate(calc(var(--angle) * 1deg)) translateY(calc(var(--arc-radius) * -1)) rotate(calc(var(--angle) * -1deg));
+    }
+    .starting-army[data-count="4"] .starting-army-unit:nth-child(3) {
+        --angle: calc(var(--center) - var(--spread) * 0.5);
+        transform: rotate(calc(var(--angle) * 1deg)) translateY(calc(var(--arc-radius) * -1)) rotate(calc(var(--angle) * -1deg));
+    }
+    .starting-army[data-count="4"] .starting-army-unit:nth-child(4) {
+        --angle: calc(var(--center) - var(--spread) * 1.5);
+        transform: rotate(calc(var(--angle) * 1deg)) translateY(calc(var(--arc-radius) * -1)) rotate(calc(var(--angle) * -1deg));
     }
 
     /* Tooltip styling for starting units */
