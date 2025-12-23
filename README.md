@@ -41,3 +41,10 @@ uv run python manage.py runserver
 
 Visit http://127.0.0.1:8000/ for the hero builder.
 
+
+## Deploy
+```bash
+git pull
+
+python manage.py collectstatic
+```

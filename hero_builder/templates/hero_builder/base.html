@@ -96,10 +96,6 @@
             border-color: #d4af37;
         }
 
-        .language-switcher-button .globe-icon {
-            font-size: 1.1rem;
-        }
-
         .language-switcher-button .arrow {
             font-size: 0.7rem;
             transition: transform 0.2s;
@@ -150,14 +146,6 @@
             background: #333;
             color: #d4af37;
             font-weight: bold;
-        }
-
-        .language-option-code {
-            color: #888;
-            font-size: 0.85rem;
-            margin-right: 8px;
-            display: inline-block;
-            min-width: 60px;
         }
 
         @media (max-width: 768px) {
@@ -379,20 +367,15 @@
                 </nav>
                 <div class="language-switcher" id="languageSwitcher">
                     <button class="language-switcher-button" onclick="toggleLanguageSwitcher()" type="button">
-                        <span class="globe-icon">🌐</span>
-                        <span class="current-lang">{{ LANGUAGE_CODE|upper }}</span>
+                        <span class="current-lang">{{ current_language_name }}</span>
                         <span class="arrow">▼</span>
                     </button>
                     <div class="language-dropdown">
-                        {% load static %}
                         {% for lang_code, lang_name in available_languages %}
                         <a href="#"
                            class="language-option {% if lang_code == LANGUAGE_CODE %}active{% endif %}"
                            data-lang-code="{{ lang_code }}"
-                           onclick="switchLanguage('{{ lang_code }}'); return false;">
-                            <span class="language-option-code">{{ lang_code|upper }}</span>
-                            <span class="language-option-name">{{ lang_name }}</span>
-                        </a>
+                           onclick="switchLanguage('{{ lang_code }}'); return false;">{{ lang_name }}</a>
                         {% endfor %}
                     </div>
                 </div>
