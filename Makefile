@@ -4,14 +4,19 @@
 #   make import      - Full import: database + transpiler
 #   make import-db   - Import game data to database only
 #   make transpile   - Run script transpiler only
+#   make decompile   - Decompile game C# assemblies
 #   make dev         - Start development server
 #   make clean       - Clean generated files
 
 # Paths
-# CORE_ZIP := /Volumes/BOOTCAMP/Program Files (x86)/Steam/steamapps/common/Heroes of Might & Magic Olden Era Demo/HeroesOE_Data/StreamingAssets/Core.zip
-CORE_ZIP := /Users/eb/Downloads/gamedata/steamapps/common/Heroes of Might & Magic Olden Era Demo/HeroesOE_Data/StreamingAssets/Core.zip
+# GAME_DIR := /Volumes/BOOTCAMP/Program Files (x86)/Steam/steamapps/common/Heroes of Might & Magic Olden Era Demo
+GAME_DIR := /Users/eb/Downloads/gamedata/steamapps/common/Heroes of Might & Magic Olden Era Demo
+CORE_ZIP := $(GAME_DIR)/HeroesOE_Data/StreamingAssets/Core.zip
+MANAGED_DIR := $(GAME_DIR)/HeroesOE_Data/Managed
 OUTPUT_DIR := static/js/generated
 TRANSPILER_DIR := transpiler
+DECOMPILED_DIR := decompiled
+GAME_DLL := Hex.dll
 
 # Python
 PYTHON := python
@@ -21,7 +26,7 @@ MANAGE := $(PYTHON) manage.py
 NPX := npx
 TS_NODE := $(NPX) ts-node
 
-.PHONY: all import import-db transpile dev test clean help
+.PHONY: all import import-db transpile dev test clean decompile help
 
 # Default target
 all: help
@@ -89,6 +94,29 @@ install:
 optimize-images:
 	$(MANAGE) optimize_images --format webp --force
 
+# Decompile game DLLs
+decompile:
+	@# On macOS, ensure .NET 8 from Homebrew is available (ilspycmd requires .NET 8)
+	@if [ "$$(uname)" = "Darwin" ] && [ ! -d "/opt/homebrew/opt/dotnet@8" ]; then \
+		echo "Installing .NET 8 runtime (required by ilspycmd)..."; \
+		brew install dotnet@8; \
+	fi
+	@if ! command -v ilspycmd &> /dev/null; then \
+		echo "Error: ilspycmd not found. Install with: dotnet tool install -g ilspycmd"; \
+		exit 1; \
+	fi
+	@echo ""
+	@echo "=========================================="
+	@echo "Decompiling game assemblies..."
+	@echo "=========================================="
+	@mkdir -p $(DECOMPILED_DIR)
+	@echo "Decompiling $(GAME_DLL)..."
+	DOTNET_ROOT=/opt/homebrew/opt/dotnet@8/libexec ilspycmd -p "$(MANAGED_DIR)/$(GAME_DLL)" -o "$(DECOMPILED_DIR)/$(basename $(GAME_DLL))"
+	@echo ""
+	@echo "=========================================="
+	@echo "Decompilation complete! Output: $(DECOMPILED_DIR)/"
+	@echo "=========================================="
+
 # Help
 help:
 	@echo "Olden Forge - Build Commands"
@@ -96,12 +124,14 @@ help:
 	@echo "Usage: make <target>"
 	@echo ""
 	@echo "Targets:"
-	@echo "  import      Full import: database + transpiler + images "
-	@echo "  import-db   Import game data to database only"
-	@echo "  transpile   Run script transpiler only"
-	@echo "  dev         Start development server"
-	@echo "  clean       Clean generated files"
-	@echo "  backup      Backup generated JS files"
-	@echo "  restore     Restore from backup"
-	@echo "  install     Install all dependencies"
-	@echo "  help        Show this help"
+	@echo "  import          Full import: database + transpiler + images"
+	@echo "  import-db       Import game data to database only"
+	@echo "  transpile       Run script transpiler only"
+	@echo "  optimize-images Convert images to WebP format"
+	@echo "  decompile       Decompile game C# assemblies (requires ilspycmd)"
+	@echo "  dev             Start development server"
+	@echo "  clean           Clean generated files"
+	@echo "  backup          Backup generated JS files"
+	@echo "  restore         Restore from backup"
+	@echo "  install         Install all dependencies"
+	@echo "  help            Show this help"
