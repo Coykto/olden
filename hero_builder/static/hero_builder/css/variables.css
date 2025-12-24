@@ -1,0 +1,90 @@
+/**
+ * CSS Variables
+ * Shared design tokens for the Hero Builder application
+ */
+
+:root {
+    /* Colors - Background */
+    --bg-primary: #1a1f28;
+    --bg-secondary: #252d38;
+    --bg-tertiary: #1e2530;
+    --bg-dark: #141820;
+    --bg-darker: #0d1520;
+
+    /* Colors - Borders */
+    --border-primary: #2a3545;
+    --border-secondary: #3a4555;
+    --border-hover: #5a7090;
+    --border-accent: #5a6575;
+
+    /* Colors - Text */
+    --text-white: #fff;
+    --text-light: #aabbcc;
+    --text-muted: #8899aa;
+    --text-dim: #5a6575;
+
+    /* Colors - Accent */
+    --accent-gold: #c9a227;
+    --accent-gold-bright: #e0b830;
+    --accent-gold-dim: #d4af37;
+    --accent-blue: #7ec8e3;
+    --accent-cyan: #4fc3f7;
+    --accent-green: #50c878;
+    --accent-green-light: #7ac9a5;
+    --accent-red: #e74c3c;
+    --accent-red-dark: #a05050;
+
+    /* Spacing */
+    --spacing-xs: 4px;
+    --spacing-sm: 6px;
+    --spacing-md: 8px;
+    --spacing-lg: 10px;
+    --spacing-xl: 12px;
+    --spacing-2xl: 15px;
+    --spacing-3xl: 20px;
+
+    /* Border Radius */
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
+    --radius-xl: 10px;
+    --radius-2xl: 12px;
+    --radius-round: 50%;
+
+    /* Shadows */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 6px 20px rgba(0, 0, 0, 0.4);
+    --shadow-xl: 0 8px 24px rgba(0, 0, 0, 0.5);
+
+    /* Transitions */
+    --transition-fast: 0.15s;
+    --transition-normal: 0.2s;
+    --transition-slow: 0.3s;
+
+    /* Z-Index Layers */
+    --z-base: 1;
+    --z-dropdown: 100;
+    --z-modal: 1000;
+    --z-tooltip: 9999;
+
+    /* Component Specific - Equipment */
+    --equip-slot-size: 4.5rem;
+    --equip-slot-icon-opacity: 0.35;
+    --equip-slot-icon-opacity-hover: 0.5;
+
+    /* Component Specific - Unit */
+    --unit-slot-size: 4.3rem;
+
+    /* Component Specific - Spell */
+    --spell-slot-size: 80px;
+
+    /* Component Specific - Skill */
+    --skill-main-size: 64px;
+    --skill-sub-size: 28px;
+
+    /* Gradients */
+    --gradient-bg-dark: linear-gradient(180deg, #1a2030 0%, #141820 100%);
+    --gradient-gold: linear-gradient(90deg, #c9a227 0%, #e0b830 100%);
+    --gradient-upgrade-glow: linear-gradient(135deg, rgba(80, 200, 120, 0.15), transparent 60%);
+}

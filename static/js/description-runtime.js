@@ -217,3 +217,8 @@ const DescriptionRuntime = {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { DescriptionRuntime };
 }
+
+// Expose to window for ES6 modules
+if (typeof window !== 'undefined') {
+  window.DescriptionRuntime = DescriptionRuntime;
+}

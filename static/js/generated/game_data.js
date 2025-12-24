@@ -11843,3 +11843,7 @@ GameData.sidebuffs = GameData.buffs;
 if (typeof module !== "undefined" && module.exports) {
   module.exports = { GameData };
 }
+// Expose to window for ES6 modules
+if (typeof window !== "undefined") {
+  window.GameData = GameData;
+}

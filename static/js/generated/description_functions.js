@@ -7530,3 +7530,7 @@ DescriptionFunctions["unit_a1_text"] = DescriptionRuntime.memoize(function(ctx) 
 if (typeof module !== "undefined" && module.exports) {
   module.exports = { DescriptionFunctions };
 }
+// Expose to window for ES6 modules
+if (typeof window !== "undefined") {
+  window.DescriptionFunctions = DescriptionFunctions;
+}

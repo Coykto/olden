@@ -1,0 +1,248 @@
+/**
+ * Item Set Styles
+ * Item set badges and bonus displays
+ * NOTE: This is duplicated with tooltip.css - see documentation for future cleanup
+ */
+
+/* Item Set Badge in Modal */
+.item-set-badge {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    background: rgba(79, 195, 247, 0.15);
+    border: 1px solid rgba(79, 195, 247, 0.3);
+    border-radius: var(--radius-sm);
+    padding: 2px var(--spacing-sm);
+    flex-shrink: 0;
+}
+
+.item-set-badge .set-name {
+    color: var(--accent-cyan);
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-transform: none;
+}
+
+.item-set-badge .set-count {
+    color: var(--text-muted);
+    font-size: 0.7rem;
+}
+
+/* Item tooltip content (bonuses, descriptions, etc.) */
+.item-name {
+    font-size: 1.1rem;
+    font-weight: bold;
+    display: block;
+    margin-bottom: var(--spacing-xs);
+}
+
+.item-rarity {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    text-transform: capitalize;
+}
+
+.tooltip-bonuses {
+    margin-top: var(--spacing-lg);
+}
+
+.bonus-line {
+    color: var(--accent-blue);
+    font-size: 0.9rem;
+    line-height: 1.4;
+    margin: var(--spacing-xs) 0;
+}
+
+.item-description {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    line-height: 1.4;
+    margin-top: var(--spacing-lg);
+    font-style: italic;
+}
+
+.tooltip-narrative {
+    color: #9aa5b0;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--border-primary);
+    font-style: italic;
+}
+
+.tooltip-description {
+    color: #9aa5b0;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--border-primary);
+    font-style: italic;
+}
+
+/* Upgrade controls in tooltip */
+.tooltip-level {
+    color: var(--text-white);
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: center;
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--border-secondary);
+}
+
+.tooltip-upgrade-row {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: center;
+    margin-top: var(--spacing-md);
+}
+
+.tooltip-upgrade-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xs) var(--spacing-lg);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--radius-sm);
+    color: var(--accent-gold);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    width: 100%;
+}
+
+.tooltip-upgrade-btn:hover {
+    background: var(--bg-primary);
+    border-color: var(--accent-gold);
+}
+
+.tooltip-upgrade-btn.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.tooltip-upgrade-btn.disabled:hover {
+    background: var(--bg-secondary);
+    border-color: var(--border-secondary);
+}
+
+.tooltip-remove-btn {
+    display: block;
+    width: 100%;
+    margin-top: var(--spacing-md);
+    padding: var(--spacing-sm);
+    background: #3a2525;
+    border: 1px solid #5a3535;
+    border-radius: var(--radius-sm);
+    color: #e57373;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+}
+
+.tooltip-remove-btn:hover {
+    background: #4a3535;
+    border-color: #e57373;
+}
+
+/* Remove button in spell tooltip */
+.spell-remove-btn {
+    background: #3a2525 !important;
+    border-color: #5a3535 !important;
+}
+
+.spell-remove-btn:hover:not(:disabled) {
+    background: var(--accent-red) !important;
+    border-color: var(--accent-red) !important;
+    color: white !important;
+}
+
+.spell-remove-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Unit tooltip stat bar - more compact version */
+.tooltip-stat-bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--spacing-xs) var(--spacing-md);
+    margin: var(--spacing-md) 0;
+}
+
+.tooltip-stat-bar .unit-stat {
+    padding: 2px var(--spacing-xs);
+}
+
+.tooltip-stat-bar .unit-stat-icon img {
+    width: 14px;
+    height: 14px;
+}
+
+.tooltip-stat-bar .unit-stat-value {
+    font-size: 0.8rem;
+}
+
+.tooltip-value {
+    color: var(--accent-gold-dim);
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+/* Tooltip abilities row */
+.tooltip-abilities-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    margin: var(--spacing-md) 0;
+    padding: var(--spacing-md) 0;
+    border-top: 1px solid var(--border-primary);
+    border-bottom: 1px solid var(--border-primary);
+}
+
+.tooltip-ability-item {
+    position: relative;
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-sm);
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid #3a4a5a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.tooltip-ability-item.passive {
+    border-color: #4a6a5a;
+}
+
+.tooltip-ability-item.active {
+    border-color: #6a5a4a;
+}
+
+.tooltip-ability-item.base-passive {
+    border-color: #5a5a6a;
+}
+
+.tooltip-ability-item:hover {
+    border-color: #7a8a9a;
+    background: rgba(50, 60, 70, 0.5);
+}
+
+.tooltip-ability-icon {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+}
+
+.tooltip-ability-placeholder {
+    font-size: 12px;
+    color: #8a9aaa;
+    font-weight: bold;
+}

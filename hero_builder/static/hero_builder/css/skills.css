@@ -1,0 +1,119 @@
+/**
+ * Skills Styles
+ * Skills grid and subskills
+ */
+
+/* Skills Grid - 4 columns, 2 rows */
+.skills-grid {
+    display: grid;
+    grid-template-columns: repeat(4, auto);
+    gap: var(--spacing-sm);
+    flex: 1;
+}
+
+/* Skill Slot with 2 Subskill buttons stacked */
+.skill-with-subs {
+    display: flex;
+    gap: var(--spacing-xs);
+}
+
+.skill-main {
+    position: relative;
+    width: var(--skill-main-size);
+    height: var(--skill-main-size);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.skill-main:hover {
+    border-color: var(--border-hover);
+    background: var(--bg-primary);
+}
+
+.skill-main img {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--spacing-sm);
+}
+
+.skill-add-text {
+    color: var(--text-dim);
+    font-size: 1.5rem;
+    font-weight: 300;
+}
+
+.skill-main:hover .skill-add-text {
+    color: var(--text-muted);
+}
+
+/* 2 Subskill buttons stacked vertically */
+.subskill-column {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--spacing-xs);
+}
+
+.subskill-btn {
+    width: var(--skill-sub-size);
+    height: var(--skill-sub-size);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--spacing-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.subskill-btn:hover {
+    border-color: var(--border-hover);
+    background: var(--bg-primary);
+}
+
+.subskill-btn.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.subskill-btn.filled {
+    cursor: pointer;
+}
+
+.subskill-btn .add-text {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+}
+
+.subskill-btn:hover .add-text {
+    color: var(--text-muted);
+}
+
+.subskill-btn img {
+    width: 22px;
+    height: 22px;
+    border-radius: var(--radius-sm);
+}
+
+/* Skill Indicator Icons */
+.skill-indicators {
+    position: absolute;
+    top: -18px;
+    left: 0px;
+    transform: translateX(-50%);
+    display: flex;
+}
+
+.skill-indicator-icon {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: var(--radius-round) !important;
+    background: rgb(38 45 56);
+}

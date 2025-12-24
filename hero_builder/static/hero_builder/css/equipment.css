@@ -1,0 +1,143 @@
+/**
+ * Equipment Styles
+ * Equipment silhouette and slots
+ */
+
+/* Equipment Section - flexbox rows around hero silhouette */
+.equipment-section {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-2xl);
+    padding: 0.75rem;
+}
+
+.equipment-silhouette {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+/* Each row: 3 columns with space-between */
+.equip-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+/* Left/Right columns align to edges, center is centered */
+.equip-col-left,
+.equip-col-right {
+    flex: 0 0 auto;
+}
+
+.equip-col-center {
+    flex: 0 0 auto;
+    margin: 0 1rem 0 1rem;
+}
+
+/* Center offset - pushes center item down slightly */
+.offset-down {
+    margin-top: 1rem;
+}
+
+/* Empty placeholder for rows without center item */
+.equip-col-empty {
+    visibility: hidden;
+}
+
+.equip-slot {
+    position: relative;
+    width: var(--equip-slot-size);
+    height: 4.6rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-secondary);
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    margin: 0.25rem;
+}
+
+.equip-slot:hover {
+    border-color: var(--border-hover);
+}
+
+.equip-slot img {
+    width: 70%;
+    height: 70%;
+    opacity: var(--equip-slot-icon-opacity);
+}
+
+.equip-slot:hover img {
+    opacity: var(--equip-slot-icon-opacity-hover);
+}
+
+/* Upgraded item glow effect */
+.equip-slot.item-upgraded {
+    box-shadow: 0 0 8px 2px rgba(80, 200, 120, 0.6),
+                inset 0 0 6px rgba(80, 200, 120, 0.2);
+}
+
+.equip-slot.item-upgraded::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 0.6rem;
+    background: var(--gradient-upgrade-glow);
+    pointer-events: none;
+}
+
+/* Equipment Dust Summary */
+.equipment-dust-summary {
+    margin-top: var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-xl);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--radius-lg);
+}
+
+.dust-total {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-md);
+    font-weight: 500;
+    margin-bottom: var(--spacing-sm);
+    color: var(--accent-gold);
+    font-size: 0.8rem;
+}
+
+.dust-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.dust-icon-small {
+    width: 24px !important;
+    height: 24px !important;
+    vertical-align: middle;
+}
+
+.bulk-upgrade-controls {
+    display: flex;
+    gap: var(--spacing-lg);
+    justify-content: center;
+}
+
+.bulk-upgrade-btn {
+    padding: var(--spacing-sm) var(--spacing-xl);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+}
+
+.bulk-upgrade-btn:hover {
+    background: #4a5565;
+    border-color: #c4b998;
+}

@@ -664,3 +664,8 @@ const Tooltip = (function() {
         setOnHide
     };
 })();
+
+// Expose to window for ES6 modules
+if (typeof window !== 'undefined') {
+    window.Tooltip = Tooltip;
+}

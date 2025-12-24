@@ -1,0 +1,397 @@
+/**
+ * Army/Units Styles
+ * Units section and unit slots (NEWEST version - lines 2102-2433 from builder.css)
+ */
+
+/* Units Section */
+.units-section {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-2xl);
+    padding: var(--spacing-lg);
+    margin-top: auto;  /* Push to bottom of spell-army-section */
+}
+
+/* Army section header */
+.units-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+    padding: 0 var(--spacing-xs);
+}
+
+.army-title {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.army-value,
+#army-value {
+    font-size: 0.8rem;
+    color: var(--accent-gold);
+}
+
+.units-grid {
+    display: flex;
+    gap: var(--spacing-lg);
+    justify-content: space-evenly;
+}
+
+.unit-slot {
+    width: var(--unit-slot-size);
+    height: var(--unit-slot-size);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.unit-slot:hover {
+    border-color: var(--border-hover);
+}
+
+.unit-slot .add-text {
+    color: var(--text-dim);
+    font-size: 1.3rem;
+}
+
+.unit-slot:hover .add-text {
+    color: var(--text-muted);
+}
+
+/* Filled unit slot */
+.unit-slot.filled {
+    border-color: var(--border-hover);
+    position: relative;
+}
+
+.unit-slot .unit-icon {
+    width: 90%;
+    height: 90%;
+    border-radius: var(--spacing-sm);
+    object-fit: contain;
+}
+
+.unit-slot .unit-count {
+    position: absolute;
+    bottom: 2px;
+    right: 4px;
+    background: rgba(0, 0, 0, 0.85);
+    color: var(--text-white);
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 1px 5px;
+    border-radius: 3px;
+    min-width: 16px;
+    text-align: center;
+}
+
+/* Unit slot remove button */
+.unit-remove-btn {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    border: none;
+    border-radius: var(--radius-round);
+    background: rgba(180, 60, 60, 0.9);
+    color: var(--text-white);
+    font-size: 14px;
+    line-height: 16px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+    z-index: 10;
+}
+
+.unit-slot:hover .unit-remove-btn {
+    opacity: 1;
+}
+
+.unit-remove-btn:hover {
+    background: rgba(220, 80, 80, 1);
+}
+
+/* ============================================
+   Game-like Unit Card Layout (NEWEST VERSION)
+   ============================================ */
+
+/* Unit Card - Game-style design with large portrait */
+.unit-card {
+    position: relative;
+    background: linear-gradient(180deg, #1a2233 0%, #0d1520 100%);
+    border-radius: var(--radius-xl);
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.unit-card:hover {
+    border-color: #4a6090;
+    background: linear-gradient(180deg, #1e2840 0%, #101825 100%);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Card Header - name and tier badge */
+.unit-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: var(--spacing-md) 28px 0; /* Top padding + space for tier badge */
+}
+
+.unit-card-name {
+    color: #e8dcc8;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: center;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+/* Stat Bar - icons with values */
+.unit-stat-bar {
+    display: flex;
+    gap: 0 var(--spacing-lg);
+    justify-content: center;
+    margin: 0 5px;
+}
+
+.unit-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.unit-stat-icon {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.unit-stat-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.unit-stat-value {
+    font-size: 0.65rem;
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+/* Portrait Section - main image with abilities on sides */
+.unit-card-portrait-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    position: relative;
+}
+
+.unit-card-portrait {
+    width: 120px;
+    height: 120px;
+    border-radius: var(--spacing-sm);
+    object-fit: cover;
+    border: 2px solid #3a5070;
+    background: linear-gradient(135deg, #1a2535 0%, #0d1520 100%);
+    box-shadow: var(--shadow-md);
+}
+
+/* Abilities on sides of portrait */
+.unit-abilities-side {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    min-width: 28px;
+}
+
+.unit-abilities-side.left {
+    align-items: flex-end;
+}
+
+.unit-abilities-side.right {
+    align-items: flex-start;
+}
+
+/* Larger stat bar for editor modal */
+.editor-stat-bar {
+    padding: var(--spacing-md);
+    gap: var(--spacing-xs);
+}
+
+.editor-stat-bar .unit-stat {
+    min-width: 32px;
+    padding: var(--spacing-xs) var(--spacing-sm);
+}
+
+.editor-stat-bar .unit-stat-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.editor-stat-bar .unit-stat-value {
+    font-size: 0.75rem;
+}
+
+/* Abilities Row - legacy layout (still used in editor modal) */
+.unit-abilities-row {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+    padding: var(--spacing-xs) 0;
+}
+
+.unit-abilities-column {
+    display: flex;
+    gap: var(--spacing-xs);
+    flex-wrap: wrap;
+}
+
+.unit-abilities-column.passives {
+    justify-content: flex-start;
+}
+
+.unit-abilities-column.actives {
+    justify-content: flex-end;
+}
+
+/* Ability Icons - circular for passives */
+.ability-icon {
+    width: 24px;
+    height: 24px;
+    cursor: help;
+    position: relative;
+    transition: transform var(--transition-fast);
+}
+
+.ability-icon:hover {
+    transform: scale(1.2);
+    z-index: 10;
+}
+
+.ability-icon.passive {
+    background: linear-gradient(135deg, #4a6080 0%, #2a3a50 100%);
+    border: 2px solid #6a8ab0;
+    border-radius: var(--radius-round);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Pentagon shape for actives */
+.ability-icon.active {
+    background: linear-gradient(135deg, #8a6050 0%, #5a4030 100%);
+    border: 2px solid #a08070;
+    clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Ability icon images (for base passives with actual icons) */
+.ability-icon-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--radius-round);
+}
+
+/* Base passives (creature type, attack type) - slightly different styling */
+.ability-icon.base-passive {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.ability-icon.base-passive .ability-icon-img {
+    border-radius: var(--radius-round);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Unit card footer - gold cost */
+.unit-card-footer {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--accent-gold-dim);
+    padding-top: var(--spacing-sm);
+    margin-top: var(--spacing-xs);
+    border-top: 1px solid rgba(100, 140, 180, 0.3);
+    font-weight: 500;
+}
+
+/* Legacy value display */
+.unit-card-value {
+    text-align: center;
+    font-size: 0.6rem;
+    color: var(--accent-gold-dim);
+    padding-top: 2px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Unit description in editor modal */
+.unit-description {
+    color: #a8b8c8;
+    font-size: 0.85rem;
+    font-style: italic;
+    line-height: 1.4;
+    padding: var(--spacing-lg) var(--spacing-xl);
+    background: rgba(0,0,0,0.25);
+    border-radius: var(--spacing-sm);
+    border-left: 3px solid #4a5a6a;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.unit-editor-value {
+    text-align: center;
+    color: var(--accent-gold-dim);
+    font-size: 0.85rem;
+    padding: var(--spacing-md);
+    background: rgba(0,0,0,0.2);
+    border-radius: var(--radius-sm);
+}
+
+.unit-count-control {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    background: rgba(0,0,0,0.2);
+    border-radius: var(--radius-sm);
+}
+
+.unit-count-control label {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+.unit-count-control input {
+    width: 80px;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--radius-sm);
+    color: var(--text-white);
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.unit-stack-value {
+    color: var(--accent-gold-dim);
+    font-size: 0.85rem;
+    flex: 1;
+    text-align: right;
+}
